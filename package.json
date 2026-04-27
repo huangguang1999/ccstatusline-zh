@@ -1,6 +1,6 @@
 {
   "name": "ccstatusline-zh",
-  "version": "2.2.10",
+  "version": "2.2.11",
   "description": "ccstatusline 的中文汉化版 - Claude Code CLI 可定制状态栏格式化工具",
   "module": "src/ccstatusline.ts",
   "type": "module",
