@@ -6,27 +6,16 @@ import type {
     WidgetItem
 } from '../types/Widget';
 import { loadClaudeSettingsSync } from '../utils/claude-settings';
-import { getTranscriptThinkingEffort } from '../utils/jsonl';
+import {
+    getTranscriptThinkingEffort,
+    normalizeThinkingEffort,
+    type ResolvedThinkingEffort,
+    type TranscriptThinkingEffort
+} from '../utils/jsonl';
 
-export type ThinkingEffortLevel = 'low' | 'medium' | 'high' | 'max';
+export type ThinkingEffortLevel = TranscriptThinkingEffort;
 
-/**
- * Resolve thinking effort from transcript and settings.
- */
-function normalizeThinkingEffort(value: string | undefined): ThinkingEffortLevel | undefined {
-    if (!value) {
-        return undefined;
-    }
-
-    const normalized = value.toLowerCase();
-    if (normalized === 'low' || normalized === 'medium' || normalized === 'high' || normalized === 'max') {
-        return normalized;
-    }
-
-    return undefined;
-}
-
-function resolveThinkingEffortFromSettings(): ThinkingEffortLevel | undefined {
+function resolveThinkingEffortFromSettings(): ResolvedThinkingEffort | undefined {
     try {
         const settings = loadClaudeSettingsSync({ logErrors: false });
         return normalizeThinkingEffort(settings.effortLevel);
@@ -37,15 +26,22 @@ function resolveThinkingEffortFromSettings(): ThinkingEffortLevel | undefined {
     return undefined;
 }
 
-function resolveThinkingEffort(context: RenderContext): ThinkingEffortLevel {
+function resolveThinkingEffort(context: RenderContext): ResolvedThinkingEffort | null {
     return getTranscriptThinkingEffort(context.data?.transcript_path)
         ?? resolveThinkingEffortFromSettings()
-        ?? 'medium';
+        ?? null;
+}
+
+function formatEffort(resolved: ResolvedThinkingEffort | null): string {
+    if (!resolved) {
+        return 'default';
+    }
+    return resolved.known ? resolved.value : `${resolved.value}?`;
 }
 
 export class ThinkingEffortWidget implements Widget {
     getDefaultColor(): string { return 'magenta'; }
-    getDescription(): string { return '显示当前思考力度级别（low, medium, high, max）。\n多个 Claude Code 会话同时运行时可能不准确。'; }
+    getDescription(): string { return '显示当前思考力度级别（low, medium, high, xhigh, max）。\n未知级别会以末尾 "?" 标记显示（如 "super-max?"）。\n多个 Claude Code 会话同时运行时可能不准确。'; }
     getDisplayName(): string { return '思考力度'; }
     getCategory(): string { return '核心'; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
@@ -57,7 +53,7 @@ export class ThinkingEffortWidget implements Widget {
             return item.rawValue ? 'high' : '思考: high';
         }
 
-        const effort = resolveThinkingEffort(context);
+        const effort = formatEffort(resolveThinkingEffort(context));
         return item.rawValue ? effort : `思考: ${effort}`;
     }
 
