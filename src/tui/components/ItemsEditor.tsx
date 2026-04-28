@@ -201,7 +201,8 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
             setShowClearConfirm,
             openWidgetPicker,
             getCustomKeybindsForWidget,
-            setCustomEditorWidget
+            setCustomEditorWidget,
+            getUniqueBackgroundColor
         });
     });
 
@@ -209,7 +210,7 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
         // Special handling for separators (not widgets)
         if (widget.type === 'separator') {
             const char = widget.character ?? '|';
-            const charDisplay = char === ' ' ? '(space)' : char;
+            const charDisplay = char === ' ' ? '(空格)' : char;
             return `分隔符 ${charDisplay}`;
         }
         if (widget.type === 'flex-separator') {
@@ -280,7 +281,7 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
         helpText += ', 空格编辑分隔符';
     }
     if (hasWidgets) {
-        helpText += ', Enter 移动, (a)添加, (i)插入, (d)删除, (c)清空行';
+        helpText += ', Enter 移动, (a)添加, (i)插入, (k)克隆, (d)删除, (c)清空行';
     }
     if (canToggleRaw) {
         helpText += ', (r)纯值';
@@ -288,12 +289,10 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
     if (canMerge) {
         helpText += ', (m)合并';
     }
-    // Append custom keybinds before ESC
-    const customKeybindsText = customKeybinds.map(kb => kb.label).join(', ');
-    if (customKeybindsText) {
-        helpText += `, ${customKeybindsText}`;
-    }
     helpText += ', ESC 返回';
+
+    // Build custom keybinds text
+    const customKeybindsText = customKeybinds.map(kb => kb.label).join(', ');
     const pickerActionLabel = widgetPicker?.action === 'add'
         ? '添加组件'
         : widgetPicker?.action === 'insert'
@@ -319,7 +318,8 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
                         这将移除第
                         {' '}
                         {lineNumber}
-                        .
+                        {' '}
+                        行的所有组件。
                     </Text>
                     <Text color='red'>此操作不可撤销！</Text>
                 </Box>
@@ -353,7 +353,7 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
                     {' '}
                 </Text>
                 {moveMode && <Text color='blue'>[移动模式]</Text>}
-                {widgetPicker && <Text color='cyan'>{`[${pickerActionLabel.toUpperCase()}]`}</Text>}
+                {widgetPicker && <Text color='cyan'>{`[${pickerActionLabel}]`}</Text>}
                 {(settings.powerline.enabled || Boolean(settings.defaultSeparator)) && (
                     <Box marginLeft={2}>
                         <Text color='yellow'>
@@ -404,6 +404,7 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
             ) : (
                 <Box flexDirection='column'>
                     <Text dimColor>{helpText}</Text>
+                    <Text dimColor>{customKeybindsText || ' '}</Text>
                 </Box>
             )}
             {hasFlexSeparator && !widthDetectionAvailable && (

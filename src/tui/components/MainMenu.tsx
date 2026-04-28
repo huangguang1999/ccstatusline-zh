@@ -15,6 +15,7 @@ export type MainMenuOption = 'lines'
     | 'terminalConfig'
     | 'globalOverrides'
     | 'install'
+    | 'configureStatusLine'
     | 'starGithub'
     | 'save'
     | 'exit';
@@ -75,15 +76,27 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 '设置适用于所有组件的全局内边距、分隔符和颜色覆盖'
         },
         '-' as const,
-        {
-            label: isClaudeInstalled
-                ? '🔌 从 Claude Code 卸载'
-                : '📦 安装到 Claude Code',
-            value: 'install',
-            description: isClaudeInstalled
-                ? '从 Claude Code 设置中移除 ccstatusline-zh'
-                : '将 ccstatusline-zh 添加到 Claude Code 设置以自动渲染状态栏'
-        }
+        ...(isClaudeInstalled
+            ? [
+                {
+                    label: '🔧 配置状态行',
+                    value: 'configureStatusLine' as MainMenuOption,
+                    description: '配置 Claude Code 状态行设置（如刷新间隔）'
+                },
+                {
+                    label: '🔌 从 Claude Code 卸载',
+                    value: 'install' as MainMenuOption,
+                    description: '从 Claude Code 设置中移除 ccstatusline-zh'
+                }
+            ]
+            : [
+                {
+                    label: '📦 安装到 Claude Code',
+                    value: 'install' as MainMenuOption,
+                    description: '将 ccstatusline-zh 添加到 Claude Code 设置以自动渲染状态栏'
+                }
+            ]
+        )
     ];
 
     if (hasChanges) {

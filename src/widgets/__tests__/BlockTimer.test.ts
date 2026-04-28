@@ -104,7 +104,7 @@ describe('BlockTimerWidget', () => {
         baseItem: { id: 'block', type: 'block-timer' },
         createWidget: () => new BlockTimerWidget(),
         expectedDisplayName: '时段计时器',
-        expectedModifierText: '(进度条, 反转)',
+        expectedModifierText: '(长进度条, 反转)',
         modifierItem: {
             id: 'block',
             type: 'block-timer',

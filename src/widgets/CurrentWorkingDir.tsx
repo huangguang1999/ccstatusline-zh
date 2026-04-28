@@ -289,5 +289,5 @@ const CurrentWorkingDirEditor: React.FC<WidgetEditorProps> = ({ widget, onComple
         );
     }
 
-    return <Text>未知编辑模式</Text>;
+    return <Text>未知的编辑模式</Text>;
 };

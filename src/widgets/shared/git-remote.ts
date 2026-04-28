@@ -17,13 +17,13 @@ const TOGGLE_LINK_ACTION = 'toggle-link';
 
 const HIDE_NO_REMOTE_KEYBIND: CustomKeybind = {
     key: 'h',
-    label: '(h)ide when no remote',
+    label: '(h)无远程时隐藏',
     action: TOGGLE_NO_REMOTE_ACTION
 };
 
 const LINK_TO_REPO_KEYBIND: CustomKeybind = {
     key: 'l',
-    label: '(l)ink to repo',
+    label: '(l)链接到仓库',
     action: TOGGLE_LINK_ACTION
 };
 
@@ -39,10 +39,10 @@ export function getRemoteWidgetModifierText(item: WidgetItem): string | undefine
     const modifiers: string[] = [];
 
     if (isHideNoRemoteEnabled(item)) {
-        modifiers.push('hide when empty');
+        modifiers.push('为空时隐藏');
     }
     if (isLinkToRepoEnabled(item)) {
-        modifiers.push('link');
+        modifiers.push('链接');
     }
 
     return makeModifierText(modifiers);
