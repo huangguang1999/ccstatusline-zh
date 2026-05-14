@@ -4,7 +4,7 @@
 
 _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标_
 
-> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.12 版本（含 Jujutsu VCS、CompactionCounter 等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
+> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.16 版本（含 Voice Status、版本固定全局安装、Jujutsu VCS、CompactionCounter 等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/huangguang1999/ccstatusline-zh/blob/main/LICENSE)
 [![Node.js Version](https://img.shields.io/node/v/ccstatusline.svg)](https://nodejs.org)
@@ -51,7 +51,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 | 界面语言   | 英文         | 中文                      |
 | 配置兼容性 | —            | ✅ 共用相同 settings.json |
 | 功能差异   | —            | 无，功能完全一致          |
-| 同步版本   | 最新         | v2.2.12（+ jj widgets / CompactionCounter / 中文化覆盖） |
+| 同步版本   | 最新         | v2.2.16（+ jj widgets / CompactionCounter / Voice Status / 版本固定安装 / 中文化覆盖） |
 
 ---
 
@@ -88,6 +88,8 @@ npm install -g ccstatusline-zh
 bun install -g ccstatusline-zh
 ```
 
+> 💡 提示：v2.2.14 起 ccstatusline 增加了「固定版本全局安装」选项，TUI 中选择 **固定全局安装** 即可锁定当前版本，避免 `@latest` 跟随上游。详见 TUI 安装流程。
+
 ### 配置 Claude Code
 
 在 Claude Code 设置中添加状态栏配置。编辑 `~/.claude/settings.json`：
@@ -97,7 +99,8 @@ bun install -g ccstatusline-zh
   "statusLine": {
     "type": "command",
     "command": "ccstatusline-zh",
-    "padding": 0
+    "padding": 0,
+    "refreshInterval": 10
   }
 }
 ```
@@ -113,6 +116,14 @@ bun install -g ccstatusline-zh
   }
 }
 ```
+
+> `refreshInterval` 仅在 Claude Code ≥ 2.1.97 时生效，TUI 中可设置为 `1-60` 秒，留空则不写入该字段。
+>
+> 其他支持的 `command` 取值：
+> - `bunx -y ccstatusline-zh@latest`
+> - `ccstatusline-zh`（用于自管理 / 全局安装）
+>
+> 如需固定版本，可在 TUI 安装时选择「固定全局安装」，TUI 会全局安装当前版本并将 `command` 写为 `ccstatusline-zh`。
 
 ### 启动配置界面
 

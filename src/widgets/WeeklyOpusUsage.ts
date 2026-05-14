@@ -8,7 +8,7 @@ import type {
 } from '../types/Widget';
 import {
     getUsageErrorMessage,
-    resolveWeeklyUsageWindow
+    resolveWeeklyOpusUsageWindow
 } from '../utils/usage';
 
 import { makeTimerProgressBar } from './shared/progress-bar';
@@ -28,10 +28,12 @@ import {
     toggleUsageInverted
 } from './shared/usage-display';
 
-export class WeeklyUsageWidget implements Widget {
+const LABEL = '周 Opus: ';
+
+export class WeeklyOpusUsageWidget implements Widget {
     getDefaultColor(): string { return 'brightBlue'; }
-    getDescription(): string { return '显示每周 API 用量百分比'; }
-    getDisplayName(): string { return '周用量'; }
+    getDescription(): string { return '显示每周 Opus API 用量百分比'; }
+    getDisplayName(): string { return '周 Opus 用量'; }
     getCategory(): string { return '用量'; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
@@ -63,40 +65,40 @@ export class WeeklyUsageWidget implements Widget {
         const showCursor = isUsageCursorEnabled(item);
 
         if (context.isPreview) {
-            const previewPercent = 12;
+            const previewPercent = 4;
             const renderedPercent = inverted ? 100 - previewPercent : previewPercent;
 
             if (isUsageProgressMode(displayMode)) {
                 const width = getUsageProgressBarWidth(displayMode);
                 const progressBar = makeTimerProgressBar(renderedPercent, width, showCursor ? { cursorPercent: 50 } : undefined);
                 const progressDisplay = `[${progressBar}] ${renderedPercent.toFixed(1)}%`;
-                return formatRawOrLabeledValue(item, '周用量: ', progressDisplay);
+                return formatRawOrLabeledValue(item, LABEL, progressDisplay);
             }
 
             if (isUsageSliderMode(displayMode)) {
                 const slider = makeSliderBar(renderedPercent, undefined, showCursor ? { cursorPercent: 50 } : undefined);
                 const sliderDisplay = displayMode === 'slider' ? `${slider} ${renderedPercent.toFixed(1)}%` : slider;
-                return formatRawOrLabeledValue(item, '周用量: ', sliderDisplay);
+                return formatRawOrLabeledValue(item, LABEL, sliderDisplay);
             }
 
-            return formatRawOrLabeledValue(item, '周用量: ', `${previewPercent.toFixed(1)}%`);
+            return formatRawOrLabeledValue(item, LABEL, `${previewPercent.toFixed(1)}%`);
         }
 
         const data = context.usageData ?? {};
-        if (data.weeklyUsage === undefined) {
+        if (data.weeklyOpusUsage === undefined) {
             if (data.error)
                 return getUsageErrorMessage(data.error);
             return null;
         }
 
-        const percent = Math.max(0, Math.min(100, data.weeklyUsage));
+        const percent = Math.max(0, Math.min(100, data.weeklyOpusUsage));
         const renderedPercent = inverted ? 100 - percent : percent;
         const getCursorOptions = (): { cursorPercent: number } | undefined => {
             if (!showCursor) {
                 return undefined;
             }
 
-            const window = resolveWeeklyUsageWindow(data);
+            const window = resolveWeeklyOpusUsageWindow(data);
             return window ? { cursorPercent: window.elapsedPercent } : undefined;
         };
 
@@ -105,16 +107,16 @@ export class WeeklyUsageWidget implements Widget {
 
             const progressBar = makeTimerProgressBar(renderedPercent, width, getCursorOptions());
             const progressDisplay = `[${progressBar}] ${renderedPercent.toFixed(1)}%`;
-            return formatRawOrLabeledValue(item, '周用量: ', progressDisplay);
+            return formatRawOrLabeledValue(item, LABEL, progressDisplay);
         }
 
         if (isUsageSliderMode(displayMode)) {
             const slider = makeSliderBar(renderedPercent, undefined, getCursorOptions());
             const sliderDisplay = displayMode === 'slider' ? `${slider} ${renderedPercent.toFixed(1)}%` : slider;
-            return formatRawOrLabeledValue(item, '周用量: ', sliderDisplay);
+            return formatRawOrLabeledValue(item, LABEL, sliderDisplay);
         }
 
-        return formatRawOrLabeledValue(item, '周用量: ', `${percent.toFixed(1)}%`);
+        return formatRawOrLabeledValue(item, LABEL, `${percent.toFixed(1)}%`);
     }
 
     getCustomKeybinds(item?: WidgetItem): CustomKeybind[] {
