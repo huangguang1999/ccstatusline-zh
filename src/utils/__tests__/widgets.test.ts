@@ -221,7 +221,7 @@ describe('widget catalog filtering', () => {
     });
 
     it('returns no results when query chars cannot form a subsequence in any entry', () => {
-        const results = filterWidgetCatalog(catalog, '全部', 'zzz');
+        const results = filterWidgetCatalog(catalog, '全部', 'zzzz');
         expect(results).toHaveLength(0);
     });
 
