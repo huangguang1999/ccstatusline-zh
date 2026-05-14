@@ -1,0 +1,149 @@
+name: Upstream release watch
+
+# 每日扫描上游 sirmalloc/ccstatusline 最新 release，若 tag 比 fork 的 package.json
+# version 新，则开一个 sync 提醒 issue（已存在则不重复）。
+#
+# 不会改任何代码，只是开 issue 提醒，需要手动跑 `claude` + sync 流程。
+
+on:
+  schedule:
+    # 每天 UTC 01:00 = 北京时间 09:00
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Resolve fork synced version
+        id: fork
+        run: |
+          FORK_VERSION=$(jq -r .version package.json)
+          echo "version=$FORK_VERSION" >> $GITHUB_OUTPUT
+          echo "Fork synced to: $FORK_VERSION"
+
+      - name: Fetch upstream latest release
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          UPSTREAM_TAG=$(gh api repos/sirmalloc/ccstatusline/releases/latest --jq .tag_name)
+          UPSTREAM_VERSION=${UPSTREAM_TAG#v}
+          UPSTREAM_PUBLISHED=$(gh api repos/sirmalloc/ccstatusline/releases/latest --jq .published_at)
+          UPSTREAM_NAME=$(gh api repos/sirmalloc/ccstatusline/releases/latest --jq .name)
+          echo "tag=$UPSTREAM_TAG" >> $GITHUB_OUTPUT
+          echo "version=$UPSTREAM_VERSION" >> $GITHUB_OUTPUT
+          echo "published=$UPSTREAM_PUBLISHED" >> $GITHUB_OUTPUT
+          echo "name=$UPSTREAM_NAME" >> $GITHUB_OUTPUT
+          echo "Upstream latest: $UPSTREAM_TAG (published $UPSTREAM_PUBLISHED)"
+
+      - name: Determine if new release
+        id: diff
+        run: |
+          FORK="${{ steps.fork.outputs.version }}"
+          UP="${{ steps.upstream.outputs.version }}"
+          if [ "$FORK" = "$UP" ]; then
+            echo "needs_sync=false" >> $GITHUB_OUTPUT
+            echo "✅ Fork is up to date with upstream ($FORK)"
+          else
+            echo "needs_sync=true" >> $GITHUB_OUTPUT
+            echo "⚠️  Fork at $FORK, upstream at $UP — sync needed"
+          fi
+
+      - name: Check existing open issue
+        if: steps.diff.outputs.needs_sync == 'true'
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="sync: 上游发布 ${{ steps.upstream.outputs.tag }}（当前 v${{ steps.fork.outputs.version }}）"
+          # 用精确标题搜索，避免大小写/编码问题
+          NUMBER=$(gh issue list --state open --label upstream-sync \
+            --json number,title \
+            --jq "[.[] | select(.title == \"$TITLE\")] | .[0].number // empty")
+          if [ -n "$NUMBER" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "number=$NUMBER" >> $GITHUB_OUTPUT
+            echo "Already tracked in issue #$NUMBER"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Ensure label exists
+        if: steps.diff.outputs.needs_sync == 'true' && steps.existing.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create upstream-sync \
+            --color 0E8A16 \
+            --description "Tracks upstream ccstatusline release sync work" \
+            2>/dev/null || true
+
+      - name: Open sync issue
+        if: steps.diff.outputs.needs_sync == 'true' && steps.existing.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORK_VERSION: ${{ steps.fork.outputs.version }}
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+          UPSTREAM_VERSION: ${{ steps.upstream.outputs.version }}
+          UPSTREAM_NAME: ${{ steps.upstream.outputs.name }}
+          UPSTREAM_PUBLISHED: ${{ steps.upstream.outputs.published }}
+        run: |
+          gh issue create \
+            --title "sync: 上游发布 ${UPSTREAM_TAG}（当前 v${FORK_VERSION}）" \
+            --label upstream-sync \
+            --body "$(cat <<EOF
+## 上游新 release 检测
+
+| 项 | 值 |
+| --- | --- |
+| 上游 tag | [\`${UPSTREAM_TAG}\`](https://github.com/sirmalloc/ccstatusline/releases/tag/${UPSTREAM_TAG}) |
+| Release 标题 | ${UPSTREAM_NAME} |
+| 发布时间 | ${UPSTREAM_PUBLISHED} |
+| Fork 当前 | \`v${FORK_VERSION}\` |
+| Commits diff | https://github.com/sirmalloc/ccstatusline/compare/v${FORK_VERSION}...${UPSTREAM_TAG} |
+
+## 手动同步指引（jj 工作流）
+
+\`\`\`bash
+cd ~/Documents/code/ai/ccstatusline-zh
+
+# 1. 拉上游
+jj git fetch --remote upstream
+
+# 2. 从 main 顶上开 sync 分支
+jj new main -m "sync v${UPSTREAM_VERSION}"
+jj bookmark create sync/upstream-\$(date +%Y-%m-%d) -r @
+
+# 3. rebase 到 upstream main（jj 一次完成所有 commit 的 rebase）
+jj rebase -d main@upstream
+
+# 4. 看哪些 change 有冲突
+jj log
+
+# 5. 一个个解
+jj resolve <change-id>
+
+# 6. push 并开 PR
+jj git push --bookmark sync/upstream-\$(date +%Y-%m-%d)
+gh pr create --base main --title "feat: 同步上游 ccstatusline ${UPSTREAM_TAG}"
+\`\`\`
+
+## 或者一键起 Claude
+
+\`\`\`bash
+cd ~/Documents/code/ai/ccstatusline-zh
+claude
+# 然后：同步上游 ccstatusline 到 ${UPSTREAM_TAG}
+\`\`\`
+
+---
+*本 issue 由 \`.github/workflows/upstream-watch.yml\` 自动开。Sync 完成后关闭即可。*
+EOF
+)"
