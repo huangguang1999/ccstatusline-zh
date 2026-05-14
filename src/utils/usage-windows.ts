@@ -235,7 +235,6 @@ export function formatUsageResetAt(
     return formatResetAtUtc(date, compact, hour12);
 }
 
-
 export function getUsageErrorMessage(error: UsageError): string {
     switch (error) {
         case 'no-credentials': return '[无凭证]';
