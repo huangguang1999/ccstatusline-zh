@@ -38,7 +38,7 @@ describe('ExtraUsageUtilizationWidget', () => {
             }
         };
 
-        expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, context)).toBe('Overage: 25.0%');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, context)).toBe('超额: 25.0%');
         expect(render(widget, {
             id: 'extra',
             rawValue: true,
@@ -48,12 +48,12 @@ describe('ExtraUsageUtilizationWidget', () => {
             id: 'extra',
             metadata: { display: 'progress-short' },
             type: 'extra-usage-utilization'
-        }, context)).toBe('Overage: [████░░░░░░░░░░░░] 25.0%');
+        }, context)).toBe('超额: [████░░░░░░░░░░░░] 25.0%');
         expect(render(widget, {
             id: 'extra',
             metadata: { display: 'slider-only' },
             type: 'extra-usage-utilization'
-        }, context)).toBe('Overage: ▓▓▓░░░░░░░');
+        }, context)).toBe('超额: ▓▓▓░░░░░░░');
     });
 
     it('renders available utilization before unrelated usage errors', () => {
@@ -65,7 +65,7 @@ describe('ExtraUsageUtilizationWidget', () => {
                 extraUsageEnabled: true,
                 extraUsageUtilization: 0.026
             }
-        })).toBe('Overage: 2.6%');
+        })).toBe('超额: 2.6%');
     });
 
     it('exposes and toggles hide-if-disabled configuration', () => {
@@ -73,27 +73,27 @@ describe('ExtraUsageUtilizationWidget', () => {
         const baseItem: WidgetItem = { id: 'extra', type: 'extra-usage-utilization' };
 
         expect(widget.getCustomKeybinds(baseItem)).toEqual([
-            { key: 'p', label: '(p)rogress toggle', action: 'toggle-progress' },
-            { key: 'h', label: '(h)ide if disabled', action: 'toggle-hide-disabled' }
+            { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
+            { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
         ]);
         expect(widget.getCustomKeybinds({
             ...baseItem,
             metadata: { display: 'progress' }
         })).toEqual([
-            { key: 'p', label: '(p)rogress toggle', action: 'toggle-progress' },
-            { key: 'v', label: 'in(v)ert fill', action: 'toggle-invert' },
-            { key: 't', label: '(t)ime cursor', action: 'toggle-cursor' },
-            { key: 'h', label: '(h)ide if disabled', action: 'toggle-hide-disabled' }
+            { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
+            { key: 'v', label: '(v)反转填充', action: 'toggle-invert' },
+            { key: 't', label: '(t)时间游标', action: 'toggle-cursor' },
+            { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
         ]);
         expect(widget.getEditorDisplay(baseItem).modifierText).toBeUndefined();
 
         const hidden = widget.handleEditorAction('toggle-hide-disabled', baseItem);
         expect(hidden?.metadata?.hideIfDisabled).toBe('true');
-        expect(widget.getEditorDisplay(hidden ?? baseItem).modifierText).toBe('(hide if disabled)');
+        expect(widget.getEditorDisplay(hidden ?? baseItem).modifierText).toBe('(禁用时隐藏)');
         expect(widget.getEditorDisplay({
             ...baseItem,
             metadata: { display: 'progress', hideIfDisabled: 'true' }
-        }).modifierText).toBe('(long bar, hide if disabled)');
+        }).modifierText).toBe('(长进度条, 禁用时隐藏)');
 
         const shown = widget.handleEditorAction('toggle-hide-disabled', hidden ?? baseItem);
         expect(shown?.metadata?.hideIfDisabled).toBe('false');
@@ -102,9 +102,9 @@ describe('ExtraUsageUtilizationWidget', () => {
     it('shows usage errors only when required extra usage data is missing', () => {
         const widget = new ExtraUsageUtilizationWidget();
 
-        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+        mockGetUsageErrorMessage.mockReturnValue('[超时]');
 
-        expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, { usageData: { error: 'timeout' } })).toBe('[超时]');
         expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, { usageData: { extraUsageEnabled: true } })).toBeNull();
     });
 
@@ -117,7 +117,7 @@ describe('ExtraUsageUtilizationWidget', () => {
                 extraUsageEnabled: false,
                 extraUsageUtilization: 0.25
             }
-        })).toBe('Overage: n/a');
+        })).toBe('超额: n/a');
         const rawProgressItem: WidgetItem = {
             id: 'extra',
             metadata: { display: 'progress-short' },
@@ -152,6 +152,6 @@ describe('ExtraUsageUtilizationWidget', () => {
                 extraUsageEnabled: true,
                 extraUsageUtilization: 0.25
             }
-        })).toBe('Overage: [████████████░░░░] 75.0%');
+        })).toBe('超额: [████████████░░░░] 75.0%');
     });
 });

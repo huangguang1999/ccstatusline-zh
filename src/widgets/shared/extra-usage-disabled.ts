@@ -13,7 +13,7 @@ const TOGGLE_HIDE_DISABLED_ACTION = 'toggle-hide-disabled';
 
 const HIDE_DISABLED_KEYBIND: CustomKeybind = {
     key: 'h',
-    label: '(h)ide if disabled',
+    label: '(h)禁用时隐藏',
     action: TOGGLE_HIDE_DISABLED_ACTION
 };
 
@@ -39,8 +39,8 @@ export function appendHideDisabledModifier(modifierText: string | undefined, ite
     }
 
     if (!modifierText) {
-        return '(hide if disabled)';
+        return '(禁用时隐藏)';
     }
 
-    return `${modifierText.slice(0, -1)}, hide if disabled)`;
+    return `${modifierText.slice(0, -1)}, 禁用时隐藏)`;
 }

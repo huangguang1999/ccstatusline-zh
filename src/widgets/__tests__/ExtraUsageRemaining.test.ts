@@ -39,7 +39,7 @@ describe('ExtraUsageRemainingWidget', () => {
             }
         };
 
-        expect(render(widget, { id: 'extra', type: 'extra-usage-remaining' }, context)).toBe('Overage Left: $3,894.00');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-remaining' }, context)).toBe('超额剩余: $3,894.00');
         expect(render(widget, {
             id: 'extra',
             rawValue: true,
@@ -56,7 +56,7 @@ describe('ExtraUsageRemainingWidget', () => {
                 extraUsageLimit: 1000,
                 extraUsageUsed: 15
             }
-        })).toBe('Overage Left: $0.00');
+        })).toBe('超额剩余: $0.00');
     });
 
     it('exposes and toggles hide-if-disabled configuration', () => {
@@ -64,13 +64,13 @@ describe('ExtraUsageRemainingWidget', () => {
         const baseItem: WidgetItem = { id: 'extra', type: 'extra-usage-remaining' };
 
         expect(widget.getCustomKeybinds()).toEqual([
-            { key: 'h', label: '(h)ide if disabled', action: 'toggle-hide-disabled' }
+            { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
         ]);
         expect(widget.getEditorDisplay(baseItem).modifierText).toBeUndefined();
 
         const hidden = widget.handleEditorAction('toggle-hide-disabled', baseItem);
         expect(hidden?.metadata?.hideIfDisabled).toBe('true');
-        expect(widget.getEditorDisplay(hidden ?? baseItem).modifierText).toBe('(hide if disabled)');
+        expect(widget.getEditorDisplay(hidden ?? baseItem).modifierText).toBe('(禁用时隐藏)');
 
         const shown = widget.handleEditorAction('toggle-hide-disabled', hidden ?? baseItem);
         expect(shown?.metadata?.hideIfDisabled).toBe('false');
@@ -86,15 +86,15 @@ describe('ExtraUsageRemainingWidget', () => {
                 extraUsageLimit: 400000,
                 extraUsageUsed: 106
             }
-        })).toBe('Overage Left: $3,894.00');
+        })).toBe('超额剩余: $3,894.00');
     });
 
     it('shows usage errors only when required extra usage data is missing', () => {
         const widget = new ExtraUsageRemainingWidget();
 
-        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+        mockGetUsageErrorMessage.mockReturnValue('[超时]');
 
-        expect(render(widget, { id: 'extra', type: 'extra-usage-remaining' }, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-remaining' }, { usageData: { error: 'timeout' } })).toBe('[超时]');
         expect(render(widget, { id: 'extra', type: 'extra-usage-remaining' }, {
             usageData: {
                 extraUsageEnabled: true,
@@ -113,7 +113,7 @@ describe('ExtraUsageRemainingWidget', () => {
                 extraUsageLimit: 400000,
                 extraUsageUsed: 106
             }
-        })).toBe('Overage Left: n/a');
+        })).toBe('超额剩余: n/a');
         expect(render(widget, { id: 'extra', rawValue: true, type: 'extra-usage-remaining' }, { usageData: { extraUsageEnabled: false } })).toBe('n/a');
     });
 
