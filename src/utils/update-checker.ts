@@ -301,7 +301,7 @@ export function runGlobalPackageInstall(
         : ['add', '-g', `ccstatusline-zh@${version}`];
 
     return new Promise((resolve, reject) => {
-        execFile(executable, args, { timeout: GLOBAL_UPDATE_TIMEOUT_MS }, (error) => {
+        execFile(executable, args, { timeout: GLOBAL_UPDATE_TIMEOUT_MS, windowsHide: true }, (error) => {
             if (error) {
                 reject(error instanceof Error ? error : new Error('全局更新命令执行失败'));
                 return;

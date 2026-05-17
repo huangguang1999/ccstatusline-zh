@@ -141,7 +141,7 @@ describe('InstallMenu', () => {
         }
     });
 
-    it('always starts update style selection on the first item', async () => {
+    it('shows pinned global install first and selected by default', async () => {
         const stdin = createMockStdin();
         const stdout = createMockStdout();
         const stderr = createMockStdout();
@@ -166,8 +166,10 @@ describe('InstallMenu', () => {
         try {
             await flushInk();
 
-            expect(stdout.getOutput()).toContain('▶  自动更新');
-            expect(stdout.getOutput()).not.toContain('▶  固定全局安装');
+            const output = stdout.getOutput();
+            expect(output.indexOf('固定全局安装')).toBeLessThan(output.indexOf('自动更新'));
+            expect(output).toContain('▶  固定全局安装');
+            expect(output).not.toContain('▶  自动更新');
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -210,10 +212,10 @@ describe('InstallMenu', () => {
             await flushInk();
 
             const output = stdout.getOutput();
-            expect(output).toContain('npx -y ccstatusline-zh@latest');
-            expect(output).toContain('（未检测到 npx）');
-            expect(output).toContain('bunx -y ccstatusline-zh@latest');
-            expect(output).toContain('（未检测到 bunx）');
+            expect(output).toContain('npm install -g ccstatusline-zh@2.2.13');
+            expect(output).not.toContain('（未检测到 npm）');
+            expect(output).toContain('bun add -g ccstatusline-zh@2.2.13');
+            expect(output).not.toContain('（未检测到 bun）');
         } finally {
             instance.unmount();
             instance.cleanup();

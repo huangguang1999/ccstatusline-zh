@@ -177,7 +177,8 @@ function getNpmGlobalPackageVersion(platform: NodeJS.Platform): string | null {
     try {
         const rootDir = execFileSync(getPackageManagerExecutable('npm', platform), ['root', '-g'], {
             encoding: 'utf-8',
-            timeout: VERSION_LOOKUP_TIMEOUT_MS
+            timeout: VERSION_LOOKUP_TIMEOUT_MS,
+            windowsHide: true
         }).trim();
 
         return rootDir
@@ -354,7 +355,7 @@ export function runGlobalPackageUninstall(
         : ['remove', '-g', 'ccstatusline-zh'];
 
     return new Promise((resolve, reject) => {
-        execFile(executable, args, { timeout: GLOBAL_PACKAGE_TIMEOUT_MS }, (error) => {
+        execFile(executable, args, { timeout: GLOBAL_PACKAGE_TIMEOUT_MS, windowsHide: true }, (error) => {
             if (error) {
                 reject(error instanceof Error ? error : new Error('全局卸载命令执行失败'));
                 return;

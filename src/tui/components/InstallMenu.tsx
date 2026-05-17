@@ -51,14 +51,14 @@ function getPinnedDescription(currentVersion: string): string {
 function getStyleItems(currentVersion: string): ListEntry<InstallUpdateStyle>[] {
     return [
         {
-            label: '自动更新',
-            value: 'auto-update',
-            description: AUTO_UPDATE_DESCRIPTION
-        },
-        {
             label: '固定全局安装',
             value: 'pinned',
             description: getPinnedDescription(currentVersion)
+        },
+        {
+            label: '自动更新',
+            value: 'auto-update',
+            description: AUTO_UPDATE_DESCRIPTION
         }
     ];
 }
@@ -147,7 +147,7 @@ export const InstallMenu: React.FC<InstallMenuProps> = ({
     initialPackageSelection = 0
 }) => {
     const [step, setStep] = useState<InstallStep>('style');
-    const [updateStyle, setUpdateStyle] = useState<InstallUpdateStyle>('auto-update');
+    const [updateStyle, setUpdateStyle] = useState<InstallUpdateStyle>('pinned');
 
     useInput((_, key) => {
         if (key.escape) {
