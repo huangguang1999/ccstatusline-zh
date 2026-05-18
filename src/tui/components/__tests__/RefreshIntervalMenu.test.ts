@@ -93,13 +93,13 @@ describe('validateGitCacheTtlInput', () => {
     });
 
     it('should reject values outside the range', () => {
-        expect(validateGitCacheTtlInput('-1')).toContain('Minimum');
-        expect(validateGitCacheTtlInput('61')).toContain('Maximum');
+        expect(validateGitCacheTtlInput('-1')).toContain('最小');
+        expect(validateGitCacheTtlInput('61')).toContain('最大');
     });
 
     it('should reject empty and non-numeric input', () => {
-        expect(validateGitCacheTtlInput('')).toContain('valid number');
-        expect(validateGitCacheTtlInput('abc')).toContain('valid number');
+        expect(validateGitCacheTtlInput('')).toContain('有效数字');
+        expect(validateGitCacheTtlInput('abc')).toContain('有效数字');
     });
 });
 
@@ -132,13 +132,13 @@ describe('buildConfigureStatusLineItems', () => {
 
     it('should show the configured Git cache TTL', () => {
         const items = buildConfigureStatusLineItems(10, true, 5);
-        expect(items[1]?.label).toContain('Git Cache TTL');
-        expect(items[1]?.sublabel).toBe('(5s)');
+        expect(items[1]?.label).toContain('Git 缓存 TTL');
+        expect(items[1]?.sublabel).toBe('（5 秒）');
     });
 
     it('should describe zero Git cache TTL as mtime-only', () => {
         const items = buildConfigureStatusLineItems(10, true, 0);
-        expect(items[1]?.sublabel).toBe('(mtime only)');
+        expect(items[1]?.sublabel).toBe('（仅 mtime）');
     });
 });
 
@@ -222,8 +222,8 @@ describe('RefreshIntervalMenu', () => {
             stdin.write('\r');
             await flushInk();
 
-            expect(stdout.getOutput()).toContain('Enter Git cache TTL in seconds (0-60):');
-            expect(stdout.getOutput()).toContain('unstaged and untracked working-tree changes');
+            expect(stdout.getOutput()).toContain('输入 Git 缓存 TTL（秒，0-60）:');
+            expect(stdout.getOutput()).toContain('未暂存和未跟踪的工作区改动');
 
             stdin.write('\r');
             await flushInk();

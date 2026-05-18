@@ -1191,14 +1191,14 @@ export const App: React.FC = () => {
                             void setRefreshInterval(interval)
                                 .then(() => {
                                     setFlashMessage({
-                                        text: '✓ Refresh interval updated',
+                                        text: '✓ 刷新间隔已更新',
                                         color: 'green'
                                     });
                                 })
                                 .catch(() => {
                                     setCurrentRefreshInterval(previous);
                                     setFlashMessage({
-                                        text: '✗ Failed to save refresh interval',
+                                        text: '✗ 保存刷新间隔失败',
                                         color: 'red'
                                     });
                                 });
@@ -1210,65 +1210,9 @@ export const App: React.FC = () => {
                                 gitCacheTtlSeconds: ttlSeconds
                             });
                             setFlashMessage({
-                                text: '✓ Git cache TTL updated',
+                                text: '✓ Git 缓存 TTL 已更新',
                                 color: 'green'
                             });
-                            setScreen('main');
-                        }}
-                        onBack={() => {
-                            setScreen('main');
-                        }}
-                    />
-                )}
-                {screen === 'refreshInterval' && (
-                    <RefreshIntervalMenu
-                        currentInterval={currentRefreshInterval}
-                        supportsRefreshInterval={supportsRefreshInterval}
-                        onUpdate={(interval) => {
-                            const previous = currentRefreshInterval;
-                            setCurrentRefreshInterval(interval);
-                            void setRefreshInterval(interval)
-                                .then(() => {
-                                    setFlashMessage({
-                                        text: '✓ 刷新间隔已更新',
-                                        color: 'green'
-                                    });
-                                })
-                                .catch(() => {
-                                    setCurrentRefreshInterval(previous);
-                                    setFlashMessage({
-                                        text: '✗ 保存刷新间隔失败',
-                                        color: 'red'
-                                    });
-                                });
-                            setScreen('main');
-                        }}
-                        onBack={() => {
-                            setScreen('main');
-                        }}
-                    />
-                )}
-                {screen === 'refreshInterval' && (
-                    <RefreshIntervalMenu
-                        currentInterval={currentRefreshInterval}
-                        supportsRefreshInterval={supportsRefreshInterval}
-                        onUpdate={(interval) => {
-                            const previous = currentRefreshInterval;
-                            setCurrentRefreshInterval(interval);
-                            void setRefreshInterval(interval)
-                                .then(() => {
-                                    setFlashMessage({
-                                        text: '✓ 刷新间隔已更新',
-                                        color: 'green'
-                                    });
-                                })
-                                .catch(() => {
-                                    setCurrentRefreshInterval(previous);
-                                    setFlashMessage({
-                                        text: '✗ 保存刷新间隔失败',
-                                        color: 'red'
-                                    });
-                                });
                             setScreen('main');
                         }}
                         onBack={() => {

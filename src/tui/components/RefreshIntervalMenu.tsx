@@ -32,8 +32,8 @@ function getRefreshIntervalSublabel(interval: number | null, supported: boolean)
 
 function getGitCacheTtlSublabel(ttlSeconds: number): string {
     return ttlSeconds === 0
-        ? '(mtime only)'
-        : `(${ttlSeconds}s)`;
+        ? '（仅 mtime）'
+        : `（${ttlSeconds} 秒）`;
 }
 
 export function buildConfigureStatusLineItems(
@@ -86,15 +86,15 @@ export function validateGitCacheTtlInput(value: string): string | null {
     const parsed = parseInt(value, 10);
 
     if (value === '' || isNaN(parsed)) {
-        return 'Please enter a valid number';
+        return '请输入有效数字';
     }
 
     if (parsed < 0) {
-        return `Minimum Git cache TTL is 0s (you entered ${parsed}s)`;
+        return `Git 缓存 TTL 最小为 0 秒（输入了 ${parsed} 秒）`;
     }
 
     if (parsed > 60) {
-        return `Maximum Git cache TTL is 60s (you entered ${parsed}s)`;
+        return `Git 缓存 TTL 最大为 60 秒（输入了 ${parsed} 秒）`;
     }
 
     return null;
@@ -220,23 +220,23 @@ export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
             ) : editingGitCacheTtl ? (
                 <Box marginTop={1} flexDirection='column'>
                     <Text>
-                        Enter Git cache TTL in seconds (0-60):
+                        输入 Git 缓存 TTL（秒，0-60）:
                         {' '}
                         {gitCacheTtlInput}
-                        {gitCacheTtlInput.length > 0 ? 's' : ''}
+                        {gitCacheTtlInput.length > 0 ? ' 秒' : ''}
                     </Text>
                     <Text> </Text>
                     <Text dimColor wrap='wrap'>
-                        This affects how quickly git widgets notice unstaged and untracked working-tree changes.
+                        此设置影响 Git 组件多快能察觉到未暂存和未跟踪的工作区改动。
                     </Text>
                     {validationError ? (
                         <Text color='red'>{validationError}</Text>
                     ) : (
                         <Text dimColor>
-                            0 disables age-based expiry; cache validity uses .git/HEAD and .git/index mtimes only.
+                            填 0 关闭按时长过期；缓存有效性仅依据 .git/HEAD 和 .git/index 的 mtime。
                         </Text>
                     )}
-                    <Text dimColor>Press Enter to confirm, ESC to cancel.</Text>
+                    <Text dimColor>按 Enter 确认，ESC 取消。</Text>
                 </Box>
             ) : (
                 <List
