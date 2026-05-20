@@ -44,10 +44,14 @@ import {
     isUsageDateMode,
     isUsageInverted,
     isUsageProgressMode,
+    isUsageSliderMode,
+    isUsageWeekdayEnabled,
+    makeSliderBar,
     toggleUsageCompact,
     toggleUsageDateMode,
     toggleUsageHourFormat,
-    toggleUsageInverted
+    toggleUsageInverted,
+    toggleUsageWeekday
 } from './shared/usage-display';
 
 function makeTimerProgressBar(percent: number, width: number): string {
@@ -93,6 +97,10 @@ function getWeeklyResetModifierText(item: WidgetItem): string | undefined {
 
             if (isUsage12HourClock(item)) {
                 modifiers.push('12 时制');
+            }
+
+            if (isUsageWeekdayEnabled(item)) {
+                modifiers.push('weekday');
             }
         } else if (isWeeklyResetHoursOnly(item)) {
             modifiers.push('仅小时');
@@ -146,6 +154,10 @@ export class WeeklyResetTimerWidget implements Widget {
             return toggleUsageHourFormat(item);
         }
 
+        if (action === 'toggle-weekday') {
+            return toggleUsageWeekday(item);
+        }
+
         if (action === 'toggle-hours') {
             return toggleWeeklyResetHoursOnly(item);
         }
@@ -170,14 +182,19 @@ export class WeeklyResetTimerWidget implements Widget {
             }
 
             if (dateMode) {
+                const weekday = isUsageWeekdayEnabled(item);
                 const resetAt = formatUsageResetAt(
                     WEEKLY_RESET_PREVIEW_AT,
                     compact,
                     getUsageTimezone(item),
                     getUsageLocale(item),
-                    isUsage12HourClock(item)
+                    isUsage12HourClock(item),
+                    weekday
                 );
-                return formatRawOrLabeledValue(item, '周重置: ', resetAt ?? (compact ? '03-15 08:30Z' : '2026-03-15 08:30 UTC'));
+                const fallback = weekday
+                    ? (compact ? 'Sun 08:30Z' : 'Sun 08:30 UTC')
+                    : (compact ? '03-15 08:30Z' : '2026-03-15 08:30 UTC');
+                return formatRawOrLabeledValue(item, '周重置: ', resetAt ?? fallback);
             }
 
             return formatRawOrLabeledValue(item, '周重置: ', formatUsageDuration(WEEKLY_PREVIEW_DURATION_MS, compact, useDays));
@@ -205,7 +222,7 @@ export class WeeklyResetTimerWidget implements Widget {
         if (dateMode) {
             const timezone = getUsageTimezone(item);
             const locale = getUsageLocale(item);
-            const resetAt = formatUsageResetAt(usageData.weeklyResetAt, compact, timezone, locale, isUsage12HourClock(item));
+            const resetAt = formatUsageResetAt(usageData.weeklyResetAt, compact, timezone, locale, isUsage12HourClock(item), isUsageWeekdayEnabled(item));
             if (resetAt) {
                 return formatRawOrLabeledValue(item, '周重置: ', resetAt);
             }
@@ -219,6 +236,7 @@ export class WeeklyResetTimerWidget implements Widget {
         const keybinds = getUsageTimerCustomKeybinds(item, {
             includeDate: true,
             includeHourFormat: true,
+            includeWeekday: true,
             includeLocale: true,
             includeTimezone: true
         });
