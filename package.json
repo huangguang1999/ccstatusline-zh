@@ -2,10 +2,18 @@
   "name": "ccstatusline-zh",
   "version": "2.2.20",
   "description": "ccstatusline 的中文汉化版 - Claude Code CLI 可定制状态栏格式化工具",
-  "module": "src/ccstatusline.ts",
+  "main": "./dist/ccstatusline.js",
+  "module": "./dist/ccstatusline.js",
   "type": "module",
   "bin": {
     "ccstatusline-zh": "dist/ccstatusline.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/ccstatusline.js",
+      "default": "./dist/ccstatusline.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist/"
