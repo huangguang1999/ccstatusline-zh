@@ -40,6 +40,7 @@ import {
     getWidgetSpeedWindowSeconds,
     isWidgetSpeedWindowEnabled
 } from './utils/speed-window';
+import { getTerminalWidth } from './utils/terminal';
 import { prefetchUsageDataIfNeeded } from './utils/usage-prefetch';
 
 function hasSessionDurationInStatusJson(data: StatusJSON): boolean {
@@ -161,6 +162,7 @@ async function renderMultipleLines(data: StatusJSON) {
         sessionDuration,
         skillsMetrics,
         compactionData: hasCompactionWidget ? { count: compactionCount } : null,
+        terminalWidth: getTerminalWidth(),
         isPreview: false,
         minimalist: settings.minimalistMode,
         gitCacheTtlSeconds: settings.gitCacheTtlSeconds
