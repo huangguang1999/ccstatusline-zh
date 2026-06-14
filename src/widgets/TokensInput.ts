@@ -24,13 +24,13 @@ export class TokensInputWidget implements Widget {
             return formatRawOrLabeledValue(item, '输入: ', '15.2k');
         }
 
+        if (context.tokenMetrics) {
+            return formatRawOrLabeledValue(item, '输入: ', formatTokens(context.tokenMetrics.inputTokens));
+        }
+
         const inputTotalTokens = getContextWindowInputTotalTokens(context.data);
         if (inputTotalTokens !== null) {
             return formatRawOrLabeledValue(item, '输入: ', formatTokens(inputTotalTokens));
-        }
-
-        if (context.tokenMetrics) {
-            return formatRawOrLabeledValue(item, '输入: ', formatTokens(context.tokenMetrics.inputTokens));
         }
         return null;
     }
