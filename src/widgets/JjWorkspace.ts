@@ -4,6 +4,7 @@ import type {
     CustomKeybind,
     Widget,
     WidgetEditorDisplay,
+    WidgetEditorProps,
     WidgetItem
 } from '../types/Widget';
 import {
@@ -11,7 +12,14 @@ import {
     runJjArgs
 } from '../utils/jj';
 
+import {
+    formatSymbolPrefix,
+    getSymbolKeybind,
+    renderSymbolOverrideEditor
+} from './shared/symbol-override';
+
 const CURRENT_WORKSPACE_TEMPLATE = 'if(target.current_working_copy(), name ++ "\n")';
+const DEFAULT_SYMBOL = '◆';
 
 export class JjWorkspaceWidget implements Widget {
     getDefaultColor(): string { return 'blue'; }
@@ -48,9 +56,10 @@ export class JjWorkspaceWidget implements Widget {
 
     render(item: WidgetItem, context: RenderContext, _settings: Settings): string | null {
         const hideNoJj = item.metadata?.hideNoJj === 'true';
+        const prefix = formatSymbolPrefix(item, DEFAULT_SYMBOL);
 
         if (context.isPreview) {
-            return item.rawValue ? 'default' : '◆ default';
+            return item.rawValue ? 'default' : `${prefix}default`;
         }
 
         if (!isInsideJjRepo(context)) {
@@ -59,7 +68,7 @@ export class JjWorkspaceWidget implements Widget {
 
         const workspace = this.getJjWorkspace(context);
         if (workspace) {
-            return item.rawValue ? workspace : `◆ ${workspace}`;
+            return item.rawValue ? workspace : `${prefix}${workspace}`;
         }
 
         return hideNoJj ? null : '◆ 无 JJ';
@@ -83,6 +92,10 @@ export class JjWorkspaceWidget implements Widget {
         return [
             { key: 'h', label: '(h)隐藏「无 JJ」提示', action: 'toggle-nojj' }
         ];
+    }
+
+    renderEditor(props: WidgetEditorProps) {
+        return renderSymbolOverrideEditor(props, DEFAULT_SYMBOL);
     }
 
     supportsRawValue(): boolean { return true; }
