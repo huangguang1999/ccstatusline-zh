@@ -44,9 +44,7 @@ import {
     isUsageDateMode,
     isUsageInverted,
     isUsageProgressMode,
-    isUsageSliderMode,
     isUsageWeekdayEnabled,
-    makeSliderBar,
     toggleUsageCompact,
     toggleUsageDateMode,
     toggleUsageHourFormat,
@@ -100,7 +98,7 @@ function getWeeklyResetModifierText(item: WidgetItem): string | undefined {
             }
 
             if (isUsageWeekdayEnabled(item)) {
-                modifiers.push('weekday');
+                modifiers.push('星期');
             }
         } else if (isWeeklyResetHoursOnly(item)) {
             modifiers.push('仅小时');

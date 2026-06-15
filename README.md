@@ -4,7 +4,7 @@
 
 _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标_
 
-> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.19 版本（含 Voice Status、版本固定全局安装、Jujutsu VCS、CompactionCounter、超额用量组件、Git 子进程缓存等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
+> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.20 版本（含 Remote Control Status、渐变色支持、周重置星期显示模式、Windows npm shim、超额用量单位修复等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/huangguang1999/ccstatusline-zh/blob/main/LICENSE)
 [![Node.js Version](https://img.shields.io/node/v/ccstatusline.svg)](https://nodejs.org)
@@ -33,7 +33,7 @@ _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标
 
 ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支持 50+ 种可定制组件、Powerline 主题、交互式 TUI 配置界面等丰富功能。本项目在其基础上，将所有用户可见的英文文本直接替换为中文，包括：
 
-- **72 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余）
+- **73 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余，v2.2.20 新增的 Remote Control Status）
 - **TUI 配置界面**的全部菜单项、帮助文本、提示信息、对话框
 - **布局组件**（分隔符、弹性分隔符）的名称和描述
 - **极简模式 / Minimalist Mode**、**模糊搜索组件选择器**、**Powerline 主题色延续**（v2.2.8）
@@ -43,6 +43,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 - **版本固定全局安装**（Pinned global install）、**管理安装 / 检查更新菜单**、**npm 仓库更新检测**、**固定安装版本不一致防错屏幕**（v2.2.14–v2.2.16）
 - **超额用量占比 / 超额用量剩余组件**（按量付费月度超额额度，支持禁用时隐藏）、**用量 API 空值桶兼容**、**Git 命令旧版本兼容与 `--no-optional-locks` 锁规避**（v2.2.17–v2.2.18）
 - **Git 子进程输出持久化缓存**（可配置 TTL，按 `.git/HEAD` / `.git/index` mtime 失效）、**`CCSTATUSLINE_WIDTH` 终端宽度覆盖**、**固定全局安装设为默认安装项**、**Windows 隐藏辅助进程窗口**（v2.2.19）
+- **Remote Control Status 远程控制状态组件**、**渐变色前景色支持**、**周重置计时器星期显示模式**、**Windows npm shim 执行修复**、**超额用量单位换算修正**、**Input/Output Token 组件优先使用累计转录指标**、**UsageFetch 缓存隔离改进**（v2.2.20）
 - **确认对话框** "是 / 否"
 - **分类筛选** "全部" 等界面元素
 
@@ -55,7 +56,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 | 界面语言   | 英文         | 中文                      |
 | 配置兼容性 | —            | ✅ 共用相同 settings.json |
 | 功能差异   | —            | 无，功能完全一致          |
-| 同步版本   | 最新         | v2.2.19（+ jj widgets / CompactionCounter / Voice Status / 版本固定安装 / 超额用量组件 / Git 子进程缓存 / 中文化覆盖） |
+| 同步版本   | 最新         | v2.2.20（+ Remote Control Status / 渐变色 / 周重置星期模式 / Windows npm shim / 超额单位修正 / 中文化覆盖） |
 
 ---
 

@@ -219,8 +219,8 @@ describe('PowerlineSetup helpers', () => {
         try {
             await flushInk();
 
-            expect(stdout.getOutput()).toContain('Powerline Setup');
-            expect(stdout.getOutput()).toContain('⚠ Global override for FG active');
+            expect(stdout.getOutput()).toContain('Powerline 设置');
+            expect(stdout.getOutput()).toContain('⚠ 前景色全局覆盖已激活');
         } finally {
             instance.unmount();
             instance.cleanup();

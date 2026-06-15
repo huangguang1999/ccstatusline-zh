@@ -76,7 +76,7 @@ function toggleNerdFont(item: WidgetItem): WidgetItem {
 }
 
 function formatStatus(enabled: boolean, format: RemoteFormat, nerdFont: boolean): string {
-    const stateText = enabled ? 'on' : 'off';
+    const stateText = enabled ? '启用' : '关闭';
     const stateDot = enabled ? STATE_DOT_ON : STATE_DOT_OFF;
     const icon = nerdFont
         ? (enabled ? SATELLITE_NERD_FONT : SATELLITE_SLASH_NERD_FONT)
@@ -90,24 +90,24 @@ function formatStatus(enabled: boolean, format: RemoteFormat, nerdFont: boolean)
         case 'text':
             return stateText;
         case 'word':
-            return `remote ${stateText}`;
+            return `远程 ${stateText}`;
         case 'label-check':
-            return `remote ${enabled ? CHECK_EMOJI : CROSS_EMOJI}`;
+            return `远程 ${enabled ? CHECK_EMOJI : CROSS_EMOJI}`;
         case 'label-mark':
-            return `remote ${enabled ? CHECK_MARK : CROSS_MARK}`;
+            return `远程 ${enabled ? CHECK_MARK : CROSS_MARK}`;
     }
 }
 
 export class RemoteControlStatusWidget implements Widget {
     getDefaultColor(): string { return 'blue'; }
-    getDescription(): string { return 'Shows whether Claude Code remote control is attached to the current session'; }
-    getDisplayName(): string { return 'Remote Control Status'; }
-    getCategory(): string { return 'Core'; }
+    getDescription(): string { return '显示 Claude Code 远程控制是否已连接到当前会话'; }
+    getDisplayName(): string { return '远程控制状态'; }
+    getCategory(): string { return '核心'; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         const modifiers: string[] = [getFormat(item)];
         if (isNerdFontEnabled(item)) {
-            modifiers.push('nerd font');
+            modifiers.push('Nerd 字体');
         }
 
         return {
@@ -156,8 +156,8 @@ export class RemoteControlStatusWidget implements Widget {
 
     getCustomKeybinds(): CustomKeybind[] {
         return [
-            { key: 'f', label: '(f)ormat', action: CYCLE_FORMAT_ACTION },
-            { key: 'n', label: '(n)erd font', action: TOGGLE_NERD_FONT_ACTION }
+            { key: 'f', label: '(f)显示格式', action: CYCLE_FORMAT_ACTION },
+            { key: 'n', label: '(n)erd 字体', action: TOGGLE_NERD_FONT_ACTION }
         ];
     }
 

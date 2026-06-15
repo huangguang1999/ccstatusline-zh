@@ -231,12 +231,12 @@ describe('WeeklyResetTimerWidget', () => {
             id: 'weekly-reset',
             type: 'weekly-reset-timer',
             metadata: { absolute: 'true', weekday: 'true' }
-        }).modifierText).toBe('(date, weekday)');
+        }).modifierText).toBe('(日期, 星期)');
         expect(widget.getEditorDisplay({
             id: 'weekly-reset',
             type: 'weekly-reset-timer',
             metadata: { absolute: 'true', hour12: 'true', weekday: 'true' }
-        }).modifierText).toBe('(date, 12hr, weekday)');
+        }).modifierText).toBe('(日期, 12 时制, 星期)');
     });
 
     it('renders weekday format in preview date mode', () => {
@@ -248,7 +248,7 @@ describe('WeeklyResetTimerWidget', () => {
             id: 'weekly-reset',
             type: 'weekly-reset-timer',
             metadata: { absolute: 'true', weekday: 'true' }
-        }, { isPreview: true })).toBe('Weekly Reset: Sun 08:30 UTC');
+        }, { isPreview: true })).toBe('周重置: Sun 08:30 UTC');
     });
 
     it('renders weekday format in live date mode', () => {
@@ -266,7 +266,7 @@ describe('WeeklyResetTimerWidget', () => {
         expect(render(widget,
             { id: 'weekly-reset', type: 'weekly-reset-timer', metadata: { absolute: 'true', weekday: 'true', hour12: 'true', timezone: 'Asia/Tokyo' } },
             { usageData: { weeklyResetAt: '2026-03-15T08:30:00.000Z' } }
-        )).toBe('Weekly Reset: Sun 5:30 PM GMT+9');
+        )).toBe('周重置: Sun 5:30 PM GMT+9');
         expect(mockFormatUsageResetAt).toHaveBeenCalledWith('2026-03-15T08:30:00.000Z', false, 'Asia/Tokyo', undefined, true, true);
     });
 

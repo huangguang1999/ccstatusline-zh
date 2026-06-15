@@ -33,16 +33,16 @@ afterEach(() => {
 describe('RemoteControlStatusWidget', () => {
     describe('metadata', () => {
         it('has correct display name', () => {
-            expect(new RemoteControlStatusWidget().getDisplayName()).toBe('Remote Control Status');
+            expect(new RemoteControlStatusWidget().getDisplayName()).toBe('远程控制状态');
         });
 
         it('has correct description', () => {
             expect(new RemoteControlStatusWidget().getDescription())
-                .toBe('Shows whether Claude Code remote control is attached to the current session');
+                .toBe('显示 Claude Code 远程控制是否已连接到当前会话');
         });
 
         it('has correct category', () => {
-            expect(new RemoteControlStatusWidget().getCategory()).toBe('Core');
+            expect(new RemoteControlStatusWidget().getCategory()).toBe('核心');
         });
 
         it('has blue default color', () => {
@@ -61,14 +61,14 @@ describe('RemoteControlStatusWidget', () => {
     describe('editor configuration', () => {
         it('exposes f and n keybinds', () => {
             expect(new RemoteControlStatusWidget().getCustomKeybinds()).toEqual([
-                { key: 'f', label: '(f)ormat', action: 'cycle-format' },
-                { key: 'n', label: '(n)erd font', action: 'toggle-nerd-font' }
+                { key: 'f', label: '(f)显示格式', action: 'cycle-format' },
+                { key: 'n', label: '(n)erd 字体', action: 'toggle-nerd-font' }
             ]);
         });
 
         it('defaults to icon in the editor display', () => {
             expect(new RemoteControlStatusWidget().getEditorDisplay(ITEM)).toEqual({
-                displayText: 'Remote Control Status',
+                displayText: '远程控制状态',
                 modifierText: '(icon)'
             });
         });
@@ -78,8 +78,8 @@ describe('RemoteControlStatusWidget', () => {
                 ...ITEM,
                 metadata: { format: 'word', nerdFont: 'true' }
             })).toEqual({
-                displayText: 'Remote Control Status',
-                modifierText: '(word, nerd font)'
+                displayText: '远程控制状态',
+                modifierText: '(word, Nerd 字体)'
             });
         });
 
@@ -145,12 +145,12 @@ describe('RemoteControlStatusWidget', () => {
 
         it('renders 📡 off when OFF', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: false });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('📡 off');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('📡 关闭');
         });
 
         it('renders 📡 on when ON', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: true });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('📡 on');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('📡 启用');
         });
     });
 
@@ -159,12 +159,12 @@ describe('RemoteControlStatusWidget', () => {
 
         it('renders "off" when OFF', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: false });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('off');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('关闭');
         });
 
         it('renders "on" when ON', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: true });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('on');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('启用');
         });
     });
 
@@ -173,12 +173,12 @@ describe('RemoteControlStatusWidget', () => {
 
         it('renders "remote off" when OFF', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: false });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('remote off');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('远程 关闭');
         });
 
         it('renders "remote on" when ON', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: true });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('remote on');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('远程 启用');
         });
     });
 
@@ -187,12 +187,12 @@ describe('RemoteControlStatusWidget', () => {
 
         it('renders "remote ❌" when OFF', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: false });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('remote ❌');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('远程 ❌');
         });
 
         it('renders "remote ✅" when ON', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: true });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('remote ✅');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('远程 ✅');
         });
     });
 
@@ -201,12 +201,12 @@ describe('RemoteControlStatusWidget', () => {
 
         it('renders "remote ✗" when OFF', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: false });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('remote ✗');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('远程 ✗');
         });
 
         it('renders "remote ✓" when ON', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: true });
-            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('remote ✓');
+            expect(new RemoteControlStatusWidget().render(FORMAT_ITEM, makeContext(), DEFAULT_SETTINGS)).toBe('远程 ✓');
         });
     });
 
@@ -233,7 +233,7 @@ describe('RemoteControlStatusWidget', () => {
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: false });
             const item: WidgetItem = { ...ITEM, metadata: { format: 'word', nerdFont: 'true' } };
             expect(new RemoteControlStatusWidget().render(item, makeContext({ isPreview: true }), DEFAULT_SETTINGS))
-                .toBe('remote on');
+                .toBe('远程 启用');
         });
     });
 

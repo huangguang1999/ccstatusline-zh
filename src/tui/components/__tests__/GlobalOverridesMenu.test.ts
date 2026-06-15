@@ -206,8 +206,8 @@ describe('GlobalOverridesMenu', () => {
         try {
             await flushInk();
             const output = stdout.getOutput();
-            expect(output).toContain('Override FG Color:');
-            expect(output).toContain('(f) cycle, (g) gradient, (x) clear');
+            expect(output).toContain('覆盖前景色:');
+            expect(output).toContain('(f) 切换，(g) 渐变色，(x) 清除');
         } finally {
             instance.unmount();
             instance.cleanup();

@@ -200,8 +200,8 @@ function getPinnedMismatchItems(
             disabled: !canRunPackageManager,
             sublabel: canRunPackageManager ? undefined : `(${mismatch.packageManager} not installed)`,
             description: `Runs ${mismatch.packageManager === 'npm'
-                ? `npm install -g ccstatusline@${mismatch.runningVersion}`
-                : `bun add -g ccstatusline@${mismatch.runningVersion}`}`
+                ? `npm install -g ccstatusline-zh@${mismatch.runningVersion}`
+                : `bun add -g ccstatusline-zh@${mismatch.runningVersion}`}`
         });
     }
 
@@ -231,7 +231,7 @@ const PinnedVersionMismatchScreen: React.FC<PinnedVersionMismatchScreenProps> = 
             <Text bold>Pinned Install Version Mismatch</Text>
             <Box marginTop={1} flexDirection='column'>
                 <Text color='yellow'>
-                    Claude Code is pinned to ccstatusline v
+                    Claude Code is pinned to ccstatusline-zh v
                     {mismatch.installedVersion}
                     , but this TUI is v
                     {mismatch.runningVersion}
@@ -272,13 +272,13 @@ const PinnedVersionMismatchScreen: React.FC<PinnedVersionMismatchScreenProps> = 
 
 function getGlobalUninstallCommand(packageManager: GlobalPackageManager): string {
     return packageManager === 'npm'
-        ? 'npm uninstall -g ccstatusline'
-        : 'bun remove -g ccstatusline';
+        ? 'npm uninstall -g ccstatusline-zh'
+        : 'bun remove -g ccstatusline-zh';
 }
 
 function buildUninstallConfirmMessage(selection: UninstallSelection): string {
     if (selection.packageManagers.length === 0) {
-        return `This will remove ccstatusline from ${getClaudeSettingsPath()}. Continue?`;
+        return `This will remove ccstatusline-zh from ${getClaudeSettingsPath()}. Continue?`;
     }
 
     const commands = selection.packageManagers
