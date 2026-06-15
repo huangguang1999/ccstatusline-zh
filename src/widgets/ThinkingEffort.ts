@@ -55,7 +55,7 @@ function formatEffort(resolved: ResolvedThinkingEffort | null): string {
 
 export class ThinkingEffortWidget implements Widget {
     getDefaultColor(): string { return 'magenta'; }
-    getDescription(): string { return '显示当前思考力度级别（low, medium, high, xhigh, max）。\n未知级别会以末尾 "?" 标记显示（如 "super-max?"）。\n多个 Claude Code 会话同时运行时可能不准确。'; }
+    getDescription(): string { return '显示当前思考力度级别（low, medium, high, xhigh, max）。\nClaude Code 将 Ultracode 模式上报为 xhigh，Ultracode 本身不作为独立级别暴露。\n未知级别会以末尾 "?" 标记显示（如 "super-max?"）。\n多个 Claude Code 会话同时运行时可能不准确。'; }
     getDisplayName(): string { return '思考力度'; }
     getCategory(): string { return '核心'; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
