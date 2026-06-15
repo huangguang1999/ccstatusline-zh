@@ -172,6 +172,8 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
     const hasSeparatorItems = settings.lines.some(line => line.some(
         item => item.type === 'separator' || item.type === 'flex-separator'
     ));
+    const hasGlobalFgOverride = Boolean(settings.overrideForegroundColor && settings.overrideForegroundColor !== 'none');
+    const globalOverrideMessage = hasGlobalFgOverride ? '⚠ 前景色全局覆盖已激活' : null;
 
     useInput((input, key) => {
         if (fontInstallMessage || installingFonts) {
@@ -272,7 +274,15 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
     return (
         <Box flexDirection='column'>
             {!confirmingFontInstall && !installingFonts && !fontInstallMessage && (
-                <Text bold>Powerline 设置</Text>
+                <Box>
+                    <Text bold>Powerline 设置</Text>
+                    {globalOverrideMessage && (
+                        <Text color='yellow' dimColor>
+                            {'.  '}
+                            {globalOverrideMessage}
+                        </Text>
+                    )}
+                </Box>
             )}
 
             {confirmingFontInstall ? (
@@ -426,7 +436,7 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
 
                             <Box flexDirection='column' marginTop={1}>
                                 <Text dimColor>
-                                    启用后，全局覆盖将被禁用，并使用 Powerline 分隔符
+                                    Powerline 模式使用独立的分隔符系统
                                 </Text>
                                 <Text dimColor>
                                     主题色延续：Powerline 颜色序列跨多行状态栏连续延续
