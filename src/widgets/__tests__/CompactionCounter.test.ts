@@ -235,6 +235,20 @@ describe('CompactionCounterWidget', () => {
                 item: { ...ITEM, metadata: { showReclaimed: 'true' } }
             })).toBe('↻ 2 ↓120.0k');
         });
+
+        it('renders a custom reclaimed glyph from the symbolReclaimed override', () => {
+            expect(render({
+                compactionData: { count: 2, tokensReclaimed: 887000 },
+                item: { ...ITEM, metadata: { showReclaimed: 'true', symbolReclaimed: 'X' } }
+            })).toBe('↻ 2 X887.0k');
+        });
+
+        it('drops the reclaimed glyph but keeps the space when the override is empty', () => {
+            expect(render({
+                compactionData: { count: 2, tokensReclaimed: 887000 },
+                item: { ...ITEM, metadata: { showReclaimed: 'true', symbolReclaimed: '' } }
+            })).toBe('↻ 2 887.0k');
+        });
     });
 
     describe('editor', () => {
@@ -244,7 +258,8 @@ describe('CompactionCounterWidget', () => {
                 { key: 'n', label: '(n)Nerd 字体', action: 'toggle-nerd-font' },
                 { key: 's', label: '(s)按触发分组', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收 token', action: 'toggle-reclaimed' },
-                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' }
+                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
+                { key: 'g', label: '(g)字形', action: 'edit-symbol-override' }
             ]);
         });
 
@@ -256,7 +271,8 @@ describe('CompactionCounterWidget', () => {
                 { key: 'f', label: '(f)格式切换', action: 'cycle-format' },
                 { key: 's', label: '(s)按触发分组', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收 token', action: 'toggle-reclaimed' },
-                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' }
+                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
+                { key: 'g', label: '(g)字形', action: 'edit-symbol-override' }
             ]);
         });
 
