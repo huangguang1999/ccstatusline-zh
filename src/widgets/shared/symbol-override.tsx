@@ -19,7 +19,7 @@ export const SYMBOL_OVERRIDE_ACTION = 'edit-symbol-override';
 
 const SYMBOL_KEYBIND: CustomKeybind = {
     key: 'g',
-    label: '(g)lyph',
+    label: '(g)符号',
     action: SYMBOL_OVERRIDE_ACTION
 };
 
