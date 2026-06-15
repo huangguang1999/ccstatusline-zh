@@ -83,7 +83,11 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git remote add upstream https://github.com/sirmalloc/ccstatusline.git || true
-          git fetch upstream --tags
+          # fork 自己的 release tag(v2.2.19 等)和上游同名 tag 指向不同 commit，
+          # --tags 会因 "would clobber existing tag" 整体退出 1。新 tag(待同步那个)
+          # 和 upstream/main 都已正常拉到，这里容忍这个良性失败即可；切勿加 --force
+          # (会把 fork 的发布 tag 覆盖成上游 commit，毁掉中文化发布历史)。
+          git fetch upstream --tags || true
 
       - uses: oven-sh/setup-bun@v2
 
