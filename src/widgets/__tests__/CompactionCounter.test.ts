@@ -156,21 +156,21 @@ describe('CompactionCounterWidget', () => {
             expect(render({
                 compactionData: { count: 3, byTrigger: { auto: 2, manual: 1, unknown: 0 } },
                 item: { ...ITEM, metadata: { showTriggers: 'true' } }
-            })).toBe('↻ 3 (2 auto, 1 manual)');
+            })).toBe('↻ 3 (2 自动, 1 手动)');
         });
 
         it('shows the unknown bucket in the trigger split only when > 0', () => {
             expect(render({
                 compactionData: { count: 3, byTrigger: { auto: 2, manual: 0, unknown: 1 } },
                 item: { ...ITEM, metadata: { showTriggers: 'true' } }
-            })).toBe('↻ 3 (2 auto, 1 unknown)');
+            })).toBe('↻ 3 (2 自动, 1 未知)');
         });
 
         it('renders a manual-only trigger split', () => {
             expect(render({
                 compactionData: { count: 2, byTrigger: { auto: 0, manual: 2, unknown: 0 } },
                 item: { ...ITEM, metadata: { showTriggers: 'true' } }
-            })).toBe('↻ 2 (2 manual)');
+            })).toBe('↻ 2 (2 手动)');
         });
 
         it('shows no suffix when all trigger buckets are zero', () => {
@@ -184,14 +184,14 @@ describe('CompactionCounterWidget', () => {
             expect(render({
                 compactionData: { count: 2, byTrigger: { auto: 1, manual: 1, unknown: 0 } },
                 item: { ...ITEM, metadata: { format: 'number', showTriggers: 'true' } }
-            })).toBe('2 (1 auto, 1 manual)');
+            })).toBe('2 (1 自动, 1 手动)');
         });
 
         it('shows the trigger split sample in preview mode', () => {
             expect(render({
                 isPreview: true,
                 item: { ...ITEM, metadata: { showTriggers: 'true' } }
-            })).toBe('↻ 2 (1 auto, 1 manual)');
+            })).toBe('↻ 2 (1 自动, 1 手动)');
         });
 
         it('appends tokens reclaimed when showReclaimed is enabled', () => {
@@ -226,7 +226,7 @@ describe('CompactionCounterWidget', () => {
             expect(render({
                 compactionData: { count: 3, byTrigger: { auto: 2, manual: 1, unknown: 0 }, tokensReclaimed: 887000 },
                 item: { ...ITEM, metadata: { showTriggers: 'true', showReclaimed: 'true' } }
-            })).toBe('↻ 3 (2 auto, 1 manual) ↓887.0k');
+            })).toBe('↻ 3 (2 自动, 1 手动) ↓887.0k');
         });
 
         it('shows the tokens-reclaimed sample in preview mode', () => {
@@ -234,6 +234,20 @@ describe('CompactionCounterWidget', () => {
                 isPreview: true,
                 item: { ...ITEM, metadata: { showReclaimed: 'true' } }
             })).toBe('↻ 2 ↓120.0k');
+        });
+
+        it('renders a custom reclaimed glyph from the symbolReclaimed override', () => {
+            expect(render({
+                compactionData: { count: 2, tokensReclaimed: 887000 },
+                item: { ...ITEM, metadata: { showReclaimed: 'true', symbolReclaimed: 'X' } }
+            })).toBe('↻ 2 X887.0k');
+        });
+
+        it('drops the reclaimed glyph but keeps the space when the override is empty', () => {
+            expect(render({
+                compactionData: { count: 2, tokensReclaimed: 887000 },
+                item: { ...ITEM, metadata: { showReclaimed: 'true', symbolReclaimed: '' } }
+            })).toBe('↻ 2 887.0k');
         });
     });
 
@@ -244,7 +258,8 @@ describe('CompactionCounterWidget', () => {
                 { key: 'n', label: '(n)Nerd 字体', action: 'toggle-nerd-font' },
                 { key: 's', label: '(s)触发器拆分', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收 token', action: 'toggle-reclaimed' },
-                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' }
+                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
+                { key: 'g', label: '(g)字形', action: 'edit-symbol-override' }
             ]);
         });
 
@@ -256,7 +271,8 @@ describe('CompactionCounterWidget', () => {
                 { key: 'f', label: '(f)格式切换', action: 'cycle-format' },
                 { key: 's', label: '(s)触发器拆分', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收 token', action: 'toggle-reclaimed' },
-                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' }
+                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
+                { key: 'g', label: '(g)字形', action: 'edit-symbol-override' }
             ]);
         });
 
