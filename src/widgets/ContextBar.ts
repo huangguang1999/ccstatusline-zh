@@ -11,6 +11,7 @@ import {
     getContextConfig,
     getModelContextIdentifier
 } from '../utils/model-context';
+import { formatTokens } from '../utils/renderer';
 import { makeUsageProgressBar } from '../utils/usage';
 
 import { makeSliderBar } from './shared/usage-display';
@@ -110,8 +111,8 @@ export class ContextBarWidget implements Widget {
 
         const percent = (used / total) * 100;
         const clampedPercent = Math.max(0, Math.min(100, percent));
-        const usedK = Math.round(used / 1000);
-        const totalK = Math.round(total / 1000);
+        const usedDisplay = formatTokens(used, 0);
+        const totalDisplay = formatTokens(total, 0);
 
         if (isBarSliderMode(displayMode)) {
             const slider = makeSliderBar(clampedPercent);
@@ -120,7 +121,7 @@ export class ContextBarWidget implements Widget {
         }
 
         const barWidth = displayMode === 'progress' ? 32 : 16;
-        const display = `${makeUsageProgressBar(clampedPercent, barWidth)} ${usedK}k/${totalK}k (${Math.round(clampedPercent)}%)`;
+        const display = `${makeUsageProgressBar(clampedPercent, barWidth)} ${usedDisplay}/${totalDisplay} (${Math.round(clampedPercent)}%)`;
 
         return item.rawValue ? display : `上下文: ${display}`;
     }
