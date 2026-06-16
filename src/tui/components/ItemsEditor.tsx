@@ -360,7 +360,7 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
                             ⚠
                             {' '}
                             {settings.powerline.enabled
-                                ? 'Powerline 模式已启用：分隔符由 Powerline 设置控制'
+                                ? 'Powerline 模式已启用：手动分隔符已禁用'
                                 : '默认分隔符已启用：手动分隔符已禁用'}
                         </Text>
                     </Box>
