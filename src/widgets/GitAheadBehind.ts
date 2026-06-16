@@ -26,8 +26,8 @@ import {
     type SymbolSlot
 } from './shared/symbol-override';
 
-const AHEAD_SLOT: SymbolSlot = { id: 'symbolAhead', label: 'Ahead', defaultSymbol: '↑' };
-const BEHIND_SLOT: SymbolSlot = { id: 'symbolBehind', label: 'Behind', defaultSymbol: '↓' };
+const AHEAD_SLOT: SymbolSlot = { id: 'symbolAhead', label: '领先', defaultSymbol: '↑' };
+const BEHIND_SLOT: SymbolSlot = { id: 'symbolBehind', label: '落后', defaultSymbol: '↓' };
 
 export class GitAheadBehindWidget implements Widget {
     getDefaultColor(): string { return 'cyan'; }

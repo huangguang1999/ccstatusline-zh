@@ -39,7 +39,7 @@ const TOGGLE_TRIGGERS_ACTION = 'toggle-triggers';
 const SHOW_TRIGGERS_METADATA_KEY = 'showTriggers';
 const TOGGLE_RECLAIMED_ACTION = 'toggle-reclaimed';
 const SHOW_RECLAIMED_METADATA_KEY = 'showReclaimed';
-const RECLAIMED_SLOT: SymbolSlot = { id: 'symbolReclaimed', label: 'Reclaimed', defaultSymbol: '↓' };
+const RECLAIMED_SLOT: SymbolSlot = { id: 'symbolReclaimed', label: '已回收', defaultSymbol: '↓' };
 const SAMPLE_STATS: CompactionData = Object.freeze({
     count: 2,
     byTrigger: Object.freeze({ auto: 1, manual: 1, unknown: 0 }),
@@ -182,10 +182,10 @@ export class CompactionCounterWidget implements Widget {
             modifiers.push('Nerd 字体');
         }
         if (isMetadataFlagEnabled(item, SHOW_TRIGGERS_METADATA_KEY)) {
-            modifiers.push('trigger split');
+            modifiers.push('触发分组');
         }
         if (isMetadataFlagEnabled(item, SHOW_RECLAIMED_METADATA_KEY)) {
-            modifiers.push('reclaimed');
+            modifiers.push('已回收');
         }
         if (isHideZeroEnabled(item)) {
             modifiers.push('零时隐藏');

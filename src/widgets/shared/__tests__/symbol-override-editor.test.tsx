@@ -9,6 +9,7 @@ import {
 } from 'vitest';
 
 import type { WidgetItem } from '../../../types/Widget';
+import { getVisibleWidth } from '../../../utils/ansi';
 import {
     renderSymbolSlotsEditor,
     type SymbolSlot
@@ -60,10 +61,10 @@ function flushInk() {
 }
 
 const gitStatusSlots: SymbolSlot[] = [
-    { id: 'symbolConflicts', label: 'Conflicts', defaultSymbol: '!' },
-    { id: 'symbolStaged', label: 'Staged', defaultSymbol: '+' },
-    { id: 'symbolUnstaged', label: 'Unstaged', defaultSymbol: '*' },
-    { id: 'symbolUntracked', label: 'Untracked', defaultSymbol: '?' }
+    { id: 'symbolConflicts', label: '冲突', defaultSymbol: '!' },
+    { id: 'symbolStaged', label: '已暂存', defaultSymbol: '+' },
+    { id: 'symbolUnstaged', label: '未暂存', defaultSymbol: '*' },
+    { id: 'symbolUntracked', label: '未追踪', defaultSymbol: '?' }
 ];
 
 function renderEditor(widget: WidgetItem, slots: SymbolSlot[] = gitStatusSlots, onComplete = vi.fn(), onCancel = vi.fn()) {
@@ -119,7 +120,7 @@ describe('SymbolSlotsEditor', () => {
             const lines = getPlainOutput(rendered.stdout.getOutput())
                 .split('\n')
                 .filter(line => gitStatusSlots.some(slot => line.includes(`${slot.label}:`)));
-            const colonColumns = lines.map(line => line.indexOf(':'));
+            const colonColumns = lines.map(line => getVisibleWidth(line.slice(0, line.indexOf(':'))));
 
             expect(lines).toHaveLength(gitStatusSlots.length);
             expect(new Set(colonColumns)).toHaveLength(1);

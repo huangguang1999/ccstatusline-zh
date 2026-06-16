@@ -105,12 +105,12 @@ describe('ColorMenu', () => {
             stdin.write('\x1B[B');
             await flushInk();
 
-            const latestFrame = stdout.getOutput().split('Configure Colors').at(-1) ?? '';
+            const latestFrame = stdout.getOutput();
             const currentStyleLine = latestFrame
                 .split('\n')
-                .find(line => line.includes('Current foreground')) ?? '';
+                .findLast(line => line.includes('当前') && line.includes('前景色')) ?? '';
 
-            expect(currentStyleLine).toContain('[BOLD] [DIM ()]');
+            expect(currentStyleLine).toContain('[加粗] [暗色()]');
         } finally {
             instance.unmount();
             instance.cleanup();
