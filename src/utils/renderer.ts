@@ -38,7 +38,7 @@ export { formatTokens } from './format-tokens';
 // Build a red warning badge indicating that settings.json could not be loaded.
 // Passes colorLevel through so color is suppressed when the terminal has no color support.
 export function buildConfigWarningBadge(colorLevel: ColorLevel): string {
-    return applyColors('⚠ invalid config', 'red', undefined, false, getColorLevelString(colorLevel));
+    return applyColors('⚠ 配置无效', 'red', undefined, false, getColorLevelString(colorLevel));
 }
 
 // Paint a foreground gradient across a finished line when overrideForegroundColor

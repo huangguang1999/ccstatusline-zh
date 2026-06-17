@@ -4,7 +4,7 @@
 
 _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标_
 
-> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.20 版本（含 Remote Control Status、渐变色支持、周重置星期显示模式、Windows npm shim、超额用量单位修复等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
+> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.22 版本（含缓存命中率/读取/写入组件、超额用量消费组件、per-widget 调暗样式、组件字形覆盖、Powerline 弹性分隔符修复、配置无效警告徽章等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/huangguang1999/ccstatusline-zh/blob/main/LICENSE)
 [![Node.js Version](https://img.shields.io/node/v/ccstatusline.svg)](https://nodejs.org)
@@ -33,7 +33,7 @@ _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标
 
 ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支持 50+ 种可定制组件、Powerline 主题、交互式 TUI 配置界面等丰富功能。本项目在其基础上，将所有用户可见的英文文本直接替换为中文，包括：
 
-- **73 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余，v2.2.20 新增的 Remote Control Status）
+- **77 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余，v2.2.20 新增的 Remote Control Status，v2.2.21 新增的缓存命中率 / 缓存读取 / 缓存写入 / 超额用量消费）
 - **TUI 配置界面**的全部菜单项、帮助文本、提示信息、对话框
 - **布局组件**（分隔符、弹性分隔符）的名称和描述
 - **极简模式 / Minimalist Mode**、**模糊搜索组件选择器**、**Powerline 主题色延续**（v2.2.8）
@@ -44,6 +44,8 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 - **超额用量占比 / 超额用量剩余组件**（按量付费月度超额额度，支持禁用时隐藏）、**用量 API 空值桶兼容**、**Git 命令旧版本兼容与 `--no-optional-locks` 锁规避**（v2.2.17–v2.2.18）
 - **Git 子进程输出持久化缓存**（可配置 TTL，按 `.git/HEAD` / `.git/index` mtime 失效）、**`CCSTATUSLINE_WIDTH` 终端宽度覆盖**、**固定全局安装设为默认安装项**、**Windows 隐藏辅助进程窗口**（v2.2.19）
 - **Remote Control Status 远程控制状态组件**、**渐变色前景色支持**、**周重置计时器星期显示模式**、**Windows npm shim 执行修复**、**超额用量单位换算修正**、**Input/Output Token 组件优先使用累计转录指标**、**UsageFetch 缓存隔离改进**（v2.2.20）
+- **缓存命中率 / 缓存读取 / 缓存写入组件**、**超额用量消费组件**、**per-widget 调暗样式**（整体调暗或括号调暗）、**组件字形（Glyph）覆盖**、**CompactionCounter 触发类型拆分 & 回收 Token 数**、**上下文进度条 1M 显示修复**（v2.2.21）
+- **Powerline 弹性分隔符修复**、**CompactionCounter 回收箭头字形覆盖**、**配置文件无效时 TUI 警告徽章 & 非破坏性恢复**、**用量缓存账户 Token 变更失效**（v2.2.22）
 - **确认对话框** "是 / 否"
 - **分类筛选** "全部" 等界面元素
 
@@ -56,7 +58,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 | 界面语言   | 英文         | 中文                      |
 | 配置兼容性 | —            | ✅ 共用相同 settings.json |
 | 功能差异   | —            | 无，功能完全一致          |
-| 同步版本   | 最新         | v2.2.20（+ Remote Control Status / 渐变色 / 周重置星期模式 / Windows npm shim / 超额单位修正 / 中文化覆盖） |
+| 同步版本   | 最新         | v2.2.22（+ 缓存命中率/读取/写入 / 超额用量消费 / per-widget 调暗 / 字形覆盖 / Powerline 弹性分隔符修复 / 中文化覆盖） |
 
 ---
 
@@ -230,6 +232,14 @@ ccstatusline-zh --config /path/to/custom-settings.json
 | 缓存 Token | 显示缓存 Token 数量 |
 | 总 Token   | 显示 Token 合计     |
 
+### 缓存
+
+| 组件       | 说明                                     |
+| ---------- | ---------------------------------------- |
+| 缓存命中率 | 显示提示词缓存命中率（缓存读取 vs 写入） |
+| 缓存读取   | 显示从缓存读取的 Token 数及上下文占比    |
+| 缓存写入   | 显示写入缓存的 Token 数及上下文占比      |
+
 ### Token 速度
 
 | 组件     | 说明                        |
@@ -258,8 +268,9 @@ ccstatusline-zh --config /path/to/custom-settings.json
 | 周用量         | 显示本周 API 用量             |
 | 周 Sonnet 用量 | 显示本周 Sonnet 模型 API 用量 |
 | 周 Opus 用量   | 显示本周 Opus 模型 API 用量   |
-| 超额用量占比   | 显示超额用量（按量付费）占比       |
-| 超额用量剩余   | 显示每月超额用量额度的剩余金额（美元） |
+| 超额用量占比   | 显示超额用量（按量付费）占比             |
+| 超额用量剩余   | 显示每月超额用量额度的剩余金额（美元）   |
+| 超额用量消费   | 显示超额用量（按量付费超额部分）的消费金额 |
 | 时段计时器     | 显示当前 5 小时时段已用时间   |
 | 时段重置计时   | 显示时段重置窗口剩余时间      |
 | 周重置计时     | 显示周重置剩余时间            |
@@ -366,7 +377,7 @@ bun run lint
 ```
 src/
 ├── ccstatusline.ts          # 入口文件
-├── widgets/                 # 组件目录（72 个组件）
+├── widgets/                 # 组件目录（77 个组件）
 │   ├── Model.ts
 │   ├── GitBranch.ts
 │   ├── TokensInput.ts
