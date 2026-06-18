@@ -82,7 +82,7 @@ export function setSlotSymbol(item: WidgetItem, slot: SymbolSlot, value: string)
 }
 
 export function renderSymbolOverrideEditor(props: WidgetEditorProps, defaultSymbol: string): React.ReactElement {
-    return renderSymbolSlotsEditor(props, [{ id: 'character', label: 'Glyph', defaultSymbol }]);
+    return renderSymbolSlotsEditor(props, [{ id: 'character', label: '字形', defaultSymbol }]);
 }
 
 export function renderSymbolSlotsEditor(props: WidgetEditorProps, slots: SymbolSlot[]): React.ReactElement {

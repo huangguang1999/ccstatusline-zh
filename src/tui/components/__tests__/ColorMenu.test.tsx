@@ -63,15 +63,15 @@ describe('ColorMenu', () => {
         const stdout = createMockStdout();
         const stderr = createMockStdout();
         const widgets: WidgetItem[] = [
-            { id: '1', type: 'cache-hit-rate' },
             {
-                id: '2',
-                type: 'cache-read',
+                id: '1',
+                type: 'cache-hit-rate',
                 color: 'hex:ABB2BF',
                 backgroundColor: 'bgBrightBlack',
                 bold: true,
                 dim: 'parens'
             },
+            { id: '2', type: 'cache-read' },
             { id: '3', type: 'cache-write' },
             { id: '4', type: 'tokens-cached' }
         ];
@@ -108,9 +108,9 @@ describe('ColorMenu', () => {
             const latestFrame = stdout.getOutput().split('Configure Colors').at(-1) ?? '';
             const currentStyleLine = latestFrame
                 .split('\n')
-                .find(line => line.includes('Current foreground')) ?? '';
+                .find(line => line.includes('当前') && line.includes('前景色')) ?? '';
 
-            expect(currentStyleLine).toContain('[BOLD] [DIM ()]');
+            expect(currentStyleLine).toContain('[加粗] [暗淡()]');
         } finally {
             instance.unmount();
             instance.cleanup();
