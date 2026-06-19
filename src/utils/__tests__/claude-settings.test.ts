@@ -32,7 +32,7 @@ import {
     setRefreshInterval,
     uninstallStatusLine
 } from '../claude-settings';
-import { initConfigPath } from '../config';
+import * as config from '../config';
 
 const ORIGINAL_CLAUDE_CONFIG_DIR = process.env.CLAUDE_CONFIG_DIR;
 let testClaudeConfigDir = '';
@@ -60,11 +60,12 @@ function writeRawClaudeSettings(content: string): void {
 beforeEach(() => {
     testClaudeConfigDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ccstatusline-claude-settings-'));
     process.env.CLAUDE_CONFIG_DIR = testClaudeConfigDir;
-    initConfigPath(path.join(testClaudeConfigDir, 'ccstatusline-settings.json'));
+    config.initConfigPath(path.join(testClaudeConfigDir, 'ccstatusline-settings.json'));
 });
 
 afterEach(() => {
-    initConfigPath();
+    vi.restoreAllMocks();
+    config.initConfigPath();
     if (testClaudeConfigDir) {
         fs.rmSync(testClaudeConfigDir, { recursive: true, force: true });
     }
@@ -116,67 +117,11 @@ describe('isKnownCommand', () => {
     });
 
     it('should not match partial prefix', () => {
-        expect(isKnownCommand('npx -y ccstatusline-zh')).toBe(false);
+        expect(isKnownCommand('npx -y ccstatusline')).toBe(false);
     });
 
     it('should not match prefix that is a substring', () => {
-        expect(isKnownCommand('npx -y ccstatusline-zh@latestFOO')).toBe(false);
-    });
-
-    it('should match command containing ccstatusline.ts', () => {
-        expect(isKnownCommand('bun run /home/user/ccstatusline/src/ccstatusline.ts')).toBe(true);
-    });
-
-    it('should match command containing a quoted ccstatusline.ts path', () => {
-        expect(isKnownCommand('bun run "/Users/Jane Doe/ccstatusline/src/ccstatusline.ts"')).toBe(true);
-    });
-});
-
-describe('Claude config paths', () => {
-    it('should resolve .claude.json inside CLAUDE_CONFIG_DIR when configured', () => {
-        expect(getClaudeJsonPath()).toBe(path.join(testClaudeConfigDir, '.claude.json'));
-    });
-
-    it('should resolve .claude.json beside the default Claude config dir when CLAUDE_CONFIG_DIR is unset', () => {
-        delete process.env.CLAUDE_CONFIG_DIR;
-
-        expect(getClaudeJsonPath()).toBe(path.join(os.homedir(), '.claude.json'));
-    });
-
-    it('should use default .claude.json path when CLAUDE_CONFIG_DIR points to a file', () => {
-        const invalidConfigDir = path.join(testClaudeConfigDir, 'not-a-dir');
-        fs.writeFileSync(invalidConfigDir, 'not a directory', 'utf-8');
-        process.env.CLAUDE_CONFIG_DIR = invalidConfigDir;
-
-        expect(getClaudeJsonPath()).toBe(path.join(os.homedir(), '.claude.json'));
-    });
-
-    it('should match command containing ccstatusline.ts', () => {
-        expect(isKnownCommand('bun run /home/user/ccstatusline/src/ccstatusline.ts')).toBe(true);
-    });
-
-    it('should match command containing a quoted ccstatusline.ts path', () => {
-        expect(isKnownCommand('bun run "/Users/Jane Doe/ccstatusline/src/ccstatusline.ts"')).toBe(true);
-    });
-});
-
-describe('Claude config paths', () => {
-    it('should resolve .claude.json inside CLAUDE_CONFIG_DIR when configured', () => {
-        expect(getClaudeJsonPath()).toBe(path.join(testClaudeConfigDir, '.claude.json'));
-    });
-
-    it('should resolve .claude.json beside the default Claude config dir when CLAUDE_CONFIG_DIR is unset', () => {
-        delete process.env.CLAUDE_CONFIG_DIR;
-
-        expect(getClaudeJsonPath()).toBe(path.join(os.homedir(), '.claude.json'));
-    });
-
-    it('should use default .claude.json path when CLAUDE_CONFIG_DIR points to a file', () => {
-        const invalidConfigDir = path.join(testClaudeConfigDir, 'not-a-dir');
-        fs.writeFileSync(invalidConfigDir, 'not a directory', 'utf-8');
-        process.env.CLAUDE_CONFIG_DIR = invalidConfigDir;
-
-        expect(getClaudeJsonPath()).toBe(path.join(os.homedir(), '.claude.json'));
+        expect(isKnownCommand('npx -y ccstatusline@latestFOO')).toBe(false);
     });
 
     it('should match command containing ccstatusline.ts', () => {
@@ -254,49 +199,55 @@ describe('Claude config paths', () => {
 
 describe('buildCommand via installStatusLine', () => {
     it('should use base command when no custom config path', async () => {
-        initConfigPath();
+        config.initConfigPath();
         await installStatusLine({ commandMode: 'auto-npx' });
         expect(readInstalledCommand()).toBe(CCSTATUSLINE_COMMANDS.NPM);
     });
 
     it('should append --config with simple path (no quoting needed)', async () => {
-        initConfigPath('/tmp/settings.json');
+        vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
+        vi.spyOn(config, 'getConfigPath').mockReturnValue('/tmp/settings.json');
         await installStatusLine({ commandMode: 'auto-npx' });
         expect(readInstalledCommand()).toBe(`${CCSTATUSLINE_COMMANDS.NPM} --config /tmp/settings.json`);
     });
 
     it('should quote path with spaces', async () => {
-        initConfigPath('/my path/settings.json');
+        vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
+        vi.spyOn(config, 'getConfigPath').mockReturnValue('/my path/settings.json');
         await installStatusLine({ commandMode: 'auto-npx' });
         expect(readInstalledCommand()).toBe(`${CCSTATUSLINE_COMMANDS.NPM} --config '/my path/settings.json'`);
     });
 
     it('should quote path with parentheses', async () => {
-        initConfigPath('/my(path)/settings.json');
+        vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
+        vi.spyOn(config, 'getConfigPath').mockReturnValue('/my(path)/settings.json');
         await installStatusLine({ commandMode: 'auto-npx' });
         expect(readInstalledCommand()).toBe(`${CCSTATUSLINE_COMMANDS.NPM} --config '/my(path)/settings.json'`);
     });
 
     it('should escape embedded single quotes in path', async () => {
-        initConfigPath('/my\'path/settings.json');
+        vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
+        vi.spyOn(config, 'getConfigPath').mockReturnValue('/my\'path/settings.json');
         await installStatusLine({ commandMode: 'auto-npx' });
         expect(readInstalledCommand()).toBe(`${CCSTATUSLINE_COMMANDS.NPM} --config '/my'\\''path/settings.json'`);
     });
 
     it('should use bunx command when commandMode is auto-bunx', async () => {
-        initConfigPath('/my path/settings.json');
+        vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
+        vi.spyOn(config, 'getConfigPath').mockReturnValue('/my path/settings.json');
         await installStatusLine({ commandMode: 'auto-bunx' });
         expect(readInstalledCommand()).toBe(`${CCSTATUSLINE_COMMANDS.BUNX} --config '/my path/settings.json'`);
     });
 
     it('should generate global command with custom config path', () => {
-        initConfigPath('/my path/settings.json');
+        vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
+        vi.spyOn(config, 'getConfigPath').mockReturnValue('/my path/settings.json');
         expect(buildStatusLineCommand('global')).toBe(`${CCSTATUSLINE_COMMANDS.GLOBAL} --config '/my path/settings.json'`);
     });
 
     it('should install global command for pinned installs and save metadata', async () => {
         const configPath = path.join(testClaudeConfigDir, 'pinned-settings.json');
-        initConfigPath(configPath);
+        config.initConfigPath(configPath);
 
         await installStatusLine({
             commandMode: 'global',
@@ -316,7 +267,7 @@ describe('buildCommand via installStatusLine', () => {
 
     it('should sync hooks on install when settings include hook-enabled widgets', async () => {
         const configPath = path.join(testClaudeConfigDir, 'ccstatusline-settings.json');
-        initConfigPath(configPath);
+        config.initConfigPath(configPath);
         const settingsWithSkills = {
             ...DEFAULT_SETTINGS,
             lines: [[{ id: 'skills-1', type: 'skills' }], [], []]
@@ -346,7 +297,7 @@ describe('buildCommand via installStatusLine', () => {
 
     it('should sync hooks from the final global statusline command', async () => {
         const configPath = path.join(testClaudeConfigDir, 'global-settings.json');
-        initConfigPath(configPath);
+        config.initConfigPath(configPath);
         fs.writeFileSync(configPath, JSON.stringify({
             ...DEFAULT_SETTINGS,
             lines: [[{ id: 'skills-1', type: 'skills' }], [], []]
@@ -376,205 +327,13 @@ describe('buildCommand via installStatusLine', () => {
 
 describe('installStatusLine refreshInterval', () => {
     it('should set refreshInterval to 10 when version is supported', async () => {
-        initConfigPath();
+        config.initConfigPath();
         await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: true });
         expect(readInstalledRefreshInterval()).toBe(10);
     });
 
     it('should not set refreshInterval when version is unsupported', async () => {
-        initConfigPath();
-        await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: false });
-        expect(readInstalledRefreshInterval()).toBeUndefined();
-    });
-
-    it('should preserve existing refreshInterval on re-install', async () => {
-        writeRawClaudeSettings(JSON.stringify({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0,
-                refreshInterval: 5
-            }
-        }));
-        await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: true });
-        expect(readInstalledRefreshInterval()).toBe(5);
-    });
-});
-
-describe('refreshInterval', () => {
-    it('getRefreshInterval should return null when no settings exist', async () => {
-        await expect(getRefreshInterval()).resolves.toBeNull();
-    });
-
-    it('getRefreshInterval should return null when statusLine has no refreshInterval', async () => {
-        await saveClaudeSettings({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0
-            }
-        });
-        await expect(getRefreshInterval()).resolves.toBeNull();
-    });
-
-    it('getRefreshInterval should return the configured value', async () => {
-        await saveClaudeSettings({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0,
-                refreshInterval: 5
-            }
-        });
-        await expect(getRefreshInterval()).resolves.toBe(5);
-    });
-
-    it('setRefreshInterval should set the value on existing statusLine', async () => {
-        await saveClaudeSettings({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0
-            }
-        });
-
-        await setRefreshInterval(15);
-
-        const settings = await loadClaudeSettings();
-        expect(settings.statusLine?.refreshInterval).toBe(15);
-    });
-
-    it('setRefreshInterval with null should remove refreshInterval', async () => {
-        await saveClaudeSettings({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0,
-                refreshInterval: 10
-            }
-        });
-
-        await setRefreshInterval(null);
-
-        const settings = await loadClaudeSettings();
-        expect(settings.statusLine?.refreshInterval).toBeUndefined();
-    });
-
-    it('setRefreshInterval should do nothing when no statusLine exists', async () => {
-        await saveClaudeSettings({});
-
-        await setRefreshInterval(10);
-
-        const settings = await loadClaudeSettings();
-        expect(settings.statusLine).toBeUndefined();
-    });
-});
-
-describe('installStatusLine refreshInterval', () => {
-    it('should set refreshInterval to 10 when version is supported', async () => {
-        initConfigPath();
-        await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: true });
-        expect(readInstalledRefreshInterval()).toBe(10);
-    });
-
-    it('should not set refreshInterval when version is unsupported', async () => {
-        initConfigPath();
-        await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: false });
-        expect(readInstalledRefreshInterval()).toBeUndefined();
-    });
-
-    it('should preserve existing refreshInterval on re-install', async () => {
-        writeRawClaudeSettings(JSON.stringify({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0,
-                refreshInterval: 5
-            }
-        }));
-        await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: true });
-        expect(readInstalledRefreshInterval()).toBe(5);
-    });
-});
-
-describe('refreshInterval', () => {
-    it('getRefreshInterval should return null when no settings exist', async () => {
-        await expect(getRefreshInterval()).resolves.toBeNull();
-    });
-
-    it('getRefreshInterval should return null when statusLine has no refreshInterval', async () => {
-        await saveClaudeSettings({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0
-            }
-        });
-        await expect(getRefreshInterval()).resolves.toBeNull();
-    });
-
-    it('getRefreshInterval should return the configured value', async () => {
-        await saveClaudeSettings({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0,
-                refreshInterval: 5
-            }
-        });
-        await expect(getRefreshInterval()).resolves.toBe(5);
-    });
-
-    it('setRefreshInterval should set the value on existing statusLine', async () => {
-        await saveClaudeSettings({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0
-            }
-        });
-
-        await setRefreshInterval(15);
-
-        const settings = await loadClaudeSettings();
-        expect(settings.statusLine?.refreshInterval).toBe(15);
-    });
-
-    it('setRefreshInterval with null should remove refreshInterval', async () => {
-        await saveClaudeSettings({
-            statusLine: {
-                type: 'command',
-                command: CCSTATUSLINE_COMMANDS.NPM,
-                padding: 0,
-                refreshInterval: 10
-            }
-        });
-
-        await setRefreshInterval(null);
-
-        const settings = await loadClaudeSettings();
-        expect(settings.statusLine?.refreshInterval).toBeUndefined();
-    });
-
-    it('setRefreshInterval should do nothing when no statusLine exists', async () => {
-        await saveClaudeSettings({});
-
-        await setRefreshInterval(10);
-
-        const settings = await loadClaudeSettings();
-        expect(settings.statusLine).toBeUndefined();
-    });
-});
-
-describe('installStatusLine refreshInterval', () => {
-    it('should set refreshInterval to 10 when version is supported', async () => {
-        initConfigPath();
-        await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: true });
-        expect(readInstalledRefreshInterval()).toBe(10);
-    });
-
-    it('should not set refreshInterval when version is unsupported', async () => {
-        initConfigPath();
+        config.initConfigPath();
         await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: false });
         expect(readInstalledRefreshInterval()).toBeUndefined();
     });

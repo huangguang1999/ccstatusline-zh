@@ -47,6 +47,19 @@ describe('ExtraUsageRemainingWidget', () => {
         }, context)).toBe('$3,894.00');
     });
 
+    it('formats remaining budget in the currency reported by the API', () => {
+        const widget = new ExtraUsageRemainingWidget();
+
+        expect(render(widget, { id: 'extra', type: 'extra-usage-remaining' }, {
+            usageData: {
+                extraUsageCurrency: 'EUR',
+                extraUsageEnabled: true,
+                extraUsageLimit: 400000,
+                extraUsageUsed: 10600
+            }
+        })).toBe('超额剩余: €3,894.00');
+    });
+
     it('clamps remaining budget at zero', () => {
         const widget = new ExtraUsageRemainingWidget();
 
@@ -92,9 +105,9 @@ describe('ExtraUsageRemainingWidget', () => {
     it('shows usage errors only when required extra usage data is missing', () => {
         const widget = new ExtraUsageRemainingWidget();
 
-        mockGetUsageErrorMessage.mockReturnValue('[超时]');
+        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
 
-        expect(render(widget, { id: 'extra', type: 'extra-usage-remaining' }, { usageData: { error: 'timeout' } })).toBe('[超时]');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-remaining' }, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
         expect(render(widget, { id: 'extra', type: 'extra-usage-remaining' }, {
             usageData: {
                 extraUsageEnabled: true,

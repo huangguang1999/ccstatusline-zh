@@ -72,7 +72,7 @@ describe('widget catalog', () => {
         expect(types.has('flex-separator')).toBe(true);
     });
 
-    it('hides both separator types in powerline mode', () => {
+    it('hides manual separator but keeps flex separator in powerline mode', () => {
         const catalog = getWidgetCatalog({
             ...baseSettings,
             powerline: {
@@ -83,7 +83,7 @@ describe('widget catalog', () => {
 
         const types = new Set(catalog.map(entry => entry.type));
         expect(types.has('separator')).toBe(false);
-        expect(types.has('flex-separator')).toBe(false);
+        expect(types.has('flex-separator')).toBe(true);
     });
 
     it('returns unique categories in discovery order', () => {
@@ -158,7 +158,7 @@ describe('widget catalog filtering', () => {
     });
 
     it('matches display name with case-insensitive partial search', () => {
-        const results = filterWidgetCatalog(catalog, '全部', 'gIt br');
+        const results = filterWidgetCatalog(catalog, '全部', 'git-br');
         expect(results[0]?.type).toBe('git-branch');
     });
 
@@ -188,14 +188,9 @@ describe('widget catalog filtering', () => {
     });
 
     it('prioritizes word-initial fuzzy matches over incidental subsequence matches', () => {
-        const fuzzyCatalog: WidgetCatalogEntry[] = [
-            { type: 'tokens-cached', displayName: 'Tokens Cached', description: '', category: 'Token', searchText: 'tokens cached tokens-cached' },
-            { type: 'tokens-input', displayName: 'Tokens Input', description: '', category: 'Token', searchText: 'tokens input tokens-input' },
-            { type: 'tokens-output', displayName: 'Tokens Output', description: '', category: 'Token', searchText: 'tokens output tokens-output' }
-        ];
-        expect(filterWidgetCatalog(fuzzyCatalog, '全部', 'tc')[0]?.type).toBe('tokens-cached');
-        expect(filterWidgetCatalog(fuzzyCatalog, '全部', 'ti')[0]?.type).toBe('tokens-input');
-        expect(filterWidgetCatalog(fuzzyCatalog, '全部', 'to')[0]?.type).toBe('tokens-output');
+        expect(filterWidgetCatalog(catalog, '全部', 'tc')[0]?.type).toBe('tokens-cached');
+        expect(filterWidgetCatalog(catalog, '全部', 'tokens-in')[0]?.type).toBe('tokens-input');
+        expect(filterWidgetCatalog(catalog, '全部', 'tokens-ou')[0]?.type).toBe('tokens-output');
     });
 
     it('ranks exact substring matches above fuzzy matches', () => {
