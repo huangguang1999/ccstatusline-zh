@@ -21,7 +21,7 @@ describe('buildConfigWarningBadge', () => {
         chalk.level = 0;
         updateColorMap();
         const result = buildConfigWarningBadge(0);
-        expect(result).toBe('⚠ invalid config');
+        expect(result).toBe('⚠ 配置无效');
         expect(result).not.toContain('\x1b');
     });
 
@@ -29,7 +29,7 @@ describe('buildConfigWarningBadge', () => {
         chalk.level = 2;
         updateColorMap();
         const result = buildConfigWarningBadge(2);
-        expect(result).toContain('invalid config');
+        expect(result).toContain('配置无效');
         expect(result).toContain('\x1b');
     });
 });

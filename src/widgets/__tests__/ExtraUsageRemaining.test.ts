@@ -57,7 +57,7 @@ describe('ExtraUsageRemainingWidget', () => {
                 extraUsageLimit: 400000,
                 extraUsageUsed: 10600
             }
-        })).toBe('Overage Left: €3,894.00');
+        })).toBe('超额剩余: €3,894.00');
     });
 
     it('clamps remaining budget at zero', () => {
