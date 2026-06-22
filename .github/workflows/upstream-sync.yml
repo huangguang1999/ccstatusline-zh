@@ -38,7 +38,7 @@ jobs:
       tag: ${{ steps.upstream.outputs.tag }}
       fork_version: ${{ steps.fork.outputs.version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Resolve fork version
         id: fork
@@ -74,7 +74,7 @@ jobs:
     if: needs.detect.outputs.needs_sync == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
