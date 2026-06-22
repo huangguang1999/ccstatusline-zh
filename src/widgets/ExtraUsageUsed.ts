@@ -19,9 +19,9 @@ import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
 export class ExtraUsageUsedWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return 'Shows USD spent on extra usage (pay-as-you-go overage)'; }
-    getDisplayName(): string { return 'Extra Usage Used'; }
-    getCategory(): string { return 'Usage'; }
+    getDescription(): string { return '显示额外使用（按需计费超额）已消耗的美元金额'; }
+    getDisplayName(): string { return '已用超额额度'; }
+    getCategory(): string { return '用量'; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return {
@@ -36,14 +36,14 @@ export class ExtraUsageUsedWidget implements Widget {
 
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
         if (context.isPreview) {
-            return formatRawOrLabeledValue(item, 'Overage Used: ', '$106.00');
+            return formatRawOrLabeledValue(item, '已用超额: ', '$106.00');
         }
 
         const data = context.usageData ?? {};
         if (data.extraUsageEnabled === false) {
             return isHideExtraUsageDisabledEnabled(item)
                 ? null
-                : formatRawOrLabeledValue(item, 'Overage Used: ', 'n/a');
+                : formatRawOrLabeledValue(item, '已用超额: ', 'n/a');
         }
         if (data.extraUsageEnabled !== true || data.extraUsageUsed === undefined) {
             if (data.error)
@@ -55,7 +55,7 @@ export class ExtraUsageUsedWidget implements Widget {
         const usedDollars = data.extraUsageUsed / 100;
         const formatted = formatUsageCurrency(usedDollars, data.extraUsageCurrency);
 
-        return formatRawOrLabeledValue(item, 'Overage Used: ', formatted);
+        return formatRawOrLabeledValue(item, '已用超额: ', formatted);
     }
 
     getCustomKeybinds(): CustomKeybind[] {

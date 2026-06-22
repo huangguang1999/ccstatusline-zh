@@ -259,7 +259,7 @@ describe('CompactionCounterWidget', () => {
                 { key: 's', label: '(s)按触发拆分', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收 Token', action: 'toggle-reclaimed' },
                 { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
-                { key: 'g', label: '(g)lyph', action: 'edit-symbol-override' }
+                { key: 'g', label: '(g)字形', action: 'edit-symbol-override' }
             ]);
         });
 
@@ -272,7 +272,7 @@ describe('CompactionCounterWidget', () => {
                 { key: 's', label: '(s)按触发拆分', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收 Token', action: 'toggle-reclaimed' },
                 { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
-                { key: 'g', label: '(g)lyph', action: 'edit-symbol-override' }
+                { key: 'g', label: '(g)字形', action: 'edit-symbol-override' }
             ]);
         });
 
@@ -386,8 +386,8 @@ describe('CompactionCounterWidget', () => {
                 ...ITEM,
                 metadata: { showTriggers: 'true' }
             })).toEqual({
-                displayText: 'Compaction Counter',
-                modifierText: '(icon-space-number, trigger split)'
+                displayText: '压缩计数',
+                modifierText: '(icon-space-number, 触发拆分)'
             });
         });
 
@@ -405,8 +405,8 @@ describe('CompactionCounterWidget', () => {
                 ...ITEM,
                 metadata: { showReclaimed: 'true' }
             })).toEqual({
-                displayText: 'Compaction Counter',
-                modifierText: '(icon-space-number, reclaimed)'
+                displayText: '压缩计数',
+                modifierText: '(icon-space-number, 已回收)'
             });
         });
     });

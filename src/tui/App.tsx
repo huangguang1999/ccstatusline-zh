@@ -322,10 +322,10 @@ function joinCommandPath(dir: string, command: string): string {
 
 function getCommandFileName(globalBinDir: string, platform: NodeJS.Platform): string {
     if (platform === 'win32' || /^[a-z]:[\\/]/i.test(globalBinDir)) {
-        return 'ccstatusline.cmd';
+        return 'ccstatusline-zh.cmd';
     }
 
-    return 'ccstatusline';
+    return 'ccstatusline-zh';
 }
 
 function getPinnedGlobalRelaunchCommand(packageManager: GlobalPackageManager): string {
@@ -345,7 +345,7 @@ function getPinnedGlobalRelaunchCommand(packageManager: GlobalPackageManager): s
         );
     }
 
-    return 'ccstatusline';
+    return 'ccstatusline-zh';
 }
 
 export function getPinnedVersionMismatch(

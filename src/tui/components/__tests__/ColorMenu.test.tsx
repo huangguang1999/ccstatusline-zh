@@ -105,10 +105,10 @@ describe('ColorMenu', () => {
             stdin.write('\x1B[B');
             await flushInk();
 
-            const latestFrame = stdout.getOutput().split('Configure Colors').at(-1) ?? '';
+            const latestFrame = stdout.getOutput().split('配置颜色').at(-1) ?? '';
             const currentStyleLine = latestFrame
                 .split('\n')
-                .find(line => line.includes('Current foreground')) ?? '';
+                .find(line => line.includes('当前')) ?? '';
 
             expect(currentStyleLine).toContain('[BOLD] [DIM ()]');
         } finally {
