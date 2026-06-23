@@ -33,6 +33,7 @@ import {
     uninstallStatusLine
 } from '../claude-settings';
 import * as config from '../config';
+import { initConfigPath } from '../config';
 
 const ORIGINAL_CLAUDE_CONFIG_DIR = process.env.CLAUDE_CONFIG_DIR;
 let testClaudeConfigDir = '';

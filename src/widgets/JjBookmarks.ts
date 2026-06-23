@@ -96,7 +96,8 @@ export class JjBookmarksWidget implements Widget {
 
     getCustomKeybinds(): CustomKeybind[] {
         return [
-            { key: 'h', label: '(h)隐藏「无 JJ」提示', action: 'toggle-nojj' }
+            { key: 'h', label: '(h)隐藏「无 JJ」提示', action: 'toggle-nojj' },
+            getSymbolKeybind()
         ];
     }
 

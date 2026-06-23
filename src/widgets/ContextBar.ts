@@ -116,7 +116,7 @@ export class ContextBarWidget implements Widget {
 
         if (isBarSliderMode(displayMode)) {
             const slider = makeSliderBar(clampedPercent);
-            const sliderDisplay = displayMode === 'slider' ? `${slider} ${usedK}k/${totalK}k (${Math.round(clampedPercent)}%)` : slider;
+            const sliderDisplay = displayMode === 'slider' ? `${slider} ${usedDisplay}/${totalDisplay} (${Math.round(clampedPercent)}%)` : slider;
             return item.rawValue ? sliderDisplay : `上下文: ${sliderDisplay}`;
         }
 

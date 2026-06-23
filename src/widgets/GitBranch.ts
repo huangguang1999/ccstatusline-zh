@@ -133,7 +133,8 @@ export class GitBranchWidget implements Widget {
     getCustomKeybinds(): CustomKeybind[] {
         return [
             ...getHideNoGitKeybinds(),
-            { key: 'l', label: '(l)仓库链接', action: TOGGLE_LINK_ACTION }
+            { key: 'l', label: '(l)仓库链接', action: TOGGLE_LINK_ACTION },
+            getSymbolKeybind()
         ];
     }
 

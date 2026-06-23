@@ -39,7 +39,7 @@ const TOGGLE_TRIGGERS_ACTION = 'toggle-triggers';
 const SHOW_TRIGGERS_METADATA_KEY = 'showTriggers';
 const TOGGLE_RECLAIMED_ACTION = 'toggle-reclaimed';
 const SHOW_RECLAIMED_METADATA_KEY = 'showReclaimed';
-const RECLAIMED_SLOT: SymbolSlot = { id: 'symbolReclaimed', label: 'Reclaimed', defaultSymbol: '↓' };
+const RECLAIMED_SLOT: SymbolSlot = { id: 'symbolReclaimed', label: '已回收', defaultSymbol: '↓' };
 const SAMPLE_STATS: CompactionData = Object.freeze({
     count: 2,
     byTrigger: Object.freeze({ auto: 1, manual: 1, unknown: 0 }),
@@ -182,10 +182,10 @@ export class CompactionCounterWidget implements Widget {
             modifiers.push('Nerd 字体');
         }
         if (isMetadataFlagEnabled(item, SHOW_TRIGGERS_METADATA_KEY)) {
-            modifiers.push('trigger split');
+            modifiers.push('触发器分类');
         }
         if (isMetadataFlagEnabled(item, SHOW_RECLAIMED_METADATA_KEY)) {
-            modifiers.push('reclaimed');
+            modifiers.push('已回收');
         }
         if (isHideZeroEnabled(item)) {
             modifiers.push('零时隐藏');
@@ -248,7 +248,10 @@ export class CompactionCounterWidget implements Widget {
             keybinds.push({ key: 'n', label: '(n)Nerd 字体', action: TOGGLE_NERD_FONT_ACTION });
         }
 
+        keybinds.push({ key: 's', label: '(s)触发器分类', action: TOGGLE_TRIGGERS_ACTION });
+        keybinds.push({ key: 't', label: '(t)已回收令牌', action: TOGGLE_RECLAIMED_ACTION });
         keybinds.push({ key: 'h', label: '(h)零时隐藏', action: TOGGLE_HIDE_ZERO_ACTION });
+        keybinds.push(getSymbolKeybind());
 
         return keybinds;
     }

@@ -256,7 +256,10 @@ describe('CompactionCounterWidget', () => {
             expect(new CompactionCounterWidget().getCustomKeybinds(ITEM)).toEqual([
                 { key: 'f', label: '(f)格式切换', action: 'cycle-format' },
                 { key: 'n', label: '(n)Nerd 字体', action: 'toggle-nerd-font' },
-                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' }
+                { key: 's', label: '(s)触发器分类', action: 'toggle-triggers' },
+                { key: 't', label: '(t)已回收令牌', action: 'toggle-reclaimed' },
+                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
+                { key: 'g', label: '(g)字符', action: 'edit-symbol-override' }
             ]);
         });
 
@@ -266,7 +269,10 @@ describe('CompactionCounterWidget', () => {
                 metadata: { format: 'text-and-number' }
             })).toEqual([
                 { key: 'f', label: '(f)格式切换', action: 'cycle-format' },
-                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' }
+                { key: 's', label: '(s)触发器分类', action: 'toggle-triggers' },
+                { key: 't', label: '(t)已回收令牌', action: 'toggle-reclaimed' },
+                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
+                { key: 'g', label: '(g)字符', action: 'edit-symbol-override' }
             ]);
         });
 
@@ -380,8 +386,8 @@ describe('CompactionCounterWidget', () => {
                 ...ITEM,
                 metadata: { showTriggers: 'true' }
             })).toEqual({
-                displayText: 'Compaction Counter',
-                modifierText: '(icon-space-number, trigger split)'
+                displayText: '压缩计数',
+                modifierText: '(icon-space-number, 触发器分类)'
             });
         });
 
@@ -399,8 +405,8 @@ describe('CompactionCounterWidget', () => {
                 ...ITEM,
                 metadata: { showReclaimed: 'true' }
             })).toEqual({
-                displayText: 'Compaction Counter',
-                modifierText: '(icon-space-number, reclaimed)'
+                displayText: '压缩计数',
+                modifierText: '(icon-space-number, 已回收)'
             });
         });
     });

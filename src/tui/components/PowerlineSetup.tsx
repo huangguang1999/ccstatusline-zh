@@ -360,7 +360,7 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                             </Box>
                         </>
                     )}
-                    <Box marginTop={hasSeparatorItems ? 1 : 0}>
+                    <Box marginTop={hasManualSeparatorItems ? 1 : 0}>
                         <Text>是否要继续？</Text>
                     </Box>
                     <Box marginTop={1}>

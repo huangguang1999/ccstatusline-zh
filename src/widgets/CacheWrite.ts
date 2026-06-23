@@ -23,9 +23,9 @@ import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
 export class CacheWriteWidget implements Widget {
     getDefaultColor(): string { return 'yellow'; }
-    getDescription(): string { return 'Shows cache write tokens written to cache, with context share'; }
-    getDisplayName(): string { return 'Cache Write'; }
-    getCategory(): string { return 'Cache'; }
+    getDescription(): string { return '显示写入缓存的缓存写入令牌数及其上下文占比'; }
+    getDisplayName(): string { return '缓存写入'; }
+    getCategory(): string { return '缓存'; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName(), modifierText: getCacheModifierText(item) };
     }
@@ -36,13 +36,13 @@ export class CacheWriteWidget implements Widget {
 
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
         if (context.isPreview) {
-            return formatRawOrLabeledValue(item, 'Cache Write: ', '3k (16.0%)');
+            return formatRawOrLabeledValue(item, '缓存写入: ', '3k (16.0%)');
         }
 
         const hideWhenEmpty = isCacheHideWhenEmptyEnabled(item);
         const tokens = getCacheTokens(context, isCacheSessionScope(item));
         if (!tokens) {
-            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, 'Cache Write: ', 'n/a');
+            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, '缓存写入: ', 'n/a');
         }
 
         if (tokens.creation === 0 && hideWhenEmpty) {
@@ -50,7 +50,7 @@ export class CacheWriteWidget implements Widget {
         }
 
         const value = formatTokensWithPercentage(tokens.creation, getCacheWritePercentage(tokens));
-        return formatRawOrLabeledValue(item, 'Cache Write: ', value);
+        return formatRawOrLabeledValue(item, '缓存写入: ', value);
     }
 
     getCustomKeybinds(item?: WidgetItem): CustomKeybind[] {

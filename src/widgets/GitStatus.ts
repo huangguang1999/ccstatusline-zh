@@ -26,10 +26,10 @@ import {
     type SymbolSlot
 } from './shared/symbol-override';
 
-const CONFLICTS_SLOT: SymbolSlot = { id: 'symbolConflicts', label: 'Conflicts', defaultSymbol: '!' };
-const STAGED_SLOT: SymbolSlot = { id: 'symbolStaged', label: 'Staged', defaultSymbol: '+' };
-const UNSTAGED_SLOT: SymbolSlot = { id: 'symbolUnstaged', label: 'Unstaged', defaultSymbol: '*' };
-const UNTRACKED_SLOT: SymbolSlot = { id: 'symbolUntracked', label: 'Untracked', defaultSymbol: '?' };
+const CONFLICTS_SLOT: SymbolSlot = { id: 'symbolConflicts', label: '冲突', defaultSymbol: '!' };
+const STAGED_SLOT: SymbolSlot = { id: 'symbolStaged', label: '已暂存', defaultSymbol: '+' };
+const UNSTAGED_SLOT: SymbolSlot = { id: 'symbolUnstaged', label: '未暂存', defaultSymbol: '*' };
+const UNTRACKED_SLOT: SymbolSlot = { id: 'symbolUntracked', label: '未追踪', defaultSymbol: '?' };
 
 export class GitStatusWidget implements Widget {
     getDefaultColor(): string { return 'yellow'; }

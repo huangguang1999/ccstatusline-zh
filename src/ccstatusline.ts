@@ -22,7 +22,6 @@ import {
     loadSettings,
     saveSettings
 } from './utils/config';
-import { calculateContextPercentageMetrics } from './utils/context-percentage';
 import {
     getSessionDuration,
     getSpeedMetricsCollection,
@@ -165,7 +164,7 @@ async function renderMultipleLines(data: StatusJSON) {
         usageData,
         sessionDuration,
         skillsMetrics,
-        compactionData: hasCompactionWidget ? { count: compactionCount } : null,
+        compactionData,
         isPreview: false,
         minimalist: settings.minimalistMode,
         gitCacheTtlSeconds: settings.gitCacheTtlSeconds

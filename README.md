@@ -4,7 +4,7 @@
 
 _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标_
 
-> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.20 版本（含 Remote Control Status、渐变色支持、周重置星期显示模式、Windows npm shim、超额用量单位修复等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
+> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.22 版本（含缓存命中率 / 缓存读写组件、超额已用组件、压缩计数 compact_boundary 精准检测、弹性分隔符 Powerline 渲染修复等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/huangguang1999/ccstatusline-zh/blob/main/LICENSE)
 [![Node.js Version](https://img.shields.io/node/v/ccstatusline.svg)](https://nodejs.org)
@@ -33,7 +33,7 @@ _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标
 
 ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支持 50+ 种可定制组件、Powerline 主题、交互式 TUI 配置界面等丰富功能。本项目在其基础上，将所有用户可见的英文文本直接替换为中文，包括：
 
-- **73 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余，v2.2.20 新增的 Remote Control Status）
+- **77 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余，v2.2.20 新增的 Remote Control Status，v2.2.22 新增的缓存命中率 / 缓存读取 / 缓存写入 / 超额已用）
 - **TUI 配置界面**的全部菜单项、帮助文本、提示信息、对话框
 - **布局组件**（分隔符、弹性分隔符）的名称和描述
 - **极简模式 / Minimalist Mode**、**模糊搜索组件选择器**、**Powerline 主题色延续**（v2.2.8）
@@ -44,6 +44,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 - **超额用量占比 / 超额用量剩余组件**（按量付费月度超额额度，支持禁用时隐藏）、**用量 API 空值桶兼容**、**Git 命令旧版本兼容与 `--no-optional-locks` 锁规避**（v2.2.17–v2.2.18）
 - **Git 子进程输出持久化缓存**（可配置 TTL，按 `.git/HEAD` / `.git/index` mtime 失效）、**`CCSTATUSLINE_WIDTH` 终端宽度覆盖**、**固定全局安装设为默认安装项**、**Windows 隐藏辅助进程窗口**（v2.2.19）
 - **Remote Control Status 远程控制状态组件**、**渐变色前景色支持**、**周重置计时器星期显示模式**、**Windows npm shim 执行修复**、**超额用量单位换算修正**、**Input/Output Token 组件优先使用累计转录指标**、**UsageFetch 缓存隔离改进**（v2.2.20）
+- **缓存命中率 / 缓存读取 / 缓存写入**（Cache Hit Rate / Cache Read / Cache Write）、**超额已用组件**（Extra Usage Used）、**压缩计数改用 compact_boundary 标记精准检测**（不再依赖上下文百分比推断）、**弹性分隔符 Powerline 路径修复**、**可覆盖字符字形（Glyph override）**、**每组件暗淡样式**（整体暗淡 / 括号暗淡）、**invalid settings.json 非破坏性恢复与警告**（v2.2.21–v2.2.22）
 - **确认对话框** "是 / 否"
 - **分类筛选** "全部" 等界面元素
 
@@ -56,7 +57,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 | 界面语言   | 英文         | 中文                      |
 | 配置兼容性 | —            | ✅ 共用相同 settings.json |
 | 功能差异   | —            | 无，功能完全一致          |
-| 同步版本   | 最新         | v2.2.20（+ Remote Control Status / 渐变色 / 周重置星期模式 / Windows npm shim / 超额单位修正 / 中文化覆盖） |
+| 同步版本   | 最新         | v2.2.22（+ 缓存命中率/读写组件 / 超额已用 / 压缩计数精准检测 / Glyph override / 每组件暗淡样式 / 中文化覆盖） |
 
 ---
 
