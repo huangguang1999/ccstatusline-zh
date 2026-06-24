@@ -22,9 +22,9 @@ import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
 export class CacheHitRateWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return 'Shows prompt cache hit rate (cache reads vs cache writes)'; }
-    getDisplayName(): string { return 'Cache Hit Rate'; }
-    getCategory(): string { return 'Cache'; }
+    getDescription(): string { return '显示提示词缓存命中率（缓存读取 vs 缓存写入）'; }
+    getDisplayName(): string { return '缓存命中率'; }
+    getCategory(): string { return '缓存'; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName(), modifierText: getCacheModifierText(item) };
     }
@@ -35,25 +35,25 @@ export class CacheHitRateWidget implements Widget {
 
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
         if (context.isPreview) {
-            return formatRawOrLabeledValue(item, 'Cache Hit: ', '87.0%');
+            return formatRawOrLabeledValue(item, '缓存命中: ', '87.0%');
         }
 
         const hideWhenEmpty = isCacheHideWhenEmptyEnabled(item);
         const tokens = getCacheTokens(context, isCacheSessionScope(item));
         if (!tokens) {
-            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, 'Cache Hit: ', 'n/a');
+            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, '缓存命中: ', 'n/a');
         }
 
         const hitRate = getCacheHitRate(tokens);
         if (hitRate === null) {
-            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, 'Cache Hit: ', '0.0%');
+            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, '缓存命中: ', '0.0%');
         }
 
         if (hitRate === 0 && hideWhenEmpty) {
             return null;
         }
 
-        return formatRawOrLabeledValue(item, 'Cache Hit: ', `${hitRate.toFixed(1)}%`);
+        return formatRawOrLabeledValue(item, '缓存命中: ', `${hitRate.toFixed(1)}%`);
     }
 
     getCustomKeybinds(item?: WidgetItem): CustomKeybind[] {

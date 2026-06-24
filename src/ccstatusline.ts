@@ -22,7 +22,6 @@ import {
     loadSettings,
     saveSettings
 } from './utils/config';
-import { handleHookInput } from './utils/hook-handler';
 import {
     getSessionDuration,
     getSpeedMetricsCollection,
