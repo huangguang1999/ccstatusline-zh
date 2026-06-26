@@ -71,11 +71,7 @@ export class JjWorkspaceWidget implements Widget {
             return item.rawValue ? workspace : `${prefix}${workspace}`;
         }
 
-<<<<<<< HEAD
-        return hideNoJj ? null : '◆ 无 JJ';
-=======
-        return hideNoJj ? null : `${prefix}no jj`;
->>>>>>> 8ae6481 (feat: allow overriding widget symbols with a custom glyph (#431))
+        return hideNoJj ? null : `${prefix}无 JJ`;
     }
 
     private getJjWorkspace(context: RenderContext): string | null {

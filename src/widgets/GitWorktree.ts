@@ -56,11 +56,7 @@ export class GitWorktreeWidget implements Widget {
         if (worktree)
             return item.rawValue ? worktree : `${prefix}${worktree}`;
 
-<<<<<<< HEAD
-        return hideNoGit ? null : '𖠰 无 Git';
-=======
-        return hideNoGit ? null : `${prefix}no git`;
->>>>>>> 8ae6481 (feat: allow overriding widget symbols with a custom glyph (#431))
+        return hideNoGit ? null : `${prefix}无 Git`;
     }
 
     private getGitWorktree(context: RenderContext): string | null {

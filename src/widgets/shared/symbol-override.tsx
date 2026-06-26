@@ -82,7 +82,7 @@ export function setSlotSymbol(item: WidgetItem, slot: SymbolSlot, value: string)
 }
 
 export function renderSymbolOverrideEditor(props: WidgetEditorProps, defaultSymbol: string): React.ReactElement {
-    return renderSymbolSlotsEditor(props, [{ id: 'character', label: 'Glyph', defaultSymbol }]);
+    return renderSymbolSlotsEditor(props, [{ id: 'character', label: '字形', defaultSymbol }]);
 }
 
 export function renderSymbolSlotsEditor(props: WidgetEditorProps, slots: SymbolSlot[]): React.ReactElement {
@@ -134,11 +134,11 @@ const SymbolSlotsEditor: React.FC<WidgetEditorProps & { slots: SymbolSlot[] }> =
 
     return (
         <Box flexDirection='column'>
-            <Text bold>Glyphs</Text>
+            <Text bold>字形</Text>
             <Text dimColor>
                 {slots.length > 1
-                    ? '↑↓ row, type to set, Tab default, Backspace none, Enter save, ESC cancel'
-                    : 'Type any character or emoji, Tab default, Backspace none, Enter save, ESC cancel'}
+                    ? '↑↓ 切换行，输入设置字形，Tab 恢复默认，Backspace 清空，Enter 保存，ESC 取消'
+                    : '输入任意字符或 emoji，Tab 恢复默认，Backspace 清空，Enter 保存，ESC 取消'}
             </Text>
             <Box marginTop={1} flexDirection='column'>
                 {slots.map((slot, index) => {
@@ -158,9 +158,9 @@ const SymbolSlotsEditor: React.FC<WidgetEditorProps & { slots: SymbolSlot[] }> =
                             {value ? (
                                 <Text inverse>{value}</Text>
                             ) : (
-                                <Text inverse dimColor>(none)</Text>
+                                <Text inverse dimColor>(空)</Text>
                             )}
-                            <Text dimColor>{` (default: ${slot.defaultSymbol})`}</Text>
+                            <Text dimColor>{` （默认: ${slot.defaultSymbol}）`}</Text>
                         </Box>
                     );
                 })}

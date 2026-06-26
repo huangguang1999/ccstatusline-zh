@@ -14,10 +14,10 @@ const HIDE_WHEN_EMPTY_KEY = 'hideWhenEmpty';
 const TOGGLE_CACHE_SCOPE_ACTION = 'toggle-cache-scope';
 const TOGGLE_HIDE_EMPTY_ACTION = 'toggle-hide-empty';
 
-const CACHE_SCOPE_KEYBIND: CustomKeybind = { key: 't', label: '(t)urn/session', action: TOGGLE_CACHE_SCOPE_ACTION };
+const CACHE_SCOPE_KEYBIND: CustomKeybind = { key: 't', label: '(t)按会话统计', action: TOGGLE_CACHE_SCOPE_ACTION };
 const HIDE_WHEN_EMPTY_KEYBIND: CustomKeybind = {
     key: 'h',
-    label: '(h)ide when empty',
+    label: '(h)空时隐藏',
     action: TOGGLE_HIDE_EMPTY_ACTION
 };
 
@@ -34,10 +34,10 @@ export function isCacheHideWhenEmptyEnabled(item: WidgetItem): boolean {
 export function getCacheModifierText(item: WidgetItem): string | undefined {
     const modifiers: string[] = [];
     if (isCacheSessionScope(item)) {
-        modifiers.push('session');
+        modifiers.push('会话');
     }
     if (isCacheHideWhenEmptyEnabled(item)) {
-        modifiers.push('hide when empty');
+        modifiers.push('空时隐藏');
     }
 
     return makeModifierText(modifiers);

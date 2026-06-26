@@ -479,13 +479,13 @@ describe('refreshInterval', () => {
 
 describe('installStatusLine refreshInterval', () => {
     it('should set refreshInterval to 10 when version is supported', async () => {
-        initConfigPath();
+        config.initConfigPath();
         await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: true });
         expect(readInstalledRefreshInterval()).toBe(10);
     });
 
     it('should not set refreshInterval when version is unsupported', async () => {
-        initConfigPath();
+        config.initConfigPath();
         await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: false });
         expect(readInstalledRefreshInterval()).toBeUndefined();
     });
@@ -575,13 +575,13 @@ describe('refreshInterval', () => {
 
 describe('installStatusLine refreshInterval', () => {
     it('should set refreshInterval to 10 when version is supported', async () => {
-        initConfigPath();
+        config.initConfigPath();
         await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: true });
         expect(readInstalledRefreshInterval()).toBe(10);
     });
 
     it('should not set refreshInterval when version is unsupported', async () => {
-        initConfigPath();
+        config.initConfigPath();
         await installStatusLine({ commandMode: 'auto-npx', supportsRefreshInterval: false });
         expect(readInstalledRefreshInterval()).toBeUndefined();
     });
