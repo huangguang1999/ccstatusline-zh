@@ -108,9 +108,9 @@ describe('ColorMenu', () => {
             const latestFrame = stdout.getOutput().split('Configure Colors').at(-1) ?? '';
             const currentStyleLine = latestFrame
                 .split('\n')
-                .find(line => line.includes('Current foreground')) ?? '';
+                .findLast(line => line.includes('当前') && line.includes('前景色')) ?? '';
 
-            expect(currentStyleLine).toContain('[BOLD] [DIM ()]');
+            expect(currentStyleLine).toContain('[粗体] [暗色()]');
         } finally {
             instance.unmount();
             instance.cleanup();

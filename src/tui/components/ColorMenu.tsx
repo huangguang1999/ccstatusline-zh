@@ -442,9 +442,9 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
         }
     }
     const styleIndicators = [
-        selectedWidget?.bold ? '[BOLD]' : null,
-        selectedWidget?.dim === true ? '[DIM]' : null,
-        selectedWidget?.dim === 'parens' ? '[DIM ()]' : null
+        selectedWidget?.bold ? '[粗体]' : null,
+        selectedWidget?.dim === true ? '[暗色]' : null,
+        selectedWidget?.dim === 'parens' ? '[暗色()]' : null
     ].filter(indicator => indicator !== null).join(' ');
 
     // Gradient selection mode takes over the whole view

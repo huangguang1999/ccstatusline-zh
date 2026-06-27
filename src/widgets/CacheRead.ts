@@ -23,9 +23,9 @@ import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
 export class CacheReadWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return 'Shows cache read tokens served from cache, with context share'; }
-    getDisplayName(): string { return 'Cache Read'; }
-    getCategory(): string { return 'Cache'; }
+    getDescription(): string { return '显示从缓存读取的 token 数及其上下文占比'; }
+    getDisplayName(): string { return '缓存读取'; }
+    getCategory(): string { return '缓存'; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName(), modifierText: getCacheModifierText(item) };
     }
@@ -36,13 +36,13 @@ export class CacheReadWidget implements Widget {
 
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
         if (context.isPreview) {
-            return formatRawOrLabeledValue(item, 'Cache Read: ', '12k (64.0%)');
+            return formatRawOrLabeledValue(item, '缓存读取: ', '12k (64.0%)');
         }
 
         const hideWhenEmpty = isCacheHideWhenEmptyEnabled(item);
         const tokens = getCacheTokens(context, isCacheSessionScope(item));
         if (!tokens) {
-            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, 'Cache Read: ', 'n/a');
+            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, '缓存读取: ', 'n/a');
         }
 
         if (tokens.read === 0 && hideWhenEmpty) {
@@ -50,7 +50,7 @@ export class CacheReadWidget implements Widget {
         }
 
         const value = formatTokensWithPercentage(tokens.read, getCacheReadPercentage(tokens));
-        return formatRawOrLabeledValue(item, 'Cache Read: ', value);
+        return formatRawOrLabeledValue(item, '缓存读取: ', value);
     }
 
     getCustomKeybinds(item?: WidgetItem): CustomKeybind[] {

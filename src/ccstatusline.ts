@@ -22,8 +22,6 @@ import {
     loadSettings,
     saveSettings
 } from './utils/config';
-import { calculateContextPercentageMetrics } from './utils/context-percentage';
-import { handleHookInput } from './utils/hook-handler';
 import {
     getSessionDuration,
     getSpeedMetricsCollection,

@@ -386,7 +386,7 @@ describe('CompactionCounterWidget', () => {
                 ...ITEM,
                 metadata: { showTriggers: 'true' }
             })).toEqual({
-                displayText: 'Compaction Counter',
+                displayText: '压缩计数',
                 modifierText: '(icon-space-number, trigger split)'
             });
         });
@@ -405,7 +405,7 @@ describe('CompactionCounterWidget', () => {
                 ...ITEM,
                 metadata: { showReclaimed: 'true' }
             })).toEqual({
-                displayText: 'Compaction Counter',
+                displayText: '压缩计数',
                 modifierText: '(icon-space-number, reclaimed)'
             });
         });
