@@ -23,6 +23,7 @@ import { ConfirmDialog } from './ConfirmDialog';
 import {
     clearAllWidgetStyling,
     cycleWidgetColor,
+    cycleWidgetDim,
     resetWidgetStyling,
     setWidgetColor,
     toggleWidgetBold
@@ -268,6 +269,15 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
                     onUpdate(newItems);
                 }
             }
+        } else if (input === 'd' || input === 'D') {
+            if (highlightedItemId && highlightedItemId !== 'back') {
+                // Cycle dim for the highlighted item: off -> whole -> parens -> off
+                const selectedWidget = colorableWidgets.find(widget => widget.id === highlightedItemId);
+                if (selectedWidget) {
+                    const newItems = cycleWidgetDim(widgets, selectedWidget.id);
+                    onUpdate(newItems);
+                }
+            }
         } else if (input === 'r' || input === 'R') {
             if (highlightedItemId && highlightedItemId !== 'back') {
                 // Reset all styling (color, background, and bold) for the highlighted item
@@ -347,7 +357,7 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
                 defaultColor = widgetImpl.getDefaultColor();
             }
         }
-        const styledLabel = applyColors(label, widget.color ?? defaultColor, widget.backgroundColor, widget.bold, level);
+        const styledLabel = applyColors(label, widget.color ?? defaultColor, widget.backgroundColor, widget.bold, level, widget.dim);
         return {
             label: styledLabel,
             value: widget.id
@@ -431,6 +441,11 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
             colorDisplay = applyColors(displayName, currentColor, undefined, false, level);
         }
     }
+    const styleIndicators = [
+        selectedWidget?.bold ? '[加粗]' : null,
+        selectedWidget?.dim === true ? '[暗淡]' : null,
+        selectedWidget?.dim === 'parens' ? '[括号暗淡]' : null
+    ].filter(indicator => indicator !== null).join(' ');
 
     // Gradient selection mode takes over the whole view
     if (gradientMode) {
@@ -597,7 +612,7 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
                                 ):
                                 {' '}
                                 {colorDisplay}
-                                {selectedWidget.bold && chalk.bold(' [加粗]')}
+                                {styleIndicators && ` ${styleIndicators}`}
                             </Text>
                         </Box>
                     ) : (

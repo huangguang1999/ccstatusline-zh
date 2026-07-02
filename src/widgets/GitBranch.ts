@@ -4,6 +4,7 @@ import type {
     CustomKeybind,
     Widget,
     WidgetEditorDisplay,
+    WidgetEditorProps,
     WidgetItem
 } from '../types/Widget';
 import {
@@ -27,7 +28,13 @@ import {
     isHideNoGitEnabled
 } from './shared/git-no-git';
 import { isMetadataFlagEnabled } from './shared/metadata';
+import {
+    formatSymbolPrefix,
+    getSymbolKeybind,
+    renderSymbolOverrideEditor
+} from './shared/symbol-override';
 
+const DEFAULT_SYMBOL = '⎇';
 const LINK_KEY = 'linkToRepo';
 const LEGACY_LINK_KEY = 'linkToGitHub';
 const TOGGLE_LINK_ACTION = 'toggle-link';
@@ -88,9 +95,10 @@ export class GitBranchWidget implements Widget {
         void settings;
         const hideNoGit = isHideNoGitEnabled(item);
         const isLink = isLinkEnabled(item);
+        const prefix = formatSymbolPrefix(item, DEFAULT_SYMBOL);
 
         if (context.isPreview) {
-            const text = item.rawValue ? 'main' : '⎇ main';
+            const text = item.rawValue ? 'main' : `${prefix}main`;
             return isLink ? renderOsc8Link('https://github.com/owner/repo/tree/main', text) : text;
         }
 
@@ -103,7 +111,7 @@ export class GitBranchWidget implements Widget {
             return hideNoGit ? null : '⎇ 无 Git';
         }
 
-        const displayText = item.rawValue ? branch : `⎇ ${branch}`;
+        const displayText = item.rawValue ? branch : `${prefix}${branch}`;
 
         if (isLink) {
             const origin = getRemoteInfo('origin', context);
@@ -125,8 +133,13 @@ export class GitBranchWidget implements Widget {
     getCustomKeybinds(): CustomKeybind[] {
         return [
             ...getHideNoGitKeybinds(),
-            { key: 'l', label: '(l)仓库链接', action: TOGGLE_LINK_ACTION }
+            { key: 'l', label: '(l)仓库链接', action: TOGGLE_LINK_ACTION },
+            getSymbolKeybind()
         ];
+    }
+
+    renderEditor(props: WidgetEditorProps) {
+        return renderSymbolOverrideEditor(props, DEFAULT_SYMBOL);
     }
 
     supportsRawValue(): boolean { return true; }

@@ -169,8 +169,8 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
     const [confirmingEnable, setConfirmingEnable] = useState(false);
     const [confirmingFontInstall, setConfirmingFontInstall] = useState(false);
 
-    const hasSeparatorItems = settings.lines.some(line => line.some(
-        item => item.type === 'separator' || item.type === 'flex-separator'
+    const hasManualSeparatorItems = settings.lines.some(line => line.some(
+        item => item.type === 'separator'
     ));
     const hasGlobalFgOverride = Boolean(settings.overrideForegroundColor && settings.overrideForegroundColor !== 'none');
     const globalOverrideMessage = hasGlobalFgOverride ? '⚠ 前景色全局覆盖已激活' : null;
@@ -192,7 +192,7 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                 onBack();
             } else if (input === 't' || input === 'T') {
                 if (!powerlineConfig.enabled) {
-                    if (hasSeparatorItems) {
+                    if (hasManualSeparatorItems) {
                         setConfirmingEnable(true);
                     } else {
                         onUpdate(buildEnabledPowerlineSettings(settings, false));
@@ -350,7 +350,7 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                 </Box>
             ) : confirmingEnable ? (
                 <Box flexDirection='column' marginTop={1}>
-                    {hasSeparatorItems && (
+                    {hasManualSeparatorItems && (
                         <>
                             <Box>
                                 <Text color='yellow'>⚠ 警告：启用 Powerline 模式将移除状态栏中所有现有的分隔符和弹性分隔符。</Text>
@@ -360,7 +360,7 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                             </Box>
                         </>
                     )}
-                    <Box marginTop={hasSeparatorItems ? 1 : 0}>
+                    <Box marginTop={hasManualSeparatorItems ? 1 : 0}>
                         <Text>是否要继续？</Text>
                     </Box>
                     <Box marginTop={1}>
