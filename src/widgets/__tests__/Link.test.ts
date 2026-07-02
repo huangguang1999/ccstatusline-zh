@@ -42,9 +42,45 @@ describe('LinkWidget', () => {
         expect(result).toBe('\x1b]8;;https://example.com/docs\x1b\\🔗 https://example.com/docs\x1b]8;;\x1b\\');
     });
 
-    it('falls back to plain text for non-http URL schemes', () => {
+    it('renders OSC 8 hyperlink for POSIX file URL', () => {
         const result = renderLink({
             url: 'file:///tmp/report.txt',
+            text: 'Report'
+        });
+
+        expect(result).toBe('\x1b]8;;file:///tmp/report.txt\x1b\\🔗 Report\x1b]8;;\x1b\\');
+    });
+
+    it('renders OSC 8 hyperlink for Windows drive file URL', () => {
+        const result = renderLink({
+            url: 'file:///C:/Users/alice/report.txt',
+            text: 'Report'
+        });
+
+        expect(result).toBe('\x1b]8;;file:///C:/Users/alice/report.txt\x1b\\🔗 Report\x1b]8;;\x1b\\');
+    });
+
+    it('renders OSC 8 hyperlink for UNC file URL', () => {
+        const result = renderLink({
+            url: 'file://server/share/report.txt',
+            text: 'Report'
+        });
+
+        expect(result).toBe('\x1b]8;;file://server/share/report.txt\x1b\\🔗 Report\x1b]8;;\x1b\\');
+    });
+
+    it('falls back to plain text for file URL without a path', () => {
+        const result = renderLink({
+            url: 'file:///',
+            text: 'Report'
+        });
+
+        expect(result).toBe('🔗 Report');
+    });
+
+    it('falls back to plain text for unsupported URL schemes', () => {
+        const result = renderLink({
+            url: 'javascript:alert(1)',
             text: 'Report'
         });
 
