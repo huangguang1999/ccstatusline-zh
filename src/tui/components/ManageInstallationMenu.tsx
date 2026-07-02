@@ -197,7 +197,7 @@ export const UninstallMenu: React.FC<UninstallMenuProps> = ({
 
     return (
         <Box flexDirection='column'>
-            <Text bold>Uninstall ccstatusline</Text>
+            <Text bold>卸载 ccstatusline-zh</Text>
             <Box marginTop={1}>
                 <Text dimColor>
                     请选择要从本机移除的内容。

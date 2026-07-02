@@ -17,10 +17,14 @@ import type {
 import { renderOsc8Link } from '../utils/hyperlink';
 import { shouldInsertInput } from '../utils/input-guards';
 
-function isValidHttpUrl(url: string): boolean {
+function isValidLinkUrl(url: string): boolean {
     try {
         const parsed = new URL(url);
-        return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+            return true;
+        }
+
+        return parsed.protocol === 'file:' && parsed.pathname.length > 0 && parsed.pathname !== '/';
     } catch {
         return false;
     }
@@ -103,11 +107,11 @@ export class LinkWidget implements Widget {
         const { url, label } = getLinkLabel(item);
         const displayText = withEmojiPrefix(label, item.rawValue);
 
-        if (!url || !isValidHttpUrl(url)) {
+        if (!url || !isValidLinkUrl(url)) {
             return displayText;
         }
 
-        return renderOsc8Link(url, displayText);
+        return renderOsc8Link(new URL(url).href, displayText);
     }
 
     getCustomKeybinds(): CustomKeybind[] {
@@ -185,8 +189,8 @@ const LinkEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, onCancel,
         }
     });
 
-    const showInvalidUrlWarning = isUrlMode && urlInput.trim().length > 0 && !isValidHttpUrl(urlInput.trim());
-    const prompt = isUrlMode ? '输入 URL（http/https）：' : '输入链接文本（留空使用 URL）：';
+    const showInvalidUrlWarning = isUrlMode && urlInput.trim().length > 0 && !isValidLinkUrl(urlInput.trim());
+    const prompt = isUrlMode ? '输入 URL（http/https/file）：' : '输入链接文本（留空使用 URL）：';
 
     return (
         <Box flexDirection='column'>
@@ -210,7 +214,7 @@ const LinkEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, onCancel,
                 </Text>
             )}
             {showInvalidUrlWarning && (
-                <Text color='yellow'>URL 必须以 http:// 或 https:// 开头</Text>
+                <Text color='yellow'>URL 必须以 http://、https:// 或 file:// 开头</Text>
             )}
             <Text dimColor>←→ 移动光标，Enter 保存，ESC 取消</Text>
         </Box>

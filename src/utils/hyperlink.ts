@@ -5,8 +5,22 @@ export const IDE_LINK_MODES = [
 
 export type IdeLinkMode = (typeof IDE_LINK_MODES)[number];
 
+// 移除 C0/C1 控制字符与 DEL，防止 URL/文本破坏 OSC 8 转义序列本身
+function stripControlChars(value: string): string {
+    let result = '';
+    for (const ch of value) {
+        const code = ch.codePointAt(0) ?? 0;
+        const isControl = code <= 0x1f || (code >= 0x7f && code <= 0x9f);
+        if (!isControl) {
+            result += ch;
+        }
+    }
+
+    return result;
+}
+
 export function renderOsc8Link(url: string, text: string): string {
-    return `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\`;
+    return `\x1b]8;;${stripControlChars(url)}\x1b\\${stripControlChars(text)}\x1b]8;;\x1b\\`;
 }
 
 export function encodeGitRefForUrlPath(ref: string): string {

@@ -285,7 +285,7 @@ function buildUninstallConfirmMessage(selection: UninstallSelection): string {
         .map(packageManager => getGlobalUninstallCommand(packageManager))
         .join('\n');
 
-    return `This will remove ccstatusline from ${getClaudeSettingsPath()} and run:\n\n${commands}\n\nContinue?`;
+    return `将从 ${getClaudeSettingsPath()} 中移除 ccstatusline-zh 并运行：\n\n${commands}\n\n继续？`;
 }
 
 function clearInstallationMetadata(settings: Settings | null): Settings | null {
@@ -322,10 +322,10 @@ function joinCommandPath(dir: string, command: string): string {
 
 function getCommandFileName(globalBinDir: string, platform: NodeJS.Platform): string {
     if (platform === 'win32' || /^[a-z]:[\\/]/i.test(globalBinDir)) {
-        return 'ccstatusline.cmd';
+        return 'ccstatusline-zh.cmd';
     }
 
-    return 'ccstatusline';
+    return 'ccstatusline-zh';
 }
 
 function getPinnedGlobalRelaunchCommand(packageManager: GlobalPackageManager): string {
@@ -345,7 +345,7 @@ function getPinnedGlobalRelaunchCommand(packageManager: GlobalPackageManager): s
         );
     }
 
-    return 'ccstatusline';
+    return 'ccstatusline-zh';
 }
 
 export function getPinnedVersionMismatch(
@@ -514,7 +514,7 @@ export const App: React.FC = () => {
                 ? inspectActiveGlobalCommand({ commandAvailability })
                 : null;
             const effectiveInstallation = getPathInferredInstallation(installation, activeCommand);
-            const mismatch = getPinnedVersionMismatch(effectiveInstallation, getPackageVersion(), 'ccstatusline');
+            const mismatch = getPinnedVersionMismatch(effectiveInstallation, getPackageVersion(), 'ccstatusline-zh');
             if (mismatch) {
                 return;
             }

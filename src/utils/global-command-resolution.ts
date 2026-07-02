@@ -55,12 +55,14 @@ export function getCommandResolutionPaths(
             ? execFileSync('where', [command], {
                 encoding: 'utf-8',
                 timeout: COMMAND_LOOKUP_TIMEOUT_MS,
-                windowsHide: true
+                windowsHide: true,
+                stdio: ['ignore', 'pipe', 'ignore']
             })
             : execFileSync('which', ['-a', command], {
                 encoding: 'utf-8',
                 timeout: COMMAND_LOOKUP_TIMEOUT_MS,
-                windowsHide: true
+                windowsHide: true,
+                stdio: ['ignore', 'pipe', 'ignore']
             });
 
         return splitCommandOutput(output);
@@ -76,6 +78,7 @@ function getNpmGlobalBinDir(platform: NodeJS.Platform): string | null {
             encoding: 'utf-8',
             timeout: COMMAND_LOOKUP_TIMEOUT_MS,
             windowsHide: true,
+            stdio: ['ignore', 'pipe', 'ignore'],
             ...getPackageManagerShellOptions(executable, platform)
         }).trim();
 
@@ -93,10 +96,12 @@ function getNpmGlobalBinDir(platform: NodeJS.Platform): string | null {
 
 function getBunGlobalBinDir(): string | null {
     try {
+        // bun 未初始化全局目录时会向 stderr 打印错误（issue #39），必须静默
         const binDir = execFileSync('bun', ['pm', 'bin', '-g'], {
             encoding: 'utf-8',
             timeout: COMMAND_LOOKUP_TIMEOUT_MS,
-            windowsHide: true
+            windowsHide: true,
+            stdio: ['ignore', 'pipe', 'ignore']
         }).trim();
 
         return binDir || null;

@@ -254,7 +254,7 @@ Execute shell commands and display their output dynamically:
 ### Link Widget
 
 Create clickable links in terminals that support OSC 8 hyperlinks:
-- `metadata.url` - target URL (http/https)
+- `metadata.url` - target URL (http/https/file)。`file://` 链接是否可点击取决于终端对 OSC 8 file 协议的支持（iTerm2/WezTerm/kitty 支持较好）
 - `metadata.text` - optional display text (defaults to URL)
 - Falls back to plain text when URL is missing or unsupported
 
