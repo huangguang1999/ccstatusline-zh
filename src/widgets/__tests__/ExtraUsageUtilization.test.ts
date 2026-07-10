@@ -74,6 +74,7 @@ describe('ExtraUsageUtilizationWidget', () => {
 
         expect(widget.getCustomKeybinds(baseItem)).toEqual([
             { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
+            { key: 'u', label: '(u)显示剩余', action: 'toggle-invert' },
             { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
         ]);
         expect(widget.getCustomKeybinds({
@@ -81,19 +82,30 @@ describe('ExtraUsageUtilizationWidget', () => {
             metadata: { display: 'progress' }
         })).toEqual([
             { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
-            { key: 'v', label: '(v)反转填充', action: 'toggle-invert' },
-            { key: 't', label: '(t)时间游标', action: 'toggle-cursor' },
+            { key: 'u', label: '(u)显示剩余', action: 'toggle-invert' },
             { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
         ]);
-        expect(widget.getEditorDisplay(baseItem).modifierText).toBeUndefined();
+        expect(widget.getCustomKeybinds({
+            ...baseItem,
+            metadata: { invert: 'true' }
+        })).toEqual([
+            { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
+            { key: 'u', label: '(u)显示已用', action: 'toggle-invert' },
+            { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
+        ]);
+        expect(widget.getEditorDisplay(baseItem).modifierText).toBe('(已用)');
+        expect(widget.getEditorDisplay({
+            ...baseItem,
+            metadata: { invert: 'true' }
+        }).modifierText).toBe('(剩余)');
 
         const hidden = widget.handleEditorAction('toggle-hide-disabled', baseItem);
         expect(hidden?.metadata?.hideIfDisabled).toBe('true');
-        expect(widget.getEditorDisplay(hidden ?? baseItem).modifierText).toBe('(禁用时隐藏)');
+        expect(widget.getEditorDisplay(hidden ?? baseItem).modifierText).toBe('(已用, 禁用时隐藏)');
         expect(widget.getEditorDisplay({
             ...baseItem,
             metadata: { display: 'progress', hideIfDisabled: 'true' }
-        }).modifierText).toBe('(长进度条, 禁用时隐藏)');
+        }).modifierText).toBe('(长进度条, 已用, 禁用时隐藏)');
 
         const shown = widget.handleEditorAction('toggle-hide-disabled', hidden ?? baseItem);
         expect(shown?.metadata?.hideIfDisabled).toBe('false');
@@ -102,9 +114,9 @@ describe('ExtraUsageUtilizationWidget', () => {
     it('shows usage errors only when required extra usage data is missing', () => {
         const widget = new ExtraUsageUtilizationWidget();
 
-        mockGetUsageErrorMessage.mockReturnValue('[超时]');
+        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
 
-        expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, { usageData: { error: 'timeout' } })).toBe('[超时]');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
         expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, { usageData: { extraUsageEnabled: true } })).toBeNull();
     });
 
@@ -153,5 +165,28 @@ describe('ExtraUsageUtilizationWidget', () => {
                 extraUsageUtilization: 25
             }
         })).toBe('超额: [████████████░░░░] 75.0%');
+    });
+
+    it('inverts plain text and preview rendering', () => {
+        const widget = new ExtraUsageUtilizationWidget();
+        const item: WidgetItem = {
+            id: 'extra',
+            metadata: { invert: 'true' },
+            type: 'extra-usage-utilization'
+        };
+
+        expect(render(widget, item, {
+            usageData: {
+                extraUsageEnabled: true,
+                extraUsageUtilization: 25
+            }
+        })).toBe('超额: 75.0%');
+        expect(render(widget, { ...item, rawValue: true }, {
+            usageData: {
+                extraUsageEnabled: true,
+                extraUsageUtilization: 25
+            }
+        })).toBe('75.0%');
+        expect(render(widget, item, { isPreview: true })).toBe('超额: 97.4%');
     });
 });
