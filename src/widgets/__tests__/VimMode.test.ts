@@ -22,8 +22,22 @@ describe('VimModeWidget', () => {
         it('uses f as the format toggle keybind', () => {
             expect(new VimModeWidget().getCustomKeybinds()).toEqual([
                 { key: 'f', label: '(f)格式切换', action: 'cycle-format' },
-                { key: 'n', label: '(n)erd 字体', action: 'toggle-nerd-font' }
+                { key: 'n', label: '(n)Nerd 字体', action: 'toggle-nerd-font' }
             ]);
+        });
+
+        it('exposes the Nerd Font keybind only when an icon is visible', () => {
+            const widget = new VimModeWidget();
+            const nerdFontKeybind = { key: 'n', label: '(n)Nerd 字体', action: 'toggle-nerd-font' };
+
+            for (const format of ['icon-dash-letter', 'icon-letter', 'icon']) {
+                expect(widget.getCustomKeybinds({ ...ITEM, metadata: { format } }))
+                    .toContainEqual(nerdFontKeybind);
+            }
+            for (const format of ['letter', 'word']) {
+                expect(widget.getCustomKeybinds({ ...ITEM, metadata: { format } }))
+                    .not.toContainEqual(nerdFontKeybind);
+            }
         });
 
         it('defaults to icon-dash-letter in the editor display', () => {
@@ -39,7 +53,17 @@ describe('VimModeWidget', () => {
                 metadata: { nerdFont: 'true' }
             })).toEqual({
                 displayText: 'Vim 模式',
-                modifierText: '(icon-dash-letter, nerd font)'
+                modifierText: '(icon-dash-letter, Nerd 字体)'
+            });
+        });
+
+        it('hides stale Nerd Font metadata in text-only editor displays', () => {
+            expect(new VimModeWidget().getEditorDisplay({
+                ...ITEM,
+                metadata: { format: 'word', nerdFont: 'true' }
+            })).toEqual({
+                displayText: 'Vim 模式',
+                modifierText: '(word)'
             });
         });
 
@@ -58,6 +82,18 @@ describe('VimModeWidget', () => {
             expect(iconDashLetter?.metadata?.format).toBeUndefined();
         });
 
+        it('keeps Nerd Font through icon formats and clears it before letter format', () => {
+            const widget = new VimModeWidget();
+            const item: WidgetItem = { ...ITEM, metadata: { nerdFont: 'true' } };
+            const iconLetter = widget.handleEditorAction('cycle-format', item);
+            const icon = widget.handleEditorAction('cycle-format', iconLetter ?? ITEM);
+            const letter = widget.handleEditorAction('cycle-format', icon ?? ITEM);
+
+            expect(iconLetter?.metadata).toEqual({ format: 'icon-letter', nerdFont: 'true' });
+            expect(icon?.metadata).toEqual({ format: 'icon', nerdFont: 'true' });
+            expect(letter?.metadata).toEqual({ format: 'letter' });
+        });
+
         it('toggles nerd font metadata on and off', () => {
             const widget = new VimModeWidget();
             const enabled = widget.handleEditorAction('toggle-nerd-font', ITEM);
@@ -65,6 +101,20 @@ describe('VimModeWidget', () => {
 
             expect(enabled?.metadata?.nerdFont).toBe('true');
             expect(disabled?.metadata?.nerdFont).toBeUndefined();
+        });
+
+        it('does not toggle Nerd Font in text-only formats', () => {
+            const widget = new VimModeWidget();
+            const letterItem: WidgetItem = { ...ITEM, metadata: { format: 'letter' } };
+            const staleWordItem: WidgetItem = {
+                ...ITEM,
+                metadata: { format: 'word', nerdFont: 'true' }
+            };
+
+            expect(widget.handleEditorAction('toggle-nerd-font', letterItem)?.metadata)
+                .toEqual({ format: 'letter' });
+            expect(widget.handleEditorAction('toggle-nerd-font', staleWordItem)?.metadata)
+                .toEqual({ format: 'word' });
         });
     });
 

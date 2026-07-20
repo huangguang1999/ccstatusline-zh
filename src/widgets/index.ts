@@ -81,4 +81,5 @@ export { GitWorktreeNameWidget } from './GitWorktreeName';
 export { GitWorktreeBranchWidget } from './GitWorktreeBranch';
 export { GitWorktreeOriginalBranchWidget } from './GitWorktreeOriginalBranch';
 export { CompactionCounterWidget } from './CompactionCounter';
+export { SandboxStatusWidget } from './SandboxStatus';
 export { RemoteControlStatusWidget } from './RemoteControlStatus';
