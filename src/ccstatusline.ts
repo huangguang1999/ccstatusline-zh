@@ -23,6 +23,11 @@ import {
     saveSettings
 } from './utils/config';
 import {
+    GIT_REVIEW_REFRESH_FLAG,
+    refreshGitReviewCacheFromCli
+} from './utils/git-review-cache';
+import { handleHookInput } from './utils/hook-handler';
+import {
     getSessionDuration,
     getSpeedMetricsCollection,
     getTokenMetrics
@@ -36,10 +41,7 @@ import {
     renderStatusLine
 } from './utils/renderer';
 import { advanceGlobalSeparatorIndex } from './utils/separator-index';
-import {
-    getSkillsFilePath,
-    getSkillsMetrics
-} from './utils/skills';
+import { getSkillsMetrics } from './utils/skills';
 import {
     getWidgetSpeedWindowSeconds,
     isWidgetSpeedWindowEnabled
@@ -172,7 +174,8 @@ async function renderMultipleLines(data: StatusJSON) {
         terminalWidth: getTerminalWidth(),
         isPreview: false,
         minimalist: settings.minimalistMode,
-        gitCacheTtlSeconds: settings.gitCacheTtlSeconds
+        gitCacheTtlSeconds: settings.gitCacheTtlSeconds,
+        gitReviewNeedsChecks: lines.some(line => line.some(item => item.type === 'git-ci-status'))
     };
 
     // Always pre-render all widgets once (for efficiency)
@@ -273,58 +276,35 @@ function parseConfigArg(): string | undefined {
     return configPath;
 }
 
-interface HookInput {
-    session_id?: string;
-    hook_event_name?: string;
-    tool_name?: string;
-    tool_input?: { skill?: string };
-    prompt?: string;
-}
-
 async function handleHook(): Promise<void> {
     const input = await readStdin();
-    if (!input) {
-        console.log('{}');
-        return;
+    handleHookInput(input);
+}
+
+function handleGitReviewRefresh(): boolean {
+    const flagIndex = process.argv.indexOf(GIT_REVIEW_REFRESH_FLAG);
+    if (flagIndex === -1) {
+        return false;
     }
-    try {
-        const data = JSON.parse(input) as HookInput;
-        const sessionId = data.session_id;
-        if (!sessionId) {
-            console.log('{}');
-            return;
-        }
 
-        let skillName = '';
-        if (data.hook_event_name === 'PreToolUse' && data.tool_name === 'Skill') {
-            skillName = data.tool_input?.skill ?? '';
-        } else if (data.hook_event_name === 'UserPromptSubmit') {
-            const match = /^\/([a-zA-Z0-9_:-]+)(?:\s|$)/.exec(data.prompt ?? '');
-            if (match) {
-                skillName = match[1] ?? '';
-            }
-        }
-        if (!skillName) {
-            console.log('{}');
-            return;
-        }
+    const cwd = process.argv[flagIndex + 1];
+    const mode = process.argv[flagIndex + 2];
+    const lockPath = process.argv[flagIndex + 3];
+    if (!cwd || (mode !== 'metadata' && mode !== 'checks') || !lockPath) {
+        return true;
+    }
 
-        const filePath = getSkillsFilePath(sessionId);
-        const fs = await import('fs');
-        const path = await import('path');
-        fs.mkdirSync(path.dirname(filePath), { recursive: true });
-        const entry = JSON.stringify({
-            timestamp: new Date().toISOString(),
-            session_id: sessionId,
-            skill: skillName,
-            source: data.hook_event_name
-        });
-        fs.appendFileSync(filePath, entry + '\n');
-    } catch { /* ignore parse errors */ }
-    console.log('{}');
+    refreshGitReviewCacheFromCli(cwd, { includeChecks: mode === 'checks' }, lockPath);
+    return true;
 }
 
 async function main() {
+    // Detached cache refreshes re-enter this executable without reading stdin
+    // or loading user settings. This mode intentionally emits no output.
+    if (handleGitReviewRefresh()) {
+        return;
+    }
+
     // Print version and exit (#461). Standard CLI behavior, runs before any other mode.
     if (process.argv.includes('--version')) {
         console.log(getPackageVersion());
