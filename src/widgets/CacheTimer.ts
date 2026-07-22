@@ -41,11 +41,11 @@ const SAFETY_MARGIN = 5; // display as COLD 5s before actual expiry
 
 // One editable glyph per display state, so nerd-font / ASCII users can replace
 // the emoji (which ignore the widget's color) with symbols that respect it.
-const HOT_SLOT: SymbolSlot = { id: 'symbolHot', label: 'Working', defaultSymbol: '🔥' };
-const FRESH_SLOT: SymbolSlot = { id: 'symbolFresh', label: 'Fresh', defaultSymbol: '🟢' };
-const DRAINING_SLOT: SymbolSlot = { id: 'symbolDraining', label: 'Draining', defaultSymbol: '🟡' };
-const URGENT_SLOT: SymbolSlot = { id: 'symbolUrgent', label: 'Urgent', defaultSymbol: '🔴' };
-const COLD_SLOT: SymbolSlot = { id: 'symbolCold', label: 'Cold', defaultSymbol: '❄️' };
+const HOT_SLOT: SymbolSlot = { id: 'symbolHot', label: '工作中', defaultSymbol: '🔥' };
+const FRESH_SLOT: SymbolSlot = { id: 'symbolFresh', label: '充足', defaultSymbol: '🟢' };
+const DRAINING_SLOT: SymbolSlot = { id: 'symbolDraining', label: '消耗中', defaultSymbol: '🟡' };
+const URGENT_SLOT: SymbolSlot = { id: 'symbolUrgent', label: '即将过期', defaultSymbol: '🔴' };
+const COLD_SLOT: SymbolSlot = { id: 'symbolCold', label: '已过期', defaultSymbol: '❄️' };
 const SYMBOL_SLOTS: SymbolSlot[] = [HOT_SLOT, FRESH_SLOT, DRAINING_SLOT, URGENT_SLOT, COLD_SLOT];
 
 interface TranscriptEntry {
@@ -237,21 +237,34 @@ function withGlyph(symbol: string, text: string): string {
     return symbol.length > 0 ? `${symbol} ${text}` : text;
 }
 
+function localizeStateValue(item: WidgetItem, value: string): string {
+    if (item.rawValue) {
+        return value;
+    }
+    if (value === 'HOT') {
+        return '工作中';
+    }
+    if (value === 'COLD') {
+        return '已过期';
+    }
+    return value === 'n/a' ? '无数据' : value;
+}
+
 export class CacheTimerWidget implements Widget {
     getDefaultColor(): string { return 'brightCyan'; }
-    getDescription(): string { return 'Shows time remaining on the prompt cache TTL (5m by default, 1h configurable)'; }
-    getDisplayName(): string { return 'Cache Timer'; }
-    getCategory(): string { return 'Session'; }
+    getDescription(): string { return '显示提示词缓存 TTL 的剩余时间（默认 5 分钟，可切换为 1 小时）'; }
+    getDisplayName(): string { return '缓存计时器'; }
+    getCategory(): string { return '会话'; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         const modifiers: string[] = [];
 
         const ttlSeconds = getTtlSeconds(item);
         if (ttlSeconds !== DEFAULT_TTL_SECONDS) {
-            modifiers.push(`ttl ${formatTtlLabel(ttlSeconds)}`);
+            modifiers.push(`TTL ${formatTtlLabel(ttlSeconds)}`);
         }
         if (isMetadataFlagEnabled(item, HIDE_WHEN_EMPTY_KEY)) {
-            modifiers.push('hide when empty');
+            modifiers.push('无数据时隐藏');
         }
 
         return {
@@ -276,36 +289,36 @@ export class CacheTimerWidget implements Widget {
         const hideWhenEmpty = isMetadataFlagEnabled(item, HIDE_WHEN_EMPTY_KEY);
 
         if (context.isPreview) {
-            return formatRawOrLabeledValue(item, 'Cache: ', withGlyph(getSlotSymbol(item, FRESH_SLOT), '4:52'));
+            return formatRawOrLabeledValue(item, '缓存: ', withGlyph(getSlotSymbol(item, FRESH_SLOT), '4:52'));
         }
 
         const transcriptPath = context.data?.transcript_path;
         if (!transcriptPath) {
-            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, 'Cache: ', 'n/a');
+            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, '缓存: ', localizeStateValue(item, 'n/a'));
         }
 
         const state = getTranscriptState(transcriptPath);
 
         if (state.isWorking) {
-            return formatRawOrLabeledValue(item, 'Cache: ', withGlyph(getSlotSymbol(item, HOT_SLOT), 'HOT'));
+            return formatRawOrLabeledValue(item, '缓存: ', withGlyph(getSlotSymbol(item, HOT_SLOT), localizeStateValue(item, 'HOT')));
         }
 
         const { lastAssistant } = state;
         if (!lastAssistant) {
-            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, 'Cache: ', 'n/a');
+            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, '缓存: ', localizeStateValue(item, 'n/a'));
         }
 
         const ttlSeconds = getTtlSeconds(item);
         const remaining = getRemainingSeconds(lastAssistant, ttlSeconds);
         const glyph = getStateSymbol(item, remaining, ttlSeconds);
 
-        return formatRawOrLabeledValue(item, 'Cache: ', withGlyph(glyph, formatCountdown(remaining)));
+        return formatRawOrLabeledValue(item, '缓存: ', withGlyph(glyph, localizeStateValue(item, formatCountdown(remaining))));
     }
 
     getCustomKeybinds(): CustomKeybind[] {
         return [
-            { key: 't', label: '(t)tl', action: TOGGLE_TTL_ACTION },
-            { key: 'h', label: '(h)ide when empty', action: TOGGLE_HIDE_ACTION },
+            { key: 't', label: '(t)TTL', action: TOGGLE_TTL_ACTION },
+            { key: 'h', label: '(h)无数据时隐藏', action: TOGGLE_HIDE_ACTION },
             getSymbolKeybind()
         ];
     }

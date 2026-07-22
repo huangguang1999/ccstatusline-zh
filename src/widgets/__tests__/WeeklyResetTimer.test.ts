@@ -126,7 +126,7 @@ describe('WeeklyResetTimerWidget', () => {
 
         mockResolveWeeklyUsageWindow.mockReturnValue(null);
 
-        expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer' }, { usageData: {} })).toBe('Weekly Reset: [Loading]');
+        expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer' }, { usageData: {} })).toBe('周重置: [加载中]');
         expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer', rawValue: true }, { usageData: {} })).toBe('[Loading]');
     });
 

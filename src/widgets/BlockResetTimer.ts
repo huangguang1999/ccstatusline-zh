@@ -128,7 +128,7 @@ export class BlockResetTimerWidget implements Widget {
                 return getUsageErrorMessage(usageData.error);
             }
 
-            return formatRawOrLabeledValue(item, 'Reset: ', USAGE_TIMER_LOADING_MESSAGE);
+            return formatRawOrLabeledValue(item, '重置: ', item.rawValue ? USAGE_TIMER_LOADING_MESSAGE : '[加载中]');
         }
 
         if (isUsageProgressMode(displayMode)) {

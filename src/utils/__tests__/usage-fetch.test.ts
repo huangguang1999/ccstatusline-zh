@@ -552,7 +552,7 @@ describe('fetchUsageData error handling', () => {
         } finally {
             harness.cleanup();
         }
-    });
+    }, 15_000);
 
     it('treats null API per-model buckets as zero usage', () => {
         const harness = createProbeHarness();

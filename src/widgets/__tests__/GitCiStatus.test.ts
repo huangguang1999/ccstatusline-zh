@@ -56,6 +56,13 @@ function render(
 }
 
 describe('GitCiStatusWidget', () => {
+    it('uses localized metadata', () => {
+        const widget = new GitCiStatusWidget(createDeps());
+        expect(widget.getDisplayName()).toBe('Git CI 状态');
+        expect(widget.getDescription()).toBe('显示当前分支 PR 的 CI 检查状态（仅支持 GitHub）');
+        expect(widget.getCategory()).toBe('Git');
+    });
+
     it('renders preview', () => {
         expect(render({ isPreview: true })).toBe('✗1 ●1 ✓5');
     });
@@ -96,8 +103,8 @@ describe('GitCiStatusWidget', () => {
         expect(render({ cwd: '/tmp/repo' }, { getCachedGitReviewData: () => noChecks })).toBe('-');
     });
 
-    it('returns (no git) when not in a git repo', () => {
-        expect(render({ cwd: '/x' }, { isInsideGitWorkTree: () => false })).toBe('(no git)');
+    it('returns (无 Git) when not in a git repo', () => {
+        expect(render({ cwd: '/x' }, { isInsideGitWorkTree: () => false })).toBe('(无 Git)');
     });
 
     it('returns null when hideNoGit and not in a git repo', () => {

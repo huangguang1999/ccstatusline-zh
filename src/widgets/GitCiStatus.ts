@@ -72,11 +72,11 @@ export class GitCiStatusWidget implements Widget {
     }
 
     getDescription(): string {
-        return 'Shows CI check status for the current branch\'s PR (GitHub only)';
+        return '显示当前分支 PR 的 CI 检查状态（仅支持 GitHub）';
     }
 
     getDisplayName(): string {
-        return 'Git CI Status';
+        return 'Git CI 状态';
     }
 
     getCategory(): string {
@@ -106,7 +106,7 @@ export class GitCiStatusWidget implements Widget {
         }
 
         if (!this.deps.isInsideGitWorkTree(context)) {
-            return isHideNoGitEnabled(item) ? null : '(no git)';
+            return isHideNoGitEnabled(item) ? null : '(无 Git)';
         }
 
         const cwd = this.deps.resolveGitCwd(context) ?? this.deps.getProcessCwd();

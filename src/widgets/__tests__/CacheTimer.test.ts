@@ -45,13 +45,13 @@ describe('CacheTimer widget', () => {
 
     it('renders the preview as a labeled or raw sample', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), { isPreview: true }, DEFAULT_SETTINGS)).toBe('Cache: 🟢 4:52');
+        expect(widget.render(item(), { isPreview: true }, DEFAULT_SETTINGS)).toBe('缓存: 🟢 4:52');
         expect(widget.render(item({ rawValue: true }), { isPreview: true }, DEFAULT_SETTINGS)).toBe('🟢 4:52');
     });
 
     it('renders n/a when no transcript is available by default', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), {}, DEFAULT_SETTINGS)).toBe('Cache: n/a');
+        expect(widget.render(item(), {}, DEFAULT_SETTINGS)).toBe('缓存: 无数据');
         expect(widget.render(item({ rawValue: true }), {}, DEFAULT_SETTINGS)).toBe('n/a');
     });
 
@@ -63,14 +63,14 @@ describe('CacheTimer widget', () => {
 
     it('renders n/a for an empty transcript by default', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), transcriptContext([]), DEFAULT_SETTINGS)).toBe('Cache: n/a');
+        expect(widget.render(item(), transcriptContext([]), DEFAULT_SETTINGS)).toBe('缓存: 无数据');
     });
 
     it('shows HOT while a turn is in flight, regardless of hide-when-empty', () => {
         const widget = new CacheTimerWidget();
         const context = transcriptContext([assistant(60), pendingUser]);
-        expect(widget.render(item(), context, DEFAULT_SETTINGS)).toBe('Cache: 🔥 HOT');
-        expect(widget.render(item(hidden), context, DEFAULT_SETTINGS)).toBe('Cache: 🔥 HOT');
+        expect(widget.render(item(), context, DEFAULT_SETTINGS)).toBe('缓存: 🔥 工作中');
+        expect(widget.render(item(hidden), context, DEFAULT_SETTINGS)).toBe('缓存: 🔥 工作中');
     });
 
     const buckets = [
@@ -82,13 +82,13 @@ describe('CacheTimer widget', () => {
         it(`renders the ${label} countdown with the ${icon} icon`, () => {
             const widget = new CacheTimerWidget();
             const out = widget.render(item(), transcriptContext([assistant(elapsed)]), DEFAULT_SETTINGS);
-            expect(out).toMatch(new RegExp(`^Cache: ${icon} \\d+:\\d{2}$`));
+            expect(out).toMatch(new RegExp(`^缓存: ${icon} \\d+:\\d{2}$`));
         });
     }
 
     it('renders COLD once the TTL has elapsed', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), transcriptContext([assistant(400)]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([assistant(400)]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
     });
 
     it('renders a raw countdown without the label', () => {
@@ -97,51 +97,57 @@ describe('CacheTimer widget', () => {
         expect(out).toMatch(/^🟢 \d+:\d{2}$/);
     });
 
+    it('keeps raw status words stable for shell consumers', () => {
+        const widget = new CacheTimerWidget();
+        expect(widget.render(item({ rawValue: true }), transcriptContext([pendingUser]), DEFAULT_SETTINGS)).toBe('🔥 HOT');
+        expect(widget.render(item({ rawValue: true }), transcriptContext([assistant(400)]), DEFAULT_SETTINGS)).toBe('❄️ COLD');
+    });
+
     it('ignores sidechain rows when deriving the cache state', () => {
         const widget = new CacheTimerWidget();
         // A trailing sidechain user row must not report HOT...
-        expect(widget.render(item(), transcriptContext([assistant(400), sidechain('user', 5)]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([assistant(400), sidechain('user', 5)]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
         // ...and a trailing sidechain assistant row must not restart the countdown.
-        expect(widget.render(item(), transcriptContext([assistant(400), sidechain('assistant', 5)]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([assistant(400), sidechain('assistant', 5)]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
     });
 
     it('ignores synthetic API-error rows when deriving the cache state', () => {
         const widget = new CacheTimerWidget();
         // A failed request refreshes nothing, so the prior event still drives the countdown...
-        expect(widget.render(item(), transcriptContext([assistant(400), apiError(5)]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([assistant(400), apiError(5)]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
         // ...and with no prior main-chain row there is no cache event to report.
-        expect(widget.render(item(), transcriptContext([apiError(5)]), DEFAULT_SETTINGS)).toBe('Cache: n/a');
+        expect(widget.render(item(), transcriptContext([apiError(5)]), DEFAULT_SETTINGS)).toBe('缓存: 无数据');
     });
 
     it('skips assistant rows whose request had no cache activity', () => {
         const widget = new CacheTimerWidget();
         // The prior row that actually touched the cache still drives the countdown...
         const cached = assistantUsage(400, { cache_read_input_tokens: 100, cache_creation_input_tokens: 0 });
-        expect(widget.render(item(), transcriptContext([cached, assistantUsage(10, noCacheUsage)]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([cached, assistantUsage(10, noCacheUsage)]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
         // ...and when caching never happened at all there is nothing to count down.
-        expect(widget.render(item(), transcriptContext([assistantUsage(10, noCacheUsage)]), DEFAULT_SETTINGS)).toBe('Cache: n/a');
+        expect(widget.render(item(), transcriptContext([assistantUsage(10, noCacheUsage)]), DEFAULT_SETTINGS)).toBe('缓存: 无数据');
     });
 
     it('does not report HOT for a finished turn whose response had no cache activity', () => {
         const widget = new CacheTimerWidget();
         // The user row that started the turn precedes the zero-cache response,
         // as in a real transcript; the finished turn must not read as in-flight.
-        expect(widget.render(item(), transcriptContext([pendingUser, assistantUsage(10, noCacheUsage)]), DEFAULT_SETTINGS)).toBe('Cache: n/a');
+        expect(widget.render(item(), transcriptContext([pendingUser, assistantUsage(10, noCacheUsage)]), DEFAULT_SETTINGS)).toBe('缓存: 无数据');
         // An older cache event still drives the countdown instead.
         const cached = assistantUsage(400, { cache_read_input_tokens: 100, cache_creation_input_tokens: 0 });
-        expect(widget.render(item(), transcriptContext([cached, pendingUser, assistantUsage(10, noCacheUsage)]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([cached, pendingUser, assistantUsage(10, noCacheUsage)]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
     });
 
     it('does not report HOT for a turn that ended in an API error', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), transcriptContext([pendingUser, apiError(5)]), DEFAULT_SETTINGS)).toBe('Cache: n/a');
-        expect(widget.render(item(), transcriptContext([assistant(400), pendingUser, apiError(5)]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([pendingUser, apiError(5)]), DEFAULT_SETTINGS)).toBe('缓存: 无数据');
+        expect(widget.render(item(), transcriptContext([assistant(400), pendingUser, apiError(5)]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
     });
 
     it('starts the countdown from rows with cache reads or cache writes', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), transcriptContext([assistantUsage(10, { cache_read_input_tokens: 1234 })]), DEFAULT_SETTINGS)).toMatch(/^Cache: 🟢 \d+:\d{2}$/);
-        expect(widget.render(item(), transcriptContext([assistantUsage(10, { cache_creation_input_tokens: 55 })]), DEFAULT_SETTINGS)).toMatch(/^Cache: 🟢 \d+:\d{2}$/);
+        expect(widget.render(item(), transcriptContext([assistantUsage(10, { cache_read_input_tokens: 1234 })]), DEFAULT_SETTINGS)).toMatch(/^缓存: 🟢 \d+:\d{2}$/);
+        expect(widget.render(item(), transcriptContext([assistantUsage(10, { cache_creation_input_tokens: 55 })]), DEFAULT_SETTINGS)).toMatch(/^缓存: 🟢 \d+:\d{2}$/);
     });
 
     it('finds the trailing record even when it exceeds the initial 32 KiB tail read', () => {
@@ -149,36 +155,36 @@ describe('CacheTimer widget', () => {
         // A pending user row bigger than the initial tail (e.g. a pasted prompt
         // or large tool result) must still report HOT...
         const bigUser = JSON.stringify({ type: 'user', content: 'x'.repeat(64 * 1024) });
-        expect(widget.render(item(), transcriptContext([assistant(400), bigUser]), DEFAULT_SETTINGS)).toBe('Cache: 🔥 HOT');
+        expect(widget.render(item(), transcriptContext([assistant(400), bigUser]), DEFAULT_SETTINGS)).toBe('缓存: 🔥 工作中');
         // ...and an oversized trailing assistant row must still drive the countdown.
         const bigAssistant = JSON.stringify({ type: 'assistant', timestamp: isoAgo(10), content: 'x'.repeat(64 * 1024) });
-        expect(widget.render(item(), transcriptContext([bigAssistant]), DEFAULT_SETTINGS)).toMatch(/^Cache: 🟢 \d+:\d{2}$/);
+        expect(widget.render(item(), transcriptContext([bigAssistant]), DEFAULT_SETTINGS)).toMatch(/^缓存: 🟢 \d+:\d{2}$/);
     });
 
     it('finds a valid trailing record larger than 1 MiB', () => {
         const widget = new CacheTimerWidget();
         const huge = JSON.stringify({ type: 'assistant', timestamp: isoAgo(10), message: { usage: { cache_read_input_tokens: 42 } }, content: 'x'.repeat(2 * 1024 * 1024) });
-        expect(widget.render(item(), transcriptContext([huge]), DEFAULT_SETTINGS)).toMatch(/^Cache: 🟢 \d+:\d{2}$/);
+        expect(widget.render(item(), transcriptContext([huge]), DEFAULT_SETTINGS)).toMatch(/^缓存: 🟢 \d+:\d{2}$/);
     });
 
     it('renders n/a after scanning a file with no parseable records', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), transcriptContext(['x'.repeat(2 * 1024 * 1024)]), DEFAULT_SETTINGS)).toBe('Cache: n/a');
+        expect(widget.render(item(), transcriptContext(['x'.repeat(2 * 1024 * 1024)]), DEFAULT_SETTINGS)).toBe('缓存: 无数据');
     });
 
     it('treats a malformed assistant timestamp as no data instead of rendering NaN', () => {
         const widget = new CacheTimerWidget();
         const context = transcriptContext([JSON.stringify({ type: 'assistant', timestamp: 'not-a-date' })]);
-        expect(widget.render(item(), context, DEFAULT_SETTINGS)).toBe('Cache: n/a');
+        expect(widget.render(item(), context, DEFAULT_SETTINGS)).toBe('缓存: 无数据');
         expect(widget.render(item(hidden), context, DEFAULT_SETTINGS)).toBeNull();
     });
 
     it('exposes a hide-when-empty keybind and toggles the flag', () => {
         const widget = new CacheTimerWidget();
         expect(widget.getCustomKeybinds()).toEqual([
-            { key: 't', label: '(t)tl', action: 'toggle-ttl' },
-            { key: 'h', label: '(h)ide when empty', action: 'toggle-hide' },
-            { key: 'g', label: '(g)lyph', action: 'edit-symbol-override' }
+            { key: 't', label: '(t)TTL', action: 'toggle-ttl' },
+            { key: 'h', label: '(h)无数据时隐藏', action: 'toggle-hide' },
+            { key: 'g', label: '(g)字符', action: 'edit-symbol-override' }
         ]);
         expect(widget.handleEditorAction('toggle-hide', item())?.metadata?.hideWhenEmpty).toBe('true');
         expect(widget.handleEditorAction('unknown', item())).toBeNull();
@@ -186,39 +192,39 @@ describe('CacheTimer widget', () => {
 
     it('annotates the editor only when hide-when-empty is enabled', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.getEditorDisplay(item()).displayText).toBe('Cache Timer');
+        expect(widget.getEditorDisplay(item()).displayText).toBe('缓存计时器');
         expect(widget.getEditorDisplay(item()).modifierText).toBeUndefined();
-        expect(widget.getEditorDisplay(item(hidden)).modifierText).toBe('(hide when empty)');
+        expect(widget.getEditorDisplay(item(hidden)).modifierText).toBe('(无数据时隐藏)');
     });
 
     it('renders custom state glyphs from metadata overrides', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item({ metadata: { symbolCold: 'X' } }), transcriptContext([assistant(400)]), DEFAULT_SETTINGS)).toBe('Cache: X COLD');
-        expect(widget.render(item({ metadata: { symbolFresh: '*' } }), transcriptContext([assistant(10)]), DEFAULT_SETTINGS)).toMatch(/^Cache: \* \d+:\d{2}$/);
-        expect(widget.render(item({ metadata: { symbolHot: '>' } }), transcriptContext([assistant(60), pendingUser]), DEFAULT_SETTINGS)).toBe('Cache: > HOT');
+        expect(widget.render(item({ metadata: { symbolCold: 'X' } }), transcriptContext([assistant(400)]), DEFAULT_SETTINGS)).toBe('缓存: X 已过期');
+        expect(widget.render(item({ metadata: { symbolFresh: '*' } }), transcriptContext([assistant(10)]), DEFAULT_SETTINGS)).toMatch(/^缓存: \* \d+:\d{2}$/);
+        expect(widget.render(item({ metadata: { symbolHot: '>' } }), transcriptContext([assistant(60), pendingUser]), DEFAULT_SETTINGS)).toBe('缓存: > 工作中');
     });
 
     it('drops the glyph and its space when an override is blanked', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item({ metadata: { symbolFresh: '' } }), transcriptContext([assistant(10)]), DEFAULT_SETTINGS)).toMatch(/^Cache: \d+:\d{2}$/);
+        expect(widget.render(item({ metadata: { symbolFresh: '' } }), transcriptContext([assistant(10)]), DEFAULT_SETTINGS)).toMatch(/^缓存: \d+:\d{2}$/);
     });
 
     it('reflects a custom fresh glyph in the preview', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item({ metadata: { symbolFresh: '#' } }), { isPreview: true }, DEFAULT_SETTINGS)).toBe('Cache: # 4:52');
+        expect(widget.render(item({ metadata: { symbolFresh: '#' } }), { isPreview: true }, DEFAULT_SETTINGS)).toBe('缓存: # 4:52');
     });
 
     it('extends the countdown window when the TTL is set to 1 hour', () => {
         const widget = new CacheTimerWidget();
         // 600s in is COLD at the default 5-minute TTL...
-        expect(widget.render(item(), transcriptContext([assistant(600)]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([assistant(600)]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
         // ...but still fresh under a 1-hour TTL.
-        expect(widget.render(item({ metadata: { ttlSeconds: '3600' } }), transcriptContext([assistant(600)]), DEFAULT_SETTINGS)).toMatch(/^Cache: 🟢 \d+:\d{2}$/);
+        expect(widget.render(item({ metadata: { ttlSeconds: '3600' } }), transcriptContext([assistant(600)]), DEFAULT_SETTINGS)).toMatch(/^缓存: 🟢 \d+:\d{2}$/);
     });
 
     it('falls back to the default TTL for a malformed value', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item({ metadata: { ttlSeconds: 'abc' } }), transcriptContext([assistant(600)]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item({ metadata: { ttlSeconds: 'abc' } }), transcriptContext([assistant(600)]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
     });
 
     it('cycles the TTL between 5m and 1h via the keybind', () => {
@@ -231,7 +237,7 @@ describe('CacheTimer widget', () => {
 
     it('annotates the editor with a non-default TTL', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.getEditorDisplay(item({ metadata: { ttlSeconds: '3600' } })).modifierText).toBe('(ttl 1h)');
-        expect(widget.getEditorDisplay(item({ metadata: { ttlSeconds: '3600', hideWhenEmpty: 'true' } })).modifierText).toBe('(ttl 1h, hide when empty)');
+        expect(widget.getEditorDisplay(item({ metadata: { ttlSeconds: '3600' } })).modifierText).toBe('(TTL 1h)');
+        expect(widget.getEditorDisplay(item({ metadata: { ttlSeconds: '3600', hideWhenEmpty: 'true' } })).modifierText).toBe('(TTL 1h, 无数据时隐藏)');
     });
 });

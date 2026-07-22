@@ -95,7 +95,7 @@ describe('BlockResetTimerWidget', () => {
 
         mockResolveUsageWindowWithFallback.mockReturnValue(null);
 
-        expect(render(widget, { id: 'reset', type: 'reset-timer' }, { usageData: {} })).toBe('Reset: [Loading]');
+        expect(render(widget, { id: 'reset', type: 'reset-timer' }, { usageData: {} })).toBe('重置: [加载中]');
         expect(render(widget, { id: 'reset', type: 'reset-timer', rawValue: true }, { usageData: {} })).toBe('[Loading]');
     });
 
