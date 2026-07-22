@@ -6,7 +6,10 @@ import {
 import React, { useState } from 'react';
 
 import { getColorLevelString } from '../../types/ColorLevel';
-import type { Settings } from '../../types/Settings';
+import {
+    DefaultPaddingSideSchema,
+    type Settings
+} from '../../types/Settings';
 import {
     COLOR_MAP,
     applyColors,
@@ -231,6 +234,16 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
                     overrideForegroundColor: undefined
                 };
                 onUpdate(updatedSettings);
+            } else if (input === 'd' || input === 'D') {
+                // Cycle through padding sides: both -> left -> right -> both
+                const paddingSides = DefaultPaddingSideSchema.options;
+                const currentIndex = paddingSides.indexOf(settings.defaultPaddingSide);
+                const nextSide = paddingSides[(currentIndex + 1) % paddingSides.length] ?? 'both';
+                const updatedSettings = {
+                    ...settings,
+                    defaultPaddingSide: nextSide
+                };
+                onUpdate(updatedSettings);
             }
         }
     });
@@ -298,7 +311,7 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
             {editingPadding ? (
                 <Box flexDirection='column'>
                     <Box>
-                        <Text>输入默认内边距（应用于每个组件的左右两侧）：</Text>
+                        <Text>输入默认内边距（按“内边距方向”设置应用）：</Text>
                         <Text color='cyan'>{paddingInput ? `"${paddingInput}"` : '（空）'}</Text>
                     </Box>
                     <Text dimColor>按 Enter 保存，ESC 取消</Text>
@@ -363,6 +376,12 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
                         <Text>  默认内边距: </Text>
                         <Text color='cyan'>{settings.defaultPadding ? `"${settings.defaultPadding}"` : '（无）'}</Text>
                         <Text dimColor> - 按 (p) 编辑</Text>
+                    </Box>
+
+                    <Box>
+                        <Text>     内边距方向: </Text>
+                        <Text color='cyan'>{settings.defaultPaddingSide === 'left' ? '仅左侧' : settings.defaultPaddingSide === 'right' ? '仅右侧' : '两侧'}</Text>
+                        <Text dimColor> - 按 (d) 切换</Text>
                     </Box>
 
                     <Box>
@@ -441,6 +460,9 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
                     <Box marginTop={1} flexDirection='column'>
                         <Text dimColor wrap='wrap'>
                             注意：这些设置在渲染时应用，不会向组件列表中添加组件。
+                        </Text>
+                        <Text dimColor wrap='wrap'>
+                            • 内边距方向：选择默认内边距应用于两侧、仅左侧或仅右侧
                         </Text>
                         <Text dimColor wrap='wrap'>
                             • 继承颜色：分隔符将使用前一个组件的颜色

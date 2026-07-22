@@ -17,6 +17,13 @@ import type {
 } from '../types/Widget';
 import { shouldInsertInput } from '../utils/input-guards';
 
+import {
+    SYMBOL_OVERRIDE_ACTION,
+    formatSymbolPrefix,
+    getSymbolKeybind,
+    renderSymbolOverrideEditor
+} from './shared/symbol-override';
+
 export class CurrentWorkingDirWidget implements Widget {
     getDefaultColor(): string { return 'blue'; }
     getDescription(): string { return '显示当前工作目录'; }
@@ -108,6 +115,7 @@ export class CurrentWorkingDirWidget implements Widget {
         const segments = item.metadata?.segments ? parseInt(item.metadata.segments, 10) : undefined;
         const fishStyle = item.metadata?.fishStyle === 'true';
         const abbreviateHome = item.metadata?.abbreviateHome === 'true';
+        const symbolPrefix = formatSymbolPrefix(item, '');
 
         if (context.isPreview) {
             let previewPath: string;
@@ -132,7 +140,7 @@ export class CurrentWorkingDirWidget implements Widget {
                 previewPath = '/Users/example/Documents/Projects/my-project';
             }
 
-            return item.rawValue ? previewPath : `cwd: ${previewPath}`;
+            return item.rawValue ? `${symbolPrefix}${previewPath}` : `${symbolPrefix}cwd: ${previewPath}`;
         }
 
         const cwd = context.data?.cwd;
@@ -169,18 +177,22 @@ export class CurrentWorkingDirWidget implements Widget {
             }
         }
 
-        return item.rawValue ? displayPath : `cwd: ${displayPath}`;
+        return item.rawValue ? `${symbolPrefix}${displayPath}` : `${symbolPrefix}cwd: ${displayPath}`;
     }
 
     getCustomKeybinds(): CustomKeybind[] {
         return [
             { key: 'h', label: '(h)ome ~ 缩写', action: 'toggle-abbreviate-home' },
             { key: 's', label: '(s)路径段数', action: 'edit-segments' },
-            { key: 'f', label: '(f)ish 风格', action: 'toggle-fish-style' }
+            { key: 'f', label: '(f)ish 风格', action: 'toggle-fish-style' },
+            getSymbolKeybind()
         ];
     }
 
     renderEditor(props: WidgetEditorProps): React.ReactElement {
+        if (props.action === SYMBOL_OVERRIDE_ACTION) {
+            return renderSymbolOverrideEditor(props, '');
+        }
         return <CurrentWorkingDirEditor {...props} />;
     }
 

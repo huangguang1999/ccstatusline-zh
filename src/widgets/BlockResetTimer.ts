@@ -52,6 +52,7 @@ function makeTimerProgressBar(percent: number, width: number): string {
 }
 
 const BLOCK_RESET_PREVIEW_AT = '2026-03-12T08:30:00.000Z';
+const USAGE_TIMER_LOADING_MESSAGE = '[Loading]';
 
 export class BlockResetTimerWidget implements Widget {
     getDefaultColor(): string { return 'brightBlue'; }
@@ -127,7 +128,7 @@ export class BlockResetTimerWidget implements Widget {
                 return getUsageErrorMessage(usageData.error);
             }
 
-            return null;
+            return formatRawOrLabeledValue(item, '重置: ', item.rawValue ? USAGE_TIMER_LOADING_MESSAGE : '[加载中]');
         }
 
         if (isUsageProgressMode(displayMode)) {

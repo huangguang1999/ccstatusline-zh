@@ -27,6 +27,13 @@ import {
     handleToggleNoGitAction,
     isHideNoGitEnabled
 } from './shared/git-no-git';
+import {
+    MAX_WIDTH_ACTION,
+    applyMaxWidth,
+    getMaxWidthKeybind,
+    getMaxWidthModifier,
+    renderMaxWidthEditor
+} from './shared/max-width';
 import { isMetadataFlagEnabled } from './shared/metadata';
 import {
     formatSymbolPrefix,
@@ -78,6 +85,9 @@ export class GitBranchWidget implements Widget {
             modifiers.push('隐藏「无 Git」');
         if (isLink)
             modifiers.push('仓库链接');
+        const maxWidthText = getMaxWidthModifier(item);
+        if (maxWidthText)
+            modifiers.push(maxWidthText);
         return {
             displayText: this.getDisplayName(),
             modifierText: makeModifierText(modifiers)
@@ -111,7 +121,7 @@ export class GitBranchWidget implements Widget {
             return hideNoGit ? null : '⎇ 无 Git';
         }
 
-        const displayText = item.rawValue ? branch : `${prefix}${branch}`;
+        const displayText = applyMaxWidth(item.rawValue ? branch : `${prefix}${branch}`, item.maxWidth);
 
         if (isLink) {
             const origin = getRemoteInfo('origin', context);
@@ -134,11 +144,15 @@ export class GitBranchWidget implements Widget {
         return [
             ...getHideNoGitKeybinds(),
             { key: 'l', label: '(l)仓库链接', action: TOGGLE_LINK_ACTION },
+            getMaxWidthKeybind(),
             getSymbolKeybind()
         ];
     }
 
     renderEditor(props: WidgetEditorProps) {
+        if (props.action === MAX_WIDTH_ACTION) {
+            return renderMaxWidthEditor(props);
+        }
         return renderSymbolOverrideEditor(props, DEFAULT_SYMBOL);
     }
 

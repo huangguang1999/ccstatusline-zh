@@ -6,30 +6,28 @@ import type {
     WidgetEditorDisplay,
     WidgetItem
 } from '../types/Widget';
-import { getVoiceConfig } from '../utils/claude-settings';
+import { getSandboxConfig } from '../utils/claude-settings';
 
-const MIC_EMOJI = '🎤';
-const MIC_NERD_FONT = '';
-const MIC_SLASH_NERD_FONT = '';
-const STATE_DOT_OFF = '○';
-const STATE_DOT_ON = '◉';
+const DOT_ON = '●';
+const DOT_OFF = '○';
+const LOCK_NERD_FONT = '';
+const UNLOCK_NERD_FONT = '';
 
-const FORMATS = ['icon', 'icon-text', 'text', 'word'] as const;
-type VoiceFormat = typeof FORMATS[number];
+const FORMATS = ['glyph', 'text', 'word'] as const;
+type SandboxFormat = typeof FORMATS[number];
 
-const DEFAULT_FORMAT: VoiceFormat = 'icon';
+const DEFAULT_FORMAT: SandboxFormat = 'glyph';
 const CYCLE_FORMAT_ACTION = 'cycle-format';
 const TOGGLE_NERD_FONT_ACTION = 'toggle-nerd-font';
 const NERD_FONT_METADATA_KEY = 'nerdFont';
 
-function getFormat(item: WidgetItem): VoiceFormat {
+function getFormat(item: WidgetItem): SandboxFormat {
     const f = item.metadata?.format;
-    return (FORMATS as readonly string[]).includes(f ?? '') ? (f as VoiceFormat) : DEFAULT_FORMAT;
+    return (FORMATS as readonly string[]).includes(f ?? '') ? (f as SandboxFormat) : DEFAULT_FORMAT;
 }
 
 function canUseNerdFont(item: WidgetItem): boolean {
-    const format = getFormat(item);
-    return format === 'icon' || (format === 'icon-text' && !item.rawValue);
+    return getFormat(item) === 'glyph';
 }
 
 function removeNerdFont(item: WidgetItem): WidgetItem {
@@ -42,7 +40,7 @@ function removeNerdFont(item: WidgetItem): WidgetItem {
     };
 }
 
-function setFormat(item: WidgetItem, format: VoiceFormat): WidgetItem {
+function setFormat(item: WidgetItem, format: SandboxFormat): WidgetItem {
     let updatedItem: WidgetItem;
 
     if (format === DEFAULT_FORMAT) {
@@ -88,28 +86,24 @@ function toggleNerdFont(item: WidgetItem): WidgetItem {
     return removeNerdFont(item);
 }
 
-function formatStatus(enabled: boolean, format: VoiceFormat, nerdFont: boolean, rawValue: boolean): string {
-    const stateText = rawValue
-        ? (enabled ? 'on' : 'off')
-        : (enabled ? '启用' : '关闭');
-    const stateDot = enabled ? STATE_DOT_ON : STATE_DOT_OFF;
-    const icon = nerdFont
-        ? (enabled ? MIC_NERD_FONT : MIC_SLASH_NERD_FONT)
-        : MIC_EMOJI;
+function formatStatus(enabled: boolean, format: SandboxFormat, nerdFont: boolean, rawValue: boolean): string {
+    const rawStateText = enabled ? 'ON' : 'OFF';
+    const displayStateText = enabled ? '启用' : '关闭';
+    const glyph = nerdFont
+        ? (enabled ? LOCK_NERD_FONT : UNLOCK_NERD_FONT)
+        : (enabled ? DOT_ON : DOT_OFF);
 
     switch (format) {
-        case 'icon':
-            return nerdFont ? icon : (rawValue ? stateDot : `${icon} ${stateDot}`);
-        case 'icon-text':
-            return rawValue ? stateText : `${icon} ${stateText}`;
+        case 'glyph':
+            return rawValue ? glyph : `SB: ${glyph}`;
         case 'text':
-            return stateText;
+            return rawValue ? rawStateText : `SB: ${displayStateText}`;
         case 'word':
-            return rawValue ? stateText : `语音 ${stateText}`;
+            return rawValue ? rawStateText : `沙箱: ${displayStateText}`;
     }
 }
 
-function resolveVoiceConfigCwd(context: RenderContext): string | undefined {
+function resolveSandboxConfigCwd(context: RenderContext): string | undefined {
     const candidates = [
         context.data?.workspace?.project_dir,
         context.data?.cwd,
@@ -119,10 +113,16 @@ function resolveVoiceConfigCwd(context: RenderContext): string | undefined {
     return candidates.find(candidate => typeof candidate === 'string' && candidate.trim().length > 0);
 }
 
-export class VoiceStatusWidget implements Widget {
-    getDefaultColor(): string { return 'magenta'; }
-    getDescription(): string { return '显示 Claude Code 语音输入是否启用'; }
-    getDisplayName(): string { return '语音状态'; }
+export class SandboxStatusWidget implements Widget {
+    getDefaultColor(): string { return 'green'; }
+    getDescription(): string {
+        return [
+            '显示 Claude Code Bash 沙箱模式是否启用',
+            '尽力检测：受管理策略或 CLI 设置覆盖、沙箱初始化失败时，结果可能与实际状态不一致。'
+        ].join('\n');
+    }
+
+    getDisplayName(): string { return '沙箱状态'; }
     getCategory(): string { return '核心'; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
@@ -160,7 +160,7 @@ export class VoiceStatusWidget implements Widget {
             return formatStatus(true, format, nerdFont, item.rawValue ?? false);
         }
 
-        const config = getVoiceConfig(resolveVoiceConfigCwd(context));
+        const config = getSandboxConfig(resolveSandboxConfigCwd(context));
         if (config === null) {
             return null;
         }

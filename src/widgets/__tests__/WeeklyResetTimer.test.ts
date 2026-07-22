@@ -121,12 +121,13 @@ describe('WeeklyResetTimerWidget', () => {
         expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer' }, { usageData: { error: 'timeout' } })).toBe('[超时]');
     });
 
-    it('returns null when neither weekly reset data nor usage error exists', () => {
+    it('shows loading when neither weekly reset data nor usage error exists', () => {
         const widget = new WeeklyResetTimerWidget();
 
         mockResolveWeeklyUsageWindow.mockReturnValue(null);
 
-        expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer' }, { usageData: {} })).toBeNull();
+        expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer' }, { usageData: {} })).toBe('周重置: [加载中]');
+        expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer', rawValue: true }, { usageData: {} })).toBe('[Loading]');
     });
 
     it('shows raw value without label in time mode', () => {
