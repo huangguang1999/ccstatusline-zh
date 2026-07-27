@@ -58,15 +58,27 @@ jobs:
 
       - name: Determine if sync needed
         id: diff
+        env:
+          FORK_VERSION: ${{ steps.fork.outputs.version }}
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+          FORCED_TAG: ${{ inputs.tag }}
         run: |
-          FORK="v${{ steps.fork.outputs.version }}"
-          UP="${{ steps.upstream.outputs.tag }}"
-          if [ "$FORK" = "$UP" ]; then
+          FORK="${FORK_VERSION#v}"
+          UP="${UPSTREAM_TAG#v}"
+          LATEST=$(printf '%s\n%s\n' "$FORK" "$UP" | sort -V | tail -n 1)
+
+          if [ -n "$FORCED_TAG" ]; then
+            echo "needs_sync=true" >> "$GITHUB_OUTPUT"
+            echo "⚠️  手动指定同步到 v$UP"
+          elif [ "$FORK" = "$UP" ]; then
             echo "needs_sync=false" >> "$GITHUB_OUTPUT"
-            echo "✅ Fork 已是最新（$FORK）"
+            echo "✅ Fork 已是最新（v$FORK）"
+          elif [ "$LATEST" = "$FORK" ]; then
+            echo "needs_sync=false" >> "$GITHUB_OUTPUT"
+            echo "✅ Fork v$FORK 比上游 v$UP 更新，无需同步"
           else
             echo "needs_sync=true" >> "$GITHUB_OUTPUT"
-            echo "⚠️  Fork $FORK，上游 $UP —— 需要同步"
+            echo "⚠️  Fork v$FORK，上游 v$UP —— 需要同步"
           fi
 
   sync:
@@ -92,7 +104,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - name: Run Claude Code sync
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b # v1.0.183
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
