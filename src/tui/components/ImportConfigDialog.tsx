@@ -29,15 +29,15 @@ export function ImportConfigDialog({ onFileChosen, onCancel }: ImportConfigDialo
 
     return (
         <Box flexDirection='column'>
-            <Text bold>Import Config</Text>
-            <Text dimColor>Enter the file path to import configuration from:</Text>
+            <Text bold>导入配置</Text>
+            <Text dimColor>请输入要导入的配置文件路径：</Text>
             <Box marginTop={1}>
-                <Text>Path: </Text>
+                <Text>路径： </Text>
                 <Text>{inputValue}</Text>
                 <Text inverse> </Text>
             </Box>
             <Box marginTop={1}>
-                <Text dimColor>Enter to confirm, Escape to cancel</Text>
+                <Text dimColor>按 Enter 确认，按 Esc 取消</Text>
             </Box>
         </Box>
     );

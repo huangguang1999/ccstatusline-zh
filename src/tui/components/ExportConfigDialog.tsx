@@ -14,7 +14,7 @@ interface ExportConfigDialogProps {
     onCancel: () => void;
 }
 
-const DEFAULT_EXPORT_PATH = path.join(os.homedir(), 'ccstatusline-config.json');
+const DEFAULT_EXPORT_PATH = path.join(os.homedir(), 'ccstatusline-zh-config.json');
 
 export function ExportConfigDialog({ onExport, onCancel }: ExportConfigDialogProps): React.JSX.Element {
     const [inputValue, setInputValue] = useState(DEFAULT_EXPORT_PATH);
@@ -33,15 +33,15 @@ export function ExportConfigDialog({ onExport, onCancel }: ExportConfigDialogPro
 
     return (
         <Box flexDirection='column'>
-            <Text bold>Export Config</Text>
-            <Text dimColor>Enter the file path to export your configuration to:</Text>
+            <Text bold>导出配置</Text>
+            <Text dimColor>请输入配置文件的导出路径：</Text>
             <Box marginTop={1}>
-                <Text>Path: </Text>
+                <Text>路径： </Text>
                 <Text>{inputValue}</Text>
                 <Text inverse> </Text>
             </Box>
             <Box marginTop={1}>
-                <Text dimColor>Enter to confirm, Escape to cancel</Text>
+                <Text dimColor>按 Enter 确认，按 Esc 取消</Text>
             </Box>
         </Box>
     );

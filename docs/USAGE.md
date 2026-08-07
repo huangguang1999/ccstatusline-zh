@@ -154,7 +154,7 @@ When ccstatusline is installed in Claude Code, the main menu includes **Configur
 
 The TUI main menu can move configurations between machines or preserve a backup:
 
-- **Export Config** writes the current in-memory configuration to a JSON file, including edits that have not been saved to `settings.json` yet. The default destination is `~/ccstatusline-config.json`; parent directories are created as needed, and the export records the ccstatusline version that created it.
+- **Export Config** writes the current in-memory configuration to a JSON file, including edits that have not been saved to `settings.json` yet. The default destination is `~/ccstatusline-zh-config.json`; parent directories are created as needed, and the export records the ccstatusline version that created it.
 - **Import Config** reads a JSON file, validates it, migrates supported older formats, rejects files from newer schema versions, and shows the effective changes before anything is applied.
 
 The import preview follows the highlighted action:

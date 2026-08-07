@@ -4,7 +4,7 @@
 
 _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标_
 
-> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.25 版本（含缓存计时器 / Git CI / 沙箱状态组件、单侧默认内边距、选择性 Powerline 对齐、Git 宽度限制、可组合压缩指标及异步 Git 检查刷新等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
+> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前同步至上游 v2.2.27 版本（含周 Fable 用量、迁移账号用量 API 兼容、压缩后上下文修正、隐藏组件分隔符修复及配置导入/导出等最新功能）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/huangguang1999/ccstatusline-zh/blob/main/LICENSE)
 [![Node.js Version](https://img.shields.io/node/v/ccstatusline.svg)](https://nodejs.org)
@@ -33,7 +33,7 @@ _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标
 
 ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支持 80+ 种可定制组件、Powerline 主题、交互式 TUI 配置界面等丰富功能。本项目在其基础上，将所有用户可见的英文文本直接替换为中文，包括：
 
-- **86 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余，v2.2.20 新增的 Remote Control Status，v2.2.22 新增的缓存命中率 / 缓存读取 / 缓存写入 / 超额已用，v2.2.24 新增的缓存计时器 / Git CI 状态 / 沙箱状态）
+- **87 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余，v2.2.20 新增的 Remote Control Status，v2.2.22 新增的缓存命中率 / 缓存读取 / 缓存写入 / 超额已用，v2.2.24 新增的缓存计时器 / Git CI 状态 / 沙箱状态，v2.2.26 新增的周 Fable 用量）
 - **TUI 配置界面**的全部菜单项、帮助文本、提示信息、对话框
 - **布局组件**（分隔符、弹性分隔符）的名称和描述
 - **极简模式 / Minimalist Mode**、**模糊搜索组件选择器**、**Powerline 主题色延续**（v2.2.8）
@@ -46,6 +46,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 - **Remote Control Status 远程控制状态组件**、**渐变色前景色支持**、**周重置计时器星期显示模式**、**Windows npm shim 执行修复**、**超额用量单位换算修正**、**Input/Output Token 组件优先使用累计转录指标**、**UsageFetch 缓存隔离改进**（v2.2.20）
 - **缓存命中率 / 缓存读取 / 缓存写入**（Cache Hit Rate / Cache Read / Cache Write）、**超额已用组件**（Extra Usage Used）、**压缩计数改用 compact_boundary 标记精准检测**（不再依赖上下文百分比推断）、**弹性分隔符 Powerline 路径修复**、**可覆盖字符字形（Glyph override）**、**每组件暗淡样式**（整体暗淡 / 括号暗淡）、**invalid settings.json 非破坏性恢复与警告**（v2.2.21–v2.2.22）
 - **缓存计时器 / Git CI 状态 / 沙箱状态组件**、**单侧默认内边距**、**选择性 Powerline 对齐**、**Git 分支与根目录宽度限制**、**当前目录字符**、**可配置上下文窗口兜底值**、**可组合压缩指标**、**`--version` 参数**、**用量缓存与加载态修复**、**异步 Git PR/CI 检查刷新**（v2.2.23–v2.2.25）
+- **周 Fable 用量组件**、**迁移账号的 `limits[]` 用量 API 兼容**、**压缩后上下文长度修正**、**隐藏组件分隔符保留**、**配置导入/导出及差异预览**（v2.2.26–v2.2.27）
 - **确认对话框** "是 / 否"
 - **分类筛选** "全部" 等界面元素
 
@@ -58,13 +59,13 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 | 界面语言   | 英文         | 中文                      |
 | 配置兼容性 | —            | ✅ 共用相同 settings.json |
 | 功能差异   | —            | 无，功能完全一致          |
-| 同步版本   | 最新         | v2.2.25（+ 缓存计时器 / Git CI / 沙箱状态 / 布局与用量修复 / 异步 Git 检查刷新 / 中文化覆盖） |
+| 同步版本   | 最新         | v2.2.27（+ 周 Fable 用量 / 用量 API 兼容 / 压缩后上下文修正 / 配置导入导出 / 中文化覆盖） |
 
 ---
 
 ## ✨ 功能特性
 
-- **86 种可定制组件** — 模型、Git（含 PR / CI / 冲突 / 暂存 / Origin / Upstream / 工作树等细分组件）、Token、上下文、会话、费用、速度等
+- **87 种可定制组件** — 模型、Git（含 PR / CI / 冲突 / 暂存 / Origin / Upstream / 工作树等细分组件）、Token、上下文、会话、费用、速度等
 - **交互式 TUI 配置** — 按 `ccstatusline-zh setup` 启动可视化配置界面
 - **Powerline 风格** — 内置多款 Powerline 主题，支持自定义分隔符，支持主题色跨行延续
 - **极简模式** — 一键让所有组件切换到"无标签"模式，状态栏更精简
@@ -262,6 +263,7 @@ ccstatusline-zh --config /path/to/custom-settings.json
 | 周用量         | 显示本周 API 用量             |
 | 周 Sonnet 用量 | 显示本周 Sonnet 模型 API 用量 |
 | 周 Opus 用量   | 显示本周 Opus 模型 API 用量   |
+| 周 Fable 用量  | 显示本周 Fable 模型 API 用量  |
 | 超额用量占比   | 显示超额用量（按量付费）占比       |
 | 超额用量剩余   | 显示每月超额用量额度的剩余金额（美元） |
 | 时段计时器     | 显示当前 5 小时时段已用时间   |
@@ -309,6 +311,8 @@ ccstatusline-zh --config /path/to/custom-settings.json
 - **全局样式覆盖** — 设置全局颜色、样式及默认内边距方向
 - **终端选项** — 配置终端宽度和颜色级别
 - **配置状态行** — 配置 Claude Code 状态行刷新间隔（Claude Code ≥ 2.1.97）
+- **导出配置** — 将当前配置保存为 JSON 文件，用于备份或分享
+- **导入配置** — 从 JSON 文件加载配置并预览替换或合并后的差异
 - **安装到 Claude Code** — 选择自动更新 / 固定全局安装两种方式
 - **管理安装** — 已固定安装时可检查 npm 更新、运行全局更新命令、卸载
 - **检查更新** — 查询 npm 仓库最新版本并对比当前版本
@@ -371,7 +375,7 @@ bun run lint
 ```
 src/
 ├── ccstatusline.ts          # 入口文件
-├── widgets/                 # 组件目录（86 个组件）
+├── widgets/                 # 组件目录（87 个组件）
 │   ├── Model.ts
 │   ├── GitBranch.ts
 │   ├── TokensInput.ts

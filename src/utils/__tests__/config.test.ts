@@ -174,7 +174,7 @@ describe('config utilities', () => {
 
         expect(validation).toEqual({
             status: 'invalid',
-            reason: `Config version ${CURRENT_VERSION + 1} is newer than supported version ${CURRENT_VERSION}`
+            reason: `配置版本 ${CURRENT_VERSION + 1} 高于当前支持版本 ${CURRENT_VERSION}`
         });
     });
 

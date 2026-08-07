@@ -28,13 +28,13 @@ import {
     toggleUsageInverted
 } from './shared/usage-display';
 
-const LABEL = 'Fable Weekly: ';
+const LABEL = '周 Fable: ';
 
 export class FableWeeklyUsageWidget implements Widget {
     getDefaultColor(): string { return 'brightBlue'; }
-    getDescription(): string { return 'Shows Fable-only weekly usage percentage'; }
-    getDisplayName(): string { return 'Weekly Fable Usage'; }
-    getCategory(): string { return 'Usage'; }
+    getDescription(): string { return '显示每周 Fable API 用量百分比'; }
+    getDisplayName(): string { return '周 Fable 用量'; }
+    getCategory(): string { return '用量'; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return {

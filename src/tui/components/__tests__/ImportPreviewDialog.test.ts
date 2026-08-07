@@ -130,6 +130,9 @@ describe('ImportPreviewDialog helpers', () => {
 
         try {
             await flushInk();
+            expect(stdout.getOutput()).toContain('导入预览');
+            expect(stdout.getOutput()).toContain('全部替换');
+            expect(stdout.getOutput()).toContain('合并');
             expect(stdout.getOutput()).toContain('flexMode: full → full-minus-40');
 
             stdout.clearOutput();

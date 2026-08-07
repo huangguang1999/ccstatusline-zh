@@ -271,14 +271,14 @@ export async function validateImportFile(filePath: string): Promise<ImportValida
     try {
         raw = await readFile(expanded, 'utf-8');
     } catch {
-        return { status: 'invalid', reason: `Cannot read file: ${expanded}` };
+        return { status: 'invalid', reason: `无法读取文件：${expanded}` };
     }
 
     let parsed: unknown;
     try {
         parsed = JSON.parse(raw);
     } catch {
-        return { status: 'invalid', reason: 'File is not valid JSON' };
+        return { status: 'invalid', reason: '文件不是有效的 JSON' };
     }
 
     if (
@@ -290,7 +290,7 @@ export async function validateImportFile(filePath: string): Promise<ImportValida
     ) {
         return {
             status: 'invalid',
-            reason: `Config version ${parsed.version} is newer than supported version ${CURRENT_VERSION}`
+            reason: `配置版本 ${parsed.version} 高于当前支持版本 ${CURRENT_VERSION}`
         };
     }
 
@@ -300,7 +300,7 @@ export async function validateImportFile(filePath: string): Promise<ImportValida
 
     const result = SettingsSchema.safeParse(parsed);
     if (!result.success) {
-        return { status: 'invalid', reason: `Invalid config format: ${result.error.issues[0]?.message ?? 'unknown error'}` };
+        return { status: 'invalid', reason: `配置格式无效：${result.error.issues[0]?.message ?? '未知错误'}` };
     }
 
     const presentKeys = Object.keys(parsed as Record<string, unknown>)

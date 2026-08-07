@@ -53,13 +53,13 @@ export function getImportPreviewSettings(
 
 function formatScalar(value: unknown): string {
     if (value === null || value === undefined) {
-        return 'none';
+        return '无';
     }
     if (typeof value === 'boolean' || typeof value === 'number') {
         return String(value);
     }
     if (typeof value === 'string') {
-        return value || '(empty)';
+        return value || '（空）';
     }
     return JSON.stringify(value);
 }
@@ -104,17 +104,17 @@ function diffLines(currentLines: WidgetItem[][], importedLines: WidgetItem[][]):
             }
 
             if (!curWidget) {
-                const addedType = impWidget?.type ?? 'unknown';
-                entries.push({ path: `line ${li + 1} +${addedType}`, current: undefined, imported: '[added]' });
+                const addedType = impWidget?.type ?? '未知';
+                entries.push({ path: `第 ${li + 1} 行 +${addedType}`, current: undefined, imported: '[新增]' });
                 continue;
             }
 
             if (!impWidget) {
-                entries.push({ path: `line ${li + 1} -${curWidget.type}`, current: '[removed]', imported: undefined });
+                entries.push({ path: `第 ${li + 1} 行 -${curWidget.type}`, current: '[移除]', imported: undefined });
                 continue;
             }
 
-            const label = `${curWidget.type} (line ${li + 1})`;
+            const label = `${curWidget.type}（第 ${li + 1} 行）`;
             const widgetKeys = new Set([...Object.keys(curWidget), ...Object.keys(impWidget)]) as Set<keyof WidgetItem>;
             for (const key of widgetKeys) {
                 if (key === 'id') {
@@ -143,10 +143,10 @@ export function ImportPreviewDialog({
     const topLevelKeys = getImportPreviewKeys(currentSettings, previewSettings);
 
     const items: ListEntry<ImportMode>[] = [
-        { label: 'Replace All', value: 'replace', description: 'Overwrite all settings with the imported config' },
-        { label: 'Merge', value: 'merge', description: 'Overlay imported settings on top of current settings' },
+        { label: '全部替换', value: 'replace', description: '使用导入的配置覆盖所有设置' },
+        { label: '合并', value: 'merge', description: '将导入的设置覆盖到当前设置之上' },
         '-' as unknown as ListEntry<ImportMode>,
-        { label: 'Cancel', value: 'cancel' }
+        { label: '取消', value: 'cancel' }
     ];
 
     function handleSelect(value: ImportMode | 'back'): void {
@@ -231,8 +231,8 @@ export function ImportPreviewDialog({
 
     return (
         <Box flexDirection='column'>
-            <Text bold>Import Preview</Text>
-            <Text dimColor>Changes that will be applied:</Text>
+            <Text bold>导入预览</Text>
+            <Text dimColor>即将应用的更改：</Text>
             <Box flexDirection='column'>
                 {diffRows}
             </Box>

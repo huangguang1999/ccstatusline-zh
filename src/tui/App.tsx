@@ -789,10 +789,10 @@ export const App: React.FC = () => {
                 return;
             }
             await exportConfig(settings, filePath);
-            setFlashMessage({ text: `Config exported to ${filePath}`, color: 'green' });
+            setFlashMessage({ text: `配置已导出至 ${filePath}`, color: 'green' });
         } catch (err) {
             setFlowNotice({
-                title: 'Export Failed',
+                title: '导出失败',
                 message: err instanceof Error ? err.message : String(err),
                 color: 'red',
                 continueScreen: 'main'
@@ -807,7 +807,7 @@ export const App: React.FC = () => {
         const result = await validateImportFile(filePath);
         if (result.status === 'invalid') {
             setFlowNotice({
-                title: 'Import Failed',
+                title: '导入失败',
                 message: result.reason,
                 color: 'red',
                 continueScreen: 'main'
@@ -832,7 +832,7 @@ export const App: React.FC = () => {
         setSettings(importedSettings);
         setHasChanges(true);
         setImportValidation(null);
-        setFlashMessage({ text: 'Config imported — review and save', color: 'green' });
+        setFlashMessage({ text: '配置已导入，请检查后保存', color: 'green' });
         setScreen('main');
     }, [importValidation, settings]);
 

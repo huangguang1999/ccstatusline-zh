@@ -273,6 +273,10 @@ describe('Main menu structure', () => {
             disabled: true,
             sublabel: '（请先安装）'
         }));
+        expect(buildMainMenuItems(false, false)).toEqual(expect.arrayContaining([
+            expect.objectContaining({ label: '📤 导出配置', value: 'exportConfig' }),
+            expect.objectContaining({ label: '📥 导入配置', value: 'importConfig' })
+        ]));
         expect(buildManageInstallationItems()[0]).toEqual(expect.objectContaining({ label: '🔄 检查更新' }));
         expect(getMainMenuInstallSelectionIndex(false)).toBe(7);
         expect(getMainMenuInstallSelectionIndex(true, autoInstallation)).toBe(8);

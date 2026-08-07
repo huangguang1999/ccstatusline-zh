@@ -124,14 +124,14 @@ export function buildMainMenuItems(
         },
         '-',
         {
-            label: '📤 Export Config',
+            label: '📤 导出配置',
             value: 'exportConfig',
-            description: 'Save your current configuration to a JSON file for backup or sharing'
+            description: '将当前配置保存为 JSON 文件，用于备份或分享'
         },
         {
-            label: '📥 Import Config',
+            label: '📥 导入配置',
             value: 'importConfig',
-            description: 'Load configuration from a previously exported JSON file'
+            description: '从之前导出的 JSON 文件加载配置'
         },
         '-',
         getInstallationMenuItem(isClaudeInstalled, installation)
