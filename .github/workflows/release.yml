@@ -27,7 +27,7 @@ jobs:
       should_publish: ${{ steps.v.outputs.should_publish }}
       version: ${{ steps.v.outputs.version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Compare package.json version with npm
         id: v
         run: |
@@ -49,7 +49,7 @@ jobs:
     # 受保护 Environment —— 配了必需审批人后，这里会暂停等你批准
     environment: npm-publish
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
