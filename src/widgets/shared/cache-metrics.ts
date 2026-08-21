@@ -26,9 +26,9 @@ export function getCacheTokens(context: RenderContext, sessionScope: boolean): T
     return getContextWindowTurnCacheTokens(context.data);
 }
 
-// Hit rate: share of cacheable context served hot vs rewritten cold.
+// Hit rate: share of total prompt input served from the cache.
 export function getCacheHitRate(tokens: TurnCacheTokens): number | null {
-    const denominator = tokens.read + tokens.creation;
+    const denominator = tokens.input + tokens.read + tokens.creation;
     return denominator > 0 ? (tokens.read / denominator) * 100 : null;
 }
 

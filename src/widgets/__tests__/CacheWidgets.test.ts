@@ -64,9 +64,26 @@ describe('Cache widgets', () => {
         };
 
         // context = 500 + 8000 + 2000 = 10500
-        expect(new w.CacheHitRateWidget().render(turnItem('cache-hit-rate'), context, DEFAULT_SETTINGS)).toBe('缓存命中: 80.0%');
+        expect(new w.CacheHitRateWidget().render(turnItem('cache-hit-rate'), context, DEFAULT_SETTINGS)).toBe('缓存命中: 76.2%');
         expect(new w.CacheReadWidget().render(turnItem('cache-read'), context, DEFAULT_SETTINGS)).toBe('缓存读取: fmt:8000 (76.2%)');
         expect(new w.CacheWriteWidget().render(turnItem('cache-write'), context, DEFAULT_SETTINGS)).toBe('缓存写入: fmt:2000 (19.0%)');
+    });
+
+    it('includes uncached input tokens in the cache hit-rate denominator', async () => {
+        const w = await loadWidgets();
+        const context: RenderContext = {
+            data: {
+                context_window: {
+                    current_usage: {
+                        input_tokens: 9000,
+                        cache_creation_input_tokens: 0,
+                        cache_read_input_tokens: 1000
+                    }
+                }
+            }
+        };
+
+        expect(new w.CacheHitRateWidget().render(turnItem('cache-hit-rate'), context, DEFAULT_SETTINGS)).toBe('缓存命中: 10.0%');
     });
 
     it('renders session-scope values from tokenMetrics when the scope flag is set', async () => {
@@ -94,7 +111,7 @@ describe('Cache widgets', () => {
         };
 
         // session context = 1000 + 6000 + 4000 = 11000
-        expect(new w.CacheHitRateWidget().render(sessionItem('cache-hit-rate'), context, DEFAULT_SETTINGS)).toBe('缓存命中: 60.0%');
+        expect(new w.CacheHitRateWidget().render(sessionItem('cache-hit-rate'), context, DEFAULT_SETTINGS)).toBe('缓存命中: 54.5%');
         expect(new w.CacheReadWidget().render(sessionItem('cache-read'), context, DEFAULT_SETTINGS)).toBe('缓存读取: fmt:6000 (54.5%)');
         expect(new w.CacheWriteWidget().render(sessionItem('cache-write'), context, DEFAULT_SETTINGS)).toBe('缓存写入: fmt:4000 (36.4%)');
     });
@@ -113,7 +130,7 @@ describe('Cache widgets', () => {
             }
         };
 
-        expect(new w.CacheHitRateWidget().render(turnItem('cache-hit-rate', { rawValue: true }), context, DEFAULT_SETTINGS)).toBe('80.0%');
+        expect(new w.CacheHitRateWidget().render(turnItem('cache-hit-rate', { rawValue: true }), context, DEFAULT_SETTINGS)).toBe('76.2%');
         expect(new w.CacheReadWidget().render(turnItem('cache-read', { rawValue: true }), context, DEFAULT_SETTINGS)).toBe('fmt:8000 (76.2%)');
         expect(new w.CacheWriteWidget().render(turnItem('cache-write', { rawValue: true }), context, DEFAULT_SETTINGS)).toBe('fmt:2000 (19.0%)');
     });
