@@ -22,7 +22,7 @@ import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
 export class CacheHitRateWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return '显示提示缓存命中率（缓存读取 vs 缓存写入）'; }
+    getDescription(): string { return '显示提示缓存命中率（缓存读取 Token / 总输入 Token）'; }
     getDisplayName(): string { return '缓存命中率'; }
     getCategory(): string { return '缓存'; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
