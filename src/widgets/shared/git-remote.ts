@@ -9,17 +9,8 @@ import {
     toggleMetadataFlag
 } from './metadata';
 
-const HIDE_NO_REMOTE_KEY = 'hideNoRemote';
-const TOGGLE_NO_REMOTE_ACTION = 'toggle-no-remote';
-
 const LINK_TO_REPO_KEY = 'linkToRepo';
 const TOGGLE_LINK_ACTION = 'toggle-link';
-
-const HIDE_NO_REMOTE_KEYBIND: CustomKeybind = {
-    key: 'h',
-    label: '(h)无远程时隐藏',
-    action: TOGGLE_NO_REMOTE_ACTION
-};
 
 const LINK_TO_REPO_KEYBIND: CustomKeybind = {
     key: 'l',
@@ -27,31 +18,15 @@ const LINK_TO_REPO_KEYBIND: CustomKeybind = {
     action: TOGGLE_LINK_ACTION
 };
 
-export function isHideNoRemoteEnabled(item: WidgetItem): boolean {
-    return isMetadataFlagEnabled(item, HIDE_NO_REMOTE_KEY);
-}
-
 export function isLinkToRepoEnabled(item: WidgetItem): boolean {
     return isMetadataFlagEnabled(item, LINK_TO_REPO_KEY);
 }
 
 export function getRemoteWidgetModifierText(item: WidgetItem): string | undefined {
-    const modifiers: string[] = [];
-
-    if (isHideNoRemoteEnabled(item)) {
-        modifiers.push('为空时隐藏');
-    }
-    if (isLinkToRepoEnabled(item)) {
-        modifiers.push('链接');
-    }
-
-    return makeModifierText(modifiers);
+    return makeModifierText(isLinkToRepoEnabled(item) ? ['链接'] : []);
 }
 
 export function handleRemoteWidgetAction(action: string, item: WidgetItem): WidgetItem | null {
-    if (action === TOGGLE_NO_REMOTE_ACTION) {
-        return toggleMetadataFlag(item, HIDE_NO_REMOTE_KEY);
-    }
     if (action === TOGGLE_LINK_ACTION) {
         return toggleMetadataFlag(item, LINK_TO_REPO_KEY);
     }
@@ -60,9 +35,5 @@ export function handleRemoteWidgetAction(action: string, item: WidgetItem): Widg
 }
 
 export function getRemoteWidgetKeybinds(): CustomKeybind[] {
-    return [HIDE_NO_REMOTE_KEYBIND, LINK_TO_REPO_KEYBIND];
-}
-
-export function getHideNoRemoteKeybinds(): CustomKeybind[] {
-    return [HIDE_NO_REMOTE_KEYBIND];
+    return [LINK_TO_REPO_KEYBIND];
 }

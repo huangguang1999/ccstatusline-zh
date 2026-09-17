@@ -72,6 +72,26 @@ describe('BlockTimerWidget', () => {
         expect(render(widget, item, { usageData: {} })).toBe('时段 [████░░░░░░░░░░░░] 25.0%');
     });
 
+    it('rounds the progress bar fill to the nearest cell', () => {
+        const widget = new BlockTimerWidget();
+        const item: WidgetItem = {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'progress' }
+        };
+
+        mockResolveUsageWindowWithFallback.mockReturnValue({
+            sessionDurationMs: 18000000,
+            elapsedMs: 13302000,
+            remainingMs: 4698000,
+            elapsedPercent: 73.9,
+            remainingPercent: 26.1
+        });
+
+        // 73.9% of 32 cells is 23.648, past the half-cell mark, so the 24th cell fills.
+        expect(render(widget, item, { usageData: {} })).toBe(`时段 [${'█'.repeat(24)}${'░'.repeat(8)}] 73.9%`);
+    });
+
     it('renders empty values when no usage or fallback data exists', () => {
         const widget = new BlockTimerWidget();
 
@@ -83,6 +103,30 @@ describe('BlockTimerWidget', () => {
             type: 'block-timer',
             metadata: { display: 'progress' }
         }, { usageData: { error: 'timeout' } })).toBe(`时段 [${'░'.repeat(32)}] 0.0%`);
+        expect(render(widget, {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'progress' },
+            numberFormat: { style: 'compact' }
+        }, { usageData: { error: 'timeout' } })).toBe(`时段 [${'░'.repeat(32)}] 0%`);
+    });
+
+    it('hides empty values when the no-data hide state is enabled', () => {
+        const widget = new BlockTimerWidget();
+
+        mockResolveUsageWindowWithFallback.mockReturnValue(null);
+
+        expect(widget.getHideableStates().map(state => state.key)).toEqual(['no-data']);
+        expect(render(widget, {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { hide: 'no-data' }
+        }, { usageData: { error: 'timeout' } })).toBeNull();
+        expect(render(widget, {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'progress', hide: 'no-data' }
+        }, { usageData: { error: 'timeout' } })).toBeNull();
     });
 
     it('shows raw value without label in time mode', () => {
@@ -100,7 +144,116 @@ describe('BlockTimerWidget', () => {
         expect(render(widget, { id: 'block', type: 'block-timer', rawValue: true }, { usageData: {} })).toBe('2hr');
     });
 
+    it('renders slider bar with elapsed percentage', () => {
+        const widget = new BlockTimerWidget();
+        const item: WidgetItem = {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'slider' }
+        };
+
+        mockResolveUsageWindowWithFallback.mockReturnValue({
+            sessionDurationMs: 18000000,
+            elapsedMs: 9000000,
+            remainingMs: 9000000,
+            elapsedPercent: 50,
+            remainingPercent: 50
+        });
+
+        expect(render(widget, item, { usageData: {} })).toBe('时段 ▓▓▓▓▓░░░░░ 50.0%');
+    });
+
+    it('renders slider-only bar without percentage', () => {
+        const widget = new BlockTimerWidget();
+        const item: WidgetItem = {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'slider-only' }
+        };
+
+        mockResolveUsageWindowWithFallback.mockReturnValue({
+            sessionDurationMs: 18000000,
+            elapsedMs: 9000000,
+            remainingMs: 9000000,
+            elapsedPercent: 50,
+            remainingPercent: 50
+        });
+
+        expect(render(widget, item, { usageData: {} })).toBe('时段 ▓▓▓▓▓░░░░░');
+    });
+
+    it('renders inverted slider using remaining percent', () => {
+        const widget = new BlockTimerWidget();
+        const item: WidgetItem = {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'slider', invert: 'true' }
+        };
+
+        mockResolveUsageWindowWithFallback.mockReturnValue({
+            sessionDurationMs: 18000000,
+            elapsedMs: 14400000,
+            remainingMs: 3600000,
+            elapsedPercent: 80,
+            remainingPercent: 20
+        });
+
+        expect(render(widget, item, { usageData: {} })).toBe('时段 ▓▓░░░░░░░░ 20.0%');
+    });
+
+    it('renders empty slider when no usage or fallback data exists', () => {
+        const widget = new BlockTimerWidget();
+
+        mockResolveUsageWindowWithFallback.mockReturnValue(null);
+
+        expect(render(widget, {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'slider' }
+        }, { usageData: { error: 'timeout' } })).toBe('时段 ░░░░░░░░░░ 0.0%');
+        expect(render(widget, {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'slider' },
+            numberFormat: { style: 'whole' }
+        }, { usageData: { error: 'timeout' } })).toBe('时段 ░░░░░░░░░░ 0%');
+        expect(render(widget, {
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'slider-only' }
+        }, { usageData: { error: 'timeout' } })).toBe('时段 ░░░░░░░░░░');
+    });
+
+    it('exposes invert keybind in slider mode', () => {
+        const widget = new BlockTimerWidget();
+
+        expect(widget.getCustomKeybinds({
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'slider' }
+        })).toEqual([
+            { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
+            { key: 'v', label: '(v)反转填充', action: 'toggle-invert' }
+        ]);
+    });
+
+    it('shows short bar modifier text in slider modes', () => {
+        const widget = new BlockTimerWidget();
+
+        expect(widget.getEditorDisplay({
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'slider' }
+        }).modifierText).toBe('(短进度条)');
+        expect(widget.getEditorDisplay({
+            id: 'block',
+            type: 'block-timer',
+            metadata: { display: 'slider-only' }
+        }).modifierText).toBe('(仅短进度条)');
+    });
+
     runUsageTimerEditorSuite({
+        supportsSliderMode: true,
         baseItem: { id: 'block', type: 'block-timer' },
         createWidget: () => new BlockTimerWidget(),
         expectedDisplayName: '时段计时器',

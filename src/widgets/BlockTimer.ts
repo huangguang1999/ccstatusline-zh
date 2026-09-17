@@ -2,15 +2,22 @@ import type { RenderContext } from '../types/RenderContext';
 import type { Settings } from '../types/Settings';
 import type {
     CustomKeybind,
+    HideableState,
     Widget,
     WidgetEditorDisplay,
     WidgetItem
 } from '../types/Widget';
 import {
+    formatPercent,
+    resolveNumberFormat
+} from '../utils/number-format';
+import {
     formatUsageDuration,
     resolveUsageWindowWithFallback
 } from '../utils/usage';
 
+import { isHidden } from './shared/hideable';
+import { makeTimerProgressBar } from './shared/progress-bar';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 import {
     cycleUsageDisplayMode,
@@ -21,16 +28,13 @@ import {
     isUsageCompact,
     isUsageInverted,
     isUsageProgressMode,
+    isUsageSliderMode,
+    makeSliderBar,
     toggleUsageCompact,
     toggleUsageInverted
 } from './shared/usage-display';
 
-function makeTimerProgressBar(percent: number, width: number): string {
-    const clampedPercent = Math.max(0, Math.min(100, percent));
-    const filledWidth = Math.floor((clampedPercent / 100) * width);
-    const emptyWidth = width - filledWidth;
-    return '█'.repeat(filledWidth) + '░'.repeat(emptyWidth);
-}
+const NO_DATA_HIDEABLE_STATE: HideableState = { key: 'no-data', label: '无活跃时段时' };
 
 export class BlockTimerWidget implements Widget {
     getDefaultColor(): string { return 'yellow'; }
@@ -47,7 +51,7 @@ export class BlockTimerWidget implements Widget {
 
     handleEditorAction(action: string, item: WidgetItem): WidgetItem | null {
         if (action === 'toggle-progress') {
-            return cycleUsageDisplayMode(item, ['compact']);
+            return cycleUsageDisplayMode(item, ['compact'], true);
         }
 
         if (action === 'toggle-invert') {
@@ -65,6 +69,7 @@ export class BlockTimerWidget implements Widget {
         const displayMode = getUsageDisplayMode(item);
         const inverted = isUsageInverted(item);
         const compact = isUsageCompact(item);
+        const format = resolveNumberFormat('percent', item, settings);
 
         if (context.isPreview) {
             const previewPercent = inverted ? 26.1 : 73.9;
@@ -72,7 +77,15 @@ export class BlockTimerWidget implements Widget {
             if (isUsageProgressMode(displayMode)) {
                 const barWidth = getUsageProgressBarWidth(displayMode);
                 const progressBar = makeTimerProgressBar(previewPercent, barWidth);
-                return formatRawOrLabeledValue(item, '时段 ', `[${progressBar}] ${previewPercent.toFixed(1)}%`);
+                return formatRawOrLabeledValue(item, '时段 ', `[${progressBar}] ${formatPercent(previewPercent, format)}`);
+            }
+
+            if (isUsageSliderMode(displayMode)) {
+                const slider = makeSliderBar(previewPercent);
+                const sliderDisplay = displayMode === 'slider'
+                    ? `${slider} ${formatPercent(previewPercent, format)}`
+                    : slider;
+                return formatRawOrLabeledValue(item, '时段 ', sliderDisplay);
             }
 
             return formatRawOrLabeledValue(item, '时段: ', compact ? '3时45分' : '3时 45分');
@@ -82,10 +95,23 @@ export class BlockTimerWidget implements Widget {
         const window = resolveUsageWindowWithFallback(usageData, context.blockMetrics);
 
         if (!window) {
+            if (isHidden(item, NO_DATA_HIDEABLE_STATE.key)) {
+                return null;
+            }
+
+            const emptyPercent = formatPercent(0, format);
             if (isUsageProgressMode(displayMode)) {
                 const barWidth = getUsageProgressBarWidth(displayMode);
                 const emptyBar = '░'.repeat(barWidth);
-                return formatRawOrLabeledValue(item, '时段 ', `[${emptyBar}] 0.0%`);
+                return formatRawOrLabeledValue(item, '时段 ', `[${emptyBar}] ${emptyPercent}`);
+            }
+
+            if (isUsageSliderMode(displayMode)) {
+                const emptySlider = makeSliderBar(0);
+                const sliderDisplay = displayMode === 'slider'
+                    ? `${emptySlider} ${emptyPercent}`
+                    : emptySlider;
+                return formatRawOrLabeledValue(item, '时段 ', sliderDisplay);
             }
 
             return formatRawOrLabeledValue(item, '时段: ', compact ? '0时' : '0时 0分');
@@ -95,8 +121,16 @@ export class BlockTimerWidget implements Widget {
             const barWidth = getUsageProgressBarWidth(displayMode);
             const percent = inverted ? window.remainingPercent : window.elapsedPercent;
             const progressBar = makeTimerProgressBar(percent, barWidth);
-            const percentage = percent.toFixed(1);
-            return formatRawOrLabeledValue(item, '时段 ', `[${progressBar}] ${percentage}%`);
+            return formatRawOrLabeledValue(item, '时段 ', `[${progressBar}] ${formatPercent(percent, format)}`);
+        }
+
+        if (isUsageSliderMode(displayMode)) {
+            const percent = inverted ? window.remainingPercent : window.elapsedPercent;
+            const slider = makeSliderBar(percent);
+            const sliderDisplay = displayMode === 'slider'
+                ? `${slider} ${formatPercent(percent, format)}`
+                : slider;
+            return formatRawOrLabeledValue(item, '时段 ', sliderDisplay);
         }
 
         const elapsedTime = formatUsageDuration(window.elapsedMs, compact);
@@ -107,6 +141,11 @@ export class BlockTimerWidget implements Widget {
         return getUsageTimerCustomKeybinds(item);
     }
 
+    getHideableStates(): HideableState[] {
+        return [NO_DATA_HIDEABLE_STATE];
+    }
+
     supportsRawValue(): boolean { return true; }
     supportsColors(item: WidgetItem): boolean { return true; }
+    supportsNumberFormat(): boolean { return true; }
 }

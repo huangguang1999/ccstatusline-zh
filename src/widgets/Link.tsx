@@ -55,7 +55,6 @@ function buildMetadata(widget: WidgetItem, urlValue: string, textValue: string):
 
     if (Object.keys(metadata).length === 0) {
         const { metadata, ...rest } = widget;
-        void metadata; // Intentionally unused
         return rest;
     }
 
@@ -101,9 +100,6 @@ export class LinkWidget implements Widget {
     }
 
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
-        void settings;
-        void context;
-
         const { url, label } = getLinkLabel(item);
         const displayText = withEmojiPrefix(label, item.rawValue);
 
@@ -127,7 +123,6 @@ export class LinkWidget implements Widget {
 
     supportsRawValue(): boolean { return true; }
     supportsColors(item: WidgetItem): boolean {
-        void item;
         return true;
     }
 }

@@ -15,7 +15,7 @@ import type { WidgetItem } from '../../types/Widget';
 import { CacheTimerWidget } from '../CacheTimer';
 
 const item = (extra: Partial<WidgetItem> = {}): WidgetItem => ({ id: 'cache-timer', type: 'cache-timer', ...extra });
-const hidden: Partial<WidgetItem> = { metadata: { hideWhenEmpty: 'true' } };
+const hidden: Partial<WidgetItem> = { metadata: { hide: 'empty' } };
 
 const isoAgo = (seconds: number): string => new Date(Date.now() - seconds * 1000).toISOString();
 const assistant = (seconds: number): string => JSON.stringify({ type: 'assistant', timestamp: isoAgo(seconds) });
@@ -179,22 +179,21 @@ describe('CacheTimer widget', () => {
         expect(widget.render(item(hidden), context, DEFAULT_SETTINGS)).toBeNull();
     });
 
-    it('exposes a hide-when-empty keybind and toggles the flag', () => {
+    it('declares the empty hideable state and leaves h to the shared checklist', () => {
         const widget = new CacheTimerWidget();
         expect(widget.getCustomKeybinds()).toEqual([
             { key: 't', label: '(t)TTL', action: 'toggle-ttl' },
-            { key: 'h', label: '(h)无数据时隐藏', action: 'toggle-hide' },
             { key: 'g', label: '(g)字符', action: 'edit-symbol-override' }
         ]);
-        expect(widget.handleEditorAction('toggle-hide', item())?.metadata?.hideWhenEmpty).toBe('true');
+        expect(widget.getHideableStates().map(state => state.key)).toEqual(['empty']);
         expect(widget.handleEditorAction('unknown', item())).toBeNull();
     });
 
-    it('annotates the editor only when hide-when-empty is enabled', () => {
+    it('leaves the editor unannotated at default settings', () => {
         const widget = new CacheTimerWidget();
         expect(widget.getEditorDisplay(item()).displayText).toBe('缓存计时器');
         expect(widget.getEditorDisplay(item()).modifierText).toBeUndefined();
-        expect(widget.getEditorDisplay(item(hidden)).modifierText).toBe('(无数据时隐藏)');
+        expect(widget.getEditorDisplay(item(hidden)).modifierText).toBeUndefined();
     });
 
     it('renders custom state glyphs from metadata overrides', () => {
@@ -238,6 +237,6 @@ describe('CacheTimer widget', () => {
     it('annotates the editor with a non-default TTL', () => {
         const widget = new CacheTimerWidget();
         expect(widget.getEditorDisplay(item({ metadata: { ttlSeconds: '3600' } })).modifierText).toBe('(TTL 1h)');
-        expect(widget.getEditorDisplay(item({ metadata: { ttlSeconds: '3600', hideWhenEmpty: 'true' } })).modifierText).toBe('(TTL 1h, 无数据时隐藏)');
+        expect(widget.getEditorDisplay(item({ metadata: { ttlSeconds: '3600', hide: 'empty' } })).modifierText).toBe('(TTL 1h)');
     });
 });

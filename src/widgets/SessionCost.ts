@@ -1,10 +1,19 @@
 import type { RenderContext } from '../types/RenderContext';
 import type { Settings } from '../types/Settings';
 import type {
+    HideableState,
     Widget,
     WidgetEditorDisplay,
     WidgetItem
 } from '../types/Widget';
+import {
+    formatCost,
+    resolveNumberFormat
+} from '../utils/number-format';
+
+import { isHidden } from './shared/hideable';
+
+const ZERO_HIDEABLE_STATE: HideableState = { key: 'zero', label: '费用为 $0.00 时' };
 
 export class SessionCostWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
@@ -15,9 +24,15 @@ export class SessionCostWidget implements Widget {
         return { displayText: this.getDisplayName() };
     }
 
+    getHideableStates(): HideableState[] {
+        return [ZERO_HIDEABLE_STATE];
+    }
+
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
+        const format = resolveNumberFormat('cost', item, settings);
         if (context.isPreview) {
-            return item.rawValue ? '$2.45' : '费用: $2.45';
+            const value = formatCost(2.45, format);
+            return item.rawValue ? value : `费用: ${value}`;
         }
 
         const totalCost = context.data?.cost?.total_cost_usd;
@@ -25,12 +40,18 @@ export class SessionCostWidget implements Widget {
             return null;
         }
 
-        // Format the cost to 2 decimal places
-        const formattedCost = `$${totalCost.toFixed(2)}`;
+        // Keep the zero-state threshold tied to the baseline cent precision,
+        // independent of the selected display style or decimal override.
+        const roundsToZeroCents = totalCost >= 0 && totalCost < 0.005;
+        if (roundsToZeroCents && isHidden(item, ZERO_HIDEABLE_STATE.key)) {
+            return null;
+        }
 
+        const formattedCost = formatCost(totalCost, format);
         return item.rawValue ? formattedCost : `费用: ${formattedCost}`;
     }
 
     supportsRawValue(): boolean { return true; }
     supportsColors(item: WidgetItem): boolean { return true; }
+    supportsNumberFormat(): boolean { return true; }
 }

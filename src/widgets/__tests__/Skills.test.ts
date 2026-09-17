@@ -19,8 +19,7 @@ describe('SkillsWidget', () => {
     it('uses v as the mode toggle keybind', () => {
         const widget = new SkillsWidget();
         expect(widget.getCustomKeybinds({ id: 'skills', type: 'skills' })).toEqual([
-            { key: 'v', label: '(v)视图切换', action: 'cycle-mode' },
-            { key: 'h', label: '(h)空时隐藏', action: 'toggle-hide-empty' }
+            { key: 'v', label: '(v)视图切换', action: 'cycle-mode' }
         ]);
         expect(widget.getCustomKeybinds({
             id: 'skills',
@@ -28,7 +27,6 @@ describe('SkillsWidget', () => {
             metadata: { mode: 'list' }
         })).toEqual([
             { key: 'v', label: '(v)视图切换', action: 'cycle-mode' },
-            { key: 'h', label: '(h)空时隐藏', action: 'toggle-hide-empty' },
             { key: 'l', label: '(l)数量限制', action: 'edit-list-limit' }
         ]);
     });
@@ -60,25 +58,10 @@ describe('SkillsWidget', () => {
         expect(updated?.metadata?.listLimit).toBeUndefined();
     });
 
-    it('toggles hide-when-empty metadata', () => {
+    it('declares the empty hideable state', () => {
         const widget = new SkillsWidget();
-        const base: WidgetItem = { id: 'skills', type: 'skills' };
-        const hidden = widget.handleEditorAction('toggle-hide-empty', base);
-        const shown = widget.handleEditorAction('toggle-hide-empty', hidden ?? base);
 
-        expect(hidden?.metadata?.hideWhenEmpty).toBe('true');
-        expect(shown?.metadata?.hideWhenEmpty).toBe('false');
-    });
-
-    it('shows hide-when-empty in editor modifier text when enabled', () => {
-        const widget = new SkillsWidget();
-        const display = widget.getEditorDisplay({
-            id: 'skills',
-            type: 'skills',
-            metadata: { hideWhenEmpty: 'true' }
-        });
-
-        expect(display.modifierText).toBe('(最近使用, 空时隐藏)');
+        expect(widget.getHideableStates().map(state => state.key)).toEqual(['empty']);
     });
 
     it('shows list limit in editor modifier text when configured', () => {
@@ -134,17 +117,17 @@ describe('SkillsWidget', () => {
         expect(render({
             id: 'skills',
             type: 'skills',
-            metadata: { hideWhenEmpty: 'true' }
+            metadata: { hide: 'empty' }
         }, context)).toBeNull();
         expect(render({
             id: 'skills',
             type: 'skills',
-            metadata: { mode: 'count', hideWhenEmpty: 'true' }
+            metadata: { mode: 'count', hide: 'empty' }
         }, context)).toBeNull();
         expect(render({
             id: 'skills',
             type: 'skills',
-            metadata: { mode: 'list', hideWhenEmpty: 'true' }
+            metadata: { mode: 'list', hide: 'empty' }
         }, context)).toBeNull();
     });
 });

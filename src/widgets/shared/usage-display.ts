@@ -1,5 +1,6 @@
 import type {
     CustomKeybind,
+    HideableState,
     WidgetItem
 } from '../../types/Widget';
 import {
@@ -15,6 +16,11 @@ import {
 } from './metadata';
 
 export type UsageDisplayMode = 'time' | 'progress' | 'progress-short' | 'slider' | 'slider-only';
+
+// Shared by the usage percentage widgets. The reset timers render the same
+// error placeholders but cannot declare this state: they bind 'h' for the
+// hour-format toggle, which would shadow the shared hide keybind
+export const USAGE_NO_DATA_HIDEABLE_STATE: HideableState = { key: 'no-data', label: '用量数据不可用时' };
 
 const SLIDER_WIDTH = 10;
 
@@ -291,7 +297,10 @@ export function getUsageTimerCustomKeybinds(
 ): CustomKeybind[] {
     const keybinds = [PROGRESS_TOGGLE_KEYBIND];
 
-    if (item && isUsageProgressMode(getUsageDisplayMode(item))) {
+    const mode = item ? getUsageDisplayMode(item) : 'time';
+    const isBarMode = isUsageProgressMode(mode) || isUsageSliderMode(mode);
+
+    if (item && isBarMode) {
         keybinds.push(INVERT_TOGGLE_KEYBIND);
     } else {
         keybinds.push(COMPACT_TOGGLE_KEYBIND);
@@ -301,7 +310,7 @@ export function getUsageTimerCustomKeybinds(
         }
     }
 
-    if (item && isUsageDateMode(item) && !isUsageProgressMode(getUsageDisplayMode(item))) {
+    if (item && isUsageDateMode(item) && !isBarMode) {
         if (options.includeHourFormat) {
             keybinds.push(HOUR_FORMAT_TOGGLE_KEYBIND);
         }
