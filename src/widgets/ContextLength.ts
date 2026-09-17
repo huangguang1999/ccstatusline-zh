@@ -6,6 +6,7 @@ import type {
     WidgetItem
 } from '../types/Widget';
 import { getContextWindowContextLengthTokens } from '../utils/context-window';
+import { resolveNumberFormat } from '../utils/number-format';
 import { formatTokens } from '../utils/renderer';
 
 export class ContextLengthWidget implements Widget {
@@ -18,21 +19,24 @@ export class ContextLengthWidget implements Widget {
     }
 
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
+        const format = resolveNumberFormat('token', item, settings);
         if (context.isPreview) {
-            return item.rawValue ? '18.6k' : '上下文: 18.6k';
+            const value = formatTokens(18600, format);
+            return item.rawValue ? value : `上下文: ${value}`;
         }
 
         const contextLengthTokens = getContextWindowContextLengthTokens(context.data);
         if (contextLengthTokens !== null) {
-            return item.rawValue ? formatTokens(contextLengthTokens) : `上下文: ${formatTokens(contextLengthTokens)}`;
+            return item.rawValue ? formatTokens(contextLengthTokens, format) : `上下文: ${formatTokens(contextLengthTokens, format)}`;
         }
 
         if (context.tokenMetrics) {
-            return item.rawValue ? formatTokens(context.tokenMetrics.contextLength) : `上下文: ${formatTokens(context.tokenMetrics.contextLength)}`;
+            return item.rawValue ? formatTokens(context.tokenMetrics.contextLength, format) : `上下文: ${formatTokens(context.tokenMetrics.contextLength, format)}`;
         }
         return null;
     }
 
     supportsRawValue(): boolean { return true; }
     supportsColors(item: WidgetItem): boolean { return true; }
+    supportsNumberFormat(): boolean { return true; }
 }

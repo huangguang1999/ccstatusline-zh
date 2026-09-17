@@ -7,6 +7,12 @@ import React, { useState } from 'react';
 
 import { getColorLevelString } from '../../types/ColorLevel';
 import {
+    NUMBER_KINDS,
+    type GlobalNumberFormat,
+    type NumberFormat,
+    type NumberKind
+} from '../../types/NumberFormat';
+import {
     DefaultPaddingSideSchema,
     type Settings
 } from '../../types/Settings';
@@ -18,8 +24,45 @@ import {
 } from '../../utils/colors';
 import { GRADIENT_PRESET_NAMES } from '../../utils/gradient';
 import { shouldInsertInput } from '../../utils/input-guards';
+import {
+    NUMBER_STYLE_LABELS,
+    getNextNumberStyle
+} from '../../utils/number-format';
 
 import { ConfirmDialog } from './ConfirmDialog';
+
+const NUMBER_KIND_LABELS: Record<NumberKind, string> = {
+    token: '令牌',
+    speed: '速度',
+    percent: '占比',
+    memory: '内存',
+    cost: '费用'
+};
+const NUMBER_FORMAT_KIND_WIDTH = Math.max(...Object.values(NUMBER_KIND_LABELS).map(label => label.length));
+
+// Cycle a number kind's global style: default (precise) -> compact -> whole -> default.
+// A global style forces that kind across all widgets (see resolveNumberFormat).
+function cycleGlobalNumberStyle(settings: Settings, kind: NumberKind): Settings {
+    const current = settings.numberFormat?.[kind]?.style;
+    const nextStyle = getNextNumberStyle(current);
+
+    const kindFormat: NumberFormat = { ...settings.numberFormat?.[kind] };
+    if (nextStyle === undefined) {
+        delete kindFormat.style;
+    } else {
+        kindFormat.style = nextStyle;
+    }
+
+    const { [kind]: removedKind, ...restGlobal } = settings.numberFormat ?? {};
+    const nextGlobal: GlobalNumberFormat = Object.keys(kindFormat).length > 0
+        ? { ...restGlobal, [kind]: kindFormat }
+        : restGlobal;
+
+    return {
+        ...settings,
+        numberFormat: Object.keys(nextGlobal).length > 0 ? nextGlobal : undefined
+    };
+}
 
 export interface GlobalOverridesMenuProps {
     settings: Settings;
@@ -36,6 +79,8 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
     const [inheritColors, setInheritColors] = useState(settings.inheritSeparatorColors);
     const [globalBold, setGlobalBold] = useState(settings.globalBold);
     const [minimalistMode, setMinimalistMode] = useState(settings.minimalistMode);
+    const [numberFormatMode, setNumberFormatMode] = useState(false);
+    const [numberFormatKindIndex, setNumberFormatKindIndex] = useState(0);
     const [gradientMode, setGradientMode] = useState(false);
     const [gradientIndex, setGradientIndex] = useState(0);
     const [gradientCustomStep, setGradientCustomStep] = useState<'start' | 'end' | null>(null);
@@ -162,6 +207,19 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
                     setGradientCustomStep('start');
                 }
             }
+        } else if (numberFormatMode) {
+            if (key.escape) {
+                setNumberFormatMode(false);
+            } else if (key.upArrow) {
+                setNumberFormatKindIndex((numberFormatKindIndex - 1 + NUMBER_KINDS.length) % NUMBER_KINDS.length);
+            } else if (key.downArrow) {
+                setNumberFormatKindIndex((numberFormatKindIndex + 1) % NUMBER_KINDS.length);
+            } else if (key.leftArrow || key.rightArrow) {
+                const kind = NUMBER_KINDS[numberFormatKindIndex];
+                if (kind) {
+                    onUpdate(cycleGlobalNumberStyle(settings, kind));
+                }
+            }
         } else {
             if (key.escape) {
                 onBack();
@@ -211,6 +269,9 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
                     minimalistMode: newMinimalistMode
                 };
                 onUpdate(updatedSettings);
+            } else if (input === 'n' || input === 'N') {
+                setNumberFormatMode(true);
+                setNumberFormatKindIndex(0);
             } else if (input === 'f' || input === 'F') {
                 // Cycle through foreground colors
                 const nextIndex = (currentFgIndex + 1) % fgColors.length;
@@ -247,6 +308,34 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
             }
         }
     });
+
+    if (numberFormatMode) {
+        return (
+            <Box flexDirection='column'>
+                <Text bold>全局数值格式</Text>
+                <Box marginTop={1}>
+                    <Text dimColor>↑↓ 选择数值类型，←→ 切换格式，ESC 返回</Text>
+                </Box>
+                <Box marginTop={1} flexDirection='column'>
+                    {NUMBER_KINDS.map((kind, idx) => {
+                        const style = settings.numberFormat?.[kind]?.style;
+                        return (
+                            <Text key={kind} color={idx === numberFormatKindIndex ? 'cyan' : undefined}>
+                                {idx === numberFormatKindIndex ? '▶ ' : '  '}
+                                {NUMBER_KIND_LABELS[kind].padStart(NUMBER_FORMAT_KIND_WIDTH)}
+                                {': '}
+                                {style ? NUMBER_STYLE_LABELS[style] : '固定小数（默认）'}
+                            </Text>
+                        );
+                    })}
+                </Box>
+                <Box marginTop={1} flexDirection='column'>
+                    <Text dimColor>固定小数保留末尾的零（1.0M），紧凑格式去掉末尾的零（1M / 1.1M），整数不显示小数（1M）。</Text>
+                    <Text dimColor>全局格式会覆盖所有组件中同类数值的设置。小数位数可在组件配置或 settings.json 中指定。</Text>
+                </Box>
+            </Box>
+        );
+    }
 
     if (gradientMode) {
         const level = getColorLevelString(settings.colorLevel);
@@ -370,6 +459,12 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
                         <Text>极简模式: </Text>
                         <Text color={minimalistMode ? 'green' : 'red'}>{minimalistMode ? '✓ 已启用' : '✗ 已禁用'}</Text>
                         <Text dimColor> - 按 (m) 切换</Text>
+                    </Box>
+
+                    <Box>
+                        <Text>数值格式: </Text>
+                        <Text color='cyan'>{settings.numberFormat ? '已自定义' : '（默认）'}</Text>
+                        <Text dimColor> - 按 (n) 分类型配置</Text>
                     </Box>
 
                     <Box>

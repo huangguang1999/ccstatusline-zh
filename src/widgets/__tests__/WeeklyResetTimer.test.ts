@@ -112,6 +112,26 @@ describe('WeeklyResetTimerWidget', () => {
         expect(render(widget, item, { usageData: {} })).toBe('周重置 [███░░░░░░░░░░░░░] 20.0%');
     });
 
+    it('rounds the progress bar fill to the nearest cell', () => {
+        const widget = new WeeklyResetTimerWidget();
+        const item: WidgetItem = {
+            id: 'weekly-reset',
+            type: 'weekly-reset-timer',
+            metadata: { display: 'progress-short' }
+        };
+
+        mockResolveWeeklyUsageWindow.mockReturnValue({
+            sessionDurationMs: 604800000,
+            elapsedMs: 211680000,
+            remainingMs: 393120000,
+            elapsedPercent: 35,
+            remainingPercent: 65
+        });
+
+        // 35% of 16 cells is 5.6, past the half-cell mark, so the 6th cell fills.
+        expect(render(widget, item, { usageData: {} })).toBe('周重置 [██████░░░░░░░░░░] 35.0%');
+    });
+
     it('returns usage error when no weekly reset data is available', () => {
         const widget = new WeeklyResetTimerWidget();
 
@@ -321,7 +341,103 @@ describe('WeeklyResetTimerWidget', () => {
         ]);
     });
 
+    it('renders slider bar with elapsed percentage', () => {
+        const widget = new WeeklyResetTimerWidget();
+        const item: WidgetItem = {
+            id: 'weekly-reset',
+            type: 'weekly-reset-timer',
+            metadata: { display: 'slider' }
+        };
+
+        mockResolveWeeklyUsageWindow.mockReturnValue({
+            sessionDurationMs: 604800000,
+            elapsedMs: 302400000,
+            remainingMs: 302400000,
+            elapsedPercent: 50,
+            remainingPercent: 50
+        });
+
+        expect(render(widget, item, { usageData: {} })).toBe('周重置 ▓▓▓▓▓░░░░░ 50.0%');
+    });
+
+    it('renders slider-only bar without percentage', () => {
+        const widget = new WeeklyResetTimerWidget();
+        const item: WidgetItem = {
+            id: 'weekly-reset',
+            type: 'weekly-reset-timer',
+            metadata: { display: 'slider-only' }
+        };
+
+        mockResolveWeeklyUsageWindow.mockReturnValue({
+            sessionDurationMs: 604800000,
+            elapsedMs: 302400000,
+            remainingMs: 302400000,
+            elapsedPercent: 50,
+            remainingPercent: 50
+        });
+
+        expect(render(widget, item, { usageData: {} })).toBe('周重置 ▓▓▓▓▓░░░░░');
+    });
+
+    it('renders inverted slider using remaining percent', () => {
+        const widget = new WeeklyResetTimerWidget();
+        const item: WidgetItem = {
+            id: 'weekly-reset',
+            type: 'weekly-reset-timer',
+            metadata: { display: 'slider', invert: 'true' }
+        };
+
+        mockResolveWeeklyUsageWindow.mockReturnValue({
+            sessionDurationMs: 604800000,
+            elapsedMs: 483840000,
+            remainingMs: 120960000,
+            elapsedPercent: 80,
+            remainingPercent: 20
+        });
+
+        expect(render(widget, item, { usageData: {} })).toBe('周重置 ▓▓░░░░░░░░ 20.0%');
+    });
+
+    it('exposes invert keybind in slider mode and hides hours-only', () => {
+        const widget = new WeeklyResetTimerWidget();
+
+        expect(widget.getCustomKeybinds({
+            id: 'weekly-reset',
+            type: 'weekly-reset-timer',
+            metadata: { display: 'slider' }
+        })).toEqual([
+            { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
+            { key: 'v', label: '(v)反转填充', action: 'toggle-invert' }
+        ]);
+    });
+
+    it('shows short bar modifier text in slider modes', () => {
+        const widget = new WeeklyResetTimerWidget();
+
+        expect(widget.getEditorDisplay({
+            id: 'weekly-reset',
+            type: 'weekly-reset-timer',
+            metadata: { display: 'slider' }
+        }).modifierText).toBe('(短进度条)');
+        expect(widget.getEditorDisplay({
+            id: 'weekly-reset',
+            type: 'weekly-reset-timer',
+            metadata: { display: 'slider-only' }
+        }).modifierText).toBe('(仅短进度条)');
+    });
+
+    it('ignores stale hours-only metadata in slider modes', () => {
+        const widget = new WeeklyResetTimerWidget();
+
+        expect(widget.getEditorDisplay({
+            id: 'weekly-reset',
+            type: 'weekly-reset-timer',
+            metadata: { display: 'slider', hours: 'true' }
+        }).modifierText).toBe('(短进度条)');
+    });
+
     runUsageTimerEditorSuite({
+        supportsSliderMode: true,
         baseItem: { id: 'weekly-reset', type: 'weekly-reset-timer' },
         createWidget: () => new WeeklyResetTimerWidget(),
         expectedDisplayName: '周重置计时',

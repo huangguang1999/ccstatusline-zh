@@ -68,30 +68,27 @@ describe('ExtraUsageUtilizationWidget', () => {
         })).toBe('超额: 2.6%');
     });
 
-    it('exposes and toggles hide-if-disabled configuration', () => {
+    it('declares the disabled and no-data hideable states alongside display keybinds', () => {
         const widget = new ExtraUsageUtilizationWidget();
         const baseItem: WidgetItem = { id: 'extra', type: 'extra-usage-utilization' };
 
         expect(widget.getCustomKeybinds(baseItem)).toEqual([
             { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
-            { key: 'u', label: '(u)显示剩余', action: 'toggle-invert' },
-            { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
+            { key: 'u', label: '(u)显示剩余', action: 'toggle-invert' }
         ]);
         expect(widget.getCustomKeybinds({
             ...baseItem,
             metadata: { display: 'progress' }
         })).toEqual([
             { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
-            { key: 'u', label: '(u)显示剩余', action: 'toggle-invert' },
-            { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
+            { key: 'u', label: '(u)显示剩余', action: 'toggle-invert' }
         ]);
         expect(widget.getCustomKeybinds({
             ...baseItem,
             metadata: { invert: 'true' }
         })).toEqual([
             { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
-            { key: 'u', label: '(u)显示已用', action: 'toggle-invert' },
-            { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
+            { key: 'u', label: '(u)显示已用', action: 'toggle-invert' }
         ]);
         expect(widget.getEditorDisplay(baseItem).modifierText).toBe('(已用)');
         expect(widget.getEditorDisplay({
@@ -99,16 +96,7 @@ describe('ExtraUsageUtilizationWidget', () => {
             metadata: { invert: 'true' }
         }).modifierText).toBe('(剩余)');
 
-        const hidden = widget.handleEditorAction('toggle-hide-disabled', baseItem);
-        expect(hidden?.metadata?.hideIfDisabled).toBe('true');
-        expect(widget.getEditorDisplay(hidden ?? baseItem).modifierText).toBe('(已用, 禁用时隐藏)');
-        expect(widget.getEditorDisplay({
-            ...baseItem,
-            metadata: { display: 'progress', hideIfDisabled: 'true' }
-        }).modifierText).toBe('(长进度条, 已用, 禁用时隐藏)');
-
-        const shown = widget.handleEditorAction('toggle-hide-disabled', hidden ?? baseItem);
-        expect(shown?.metadata?.hideIfDisabled).toBe('false');
+        expect(widget.getHideableStates().map(state => state.key)).toEqual(['disabled', 'no-data']);
     });
 
     it('shows usage errors only when required extra usage data is missing', () => {
@@ -120,7 +108,19 @@ describe('ExtraUsageUtilizationWidget', () => {
         expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, { usageData: { extraUsageEnabled: true } })).toBeNull();
     });
 
-    it('renders n/a when extra usage is disabled', () => {
+    it('hides usage errors when the no-data state is enabled', () => {
+        const widget = new ExtraUsageUtilizationWidget();
+
+        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+
+        expect(render(widget, {
+            id: 'extra',
+            metadata: { hide: 'no-data' },
+            type: 'extra-usage-utilization'
+        }, { usageData: { error: 'timeout' } })).toBeNull();
+    });
+
+    it('renders n/a 超额用量关闭时', () => {
         const widget = new ExtraUsageUtilizationWidget();
 
         expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, {
@@ -140,12 +140,12 @@ describe('ExtraUsageUtilizationWidget', () => {
         expect(render(widget, rawProgressItem, { usageData: { extraUsageEnabled: false } })).toBe('n/a');
     });
 
-    it('hides when extra usage is disabled and hide-if-disabled is enabled', () => {
+    it('hides 超额用量关闭时 and hide-if-disabled is enabled', () => {
         const widget = new ExtraUsageUtilizationWidget();
 
         const hiddenItem: WidgetItem = {
             id: 'extra',
-            metadata: { hideIfDisabled: 'true' },
+            metadata: { hide: 'disabled' },
             type: 'extra-usage-utilization'
         };
 

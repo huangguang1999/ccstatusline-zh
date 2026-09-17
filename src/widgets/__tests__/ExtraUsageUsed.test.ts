@@ -69,21 +69,37 @@ describe('ExtraUsageUsedWidget', () => {
         })).toBe('超额已用: €5.42');
     });
 
-    it('exposes and toggles hide-if-disabled configuration', () => {
+    it('applies the global cost style while preserving the reported currency', () => {
         const widget = new ExtraUsageUsedWidget();
-        const baseItem: WidgetItem = { id: 'extra', type: 'extra-usage-used' };
+        const settings = {
+            ...DEFAULT_SETTINGS,
+            numberFormat: { cost: { style: 'whole' as const } }
+        };
+        const context: RenderContext = {
+            usageData: {
+                extraUsageCurrency: 'EUR',
+                extraUsageEnabled: true,
+                extraUsageUsed: 542
+            }
+        };
 
-        expect(widget.getCustomKeybinds()).toEqual([
-            { key: 'h', label: '(h)禁用时隐藏', action: 'toggle-hide-disabled' }
-        ]);
-        expect(widget.getEditorDisplay(baseItem).modifierText).toBeUndefined();
+        expect(widget.render({
+            id: 'extra',
+            type: 'extra-usage-used',
+            numberFormat: { decimals: 3 }
+        }, context, settings)).toBe('超额已用: €5');
+        expect(widget.render({
+            id: 'extra',
+            type: 'extra-usage-used'
+        }, { isPreview: true }, settings)).toBe('超额已用: $106');
+        expect(widget.supportsNumberFormat()).toBe(true);
+    });
 
-        const hidden = widget.handleEditorAction('toggle-hide-disabled', baseItem);
-        expect(hidden?.metadata?.hideIfDisabled).toBe('true');
-        expect(widget.getEditorDisplay(hidden ?? baseItem).modifierText).toBe('(禁用时隐藏)');
+    it('declares the disabled and no-data hideable states', () => {
+        const widget = new ExtraUsageUsedWidget();
 
-        const shown = widget.handleEditorAction('toggle-hide-disabled', hidden ?? baseItem);
-        expect(shown?.metadata?.hideIfDisabled).toBe('false');
+        expect(widget.getHideableStates().map(state => state.key)).toEqual(['disabled', 'no-data']);
+        expect(widget.getEditorDisplay({ id: 'extra', type: 'extra-usage-used' }).modifierText).toBeUndefined();
     });
 
     it('renders available used budget before unrelated usage errors', () => {
@@ -107,7 +123,7 @@ describe('ExtraUsageUsedWidget', () => {
         expect(render(widget, { id: 'extra', type: 'extra-usage-used' }, { usageData: { extraUsageEnabled: true } })).toBeNull();
     });
 
-    it('renders n/a when extra usage is disabled', () => {
+    it('renders n/a 超额用量关闭时', () => {
         const widget = new ExtraUsageUsedWidget();
 
         expect(render(widget, { id: 'extra', type: 'extra-usage-used' }, {
@@ -120,12 +136,12 @@ describe('ExtraUsageUsedWidget', () => {
         expect(render(widget, { id: 'extra', rawValue: true, type: 'extra-usage-used' }, { usageData: { extraUsageEnabled: false } })).toBe('n/a');
     });
 
-    it('hides when extra usage is disabled and hide-if-disabled is enabled', () => {
+    it('hides 超额用量关闭时 and hide-if-disabled is enabled', () => {
         const widget = new ExtraUsageUsedWidget();
 
         const hiddenItem: WidgetItem = {
             id: 'extra',
-            metadata: { hideIfDisabled: 'true' },
+            metadata: { hide: 'disabled' },
             type: 'extra-usage-used'
         };
 

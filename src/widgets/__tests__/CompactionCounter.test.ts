@@ -125,14 +125,14 @@ describe('CompactionCounterWidget', () => {
         it('returns null when count is 0 and hide zero is enabled', () => {
             expect(render({
                 compactionData: { count: 0 },
-                item: { ...ITEM, metadata: { hideZero: 'true' } }
+                item: { ...ITEM, metadata: { hide: 'zero' } }
             })).toBeNull();
         });
 
         it('renders positive counts when hide zero is enabled', () => {
             expect(render({
                 compactionData: { count: 3 },
-                item: { ...ITEM, metadata: { hideZero: 'true' } }
+                item: { ...ITEM, metadata: { hide: 'zero' } }
             })).toBe('↻ 3');
         });
 
@@ -259,7 +259,6 @@ describe('CompactionCounterWidget', () => {
                 { key: 'n', label: '(n)Nerd 字体', action: 'toggle-nerd-font' },
                 { key: 's', label: '(s)触发器分类', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收令牌', action: 'toggle-reclaimed' },
-                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
                 { key: 'g', label: '(g)字符', action: 'edit-symbol-override' }
             ]);
         });
@@ -273,7 +272,6 @@ describe('CompactionCounterWidget', () => {
                 { key: 'f', label: '(f)格式切换', action: 'cycle-format' },
                 { key: 's', label: '(s)触发器分类', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收令牌', action: 'toggle-reclaimed' },
-                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' },
                 { key: 'g', label: '(g)字符', action: 'edit-symbol-override' }
             ]);
         });
@@ -305,14 +303,8 @@ describe('CompactionCounterWidget', () => {
             });
         });
 
-        it('shows hide zero in the editor display when enabled', () => {
-            expect(new CompactionCounterWidget().getEditorDisplay({
-                ...ITEM,
-                metadata: { hideZero: 'true' }
-            })).toEqual({
-                displayText: '压缩计数',
-                modifierText: '(icon-space-number, 零时隐藏)'
-            });
+        it('declares the zero hideable state', () => {
+            expect(new CompactionCounterWidget().getHideableStates().map(state => state.key)).toEqual(['zero']);
         });
 
         it('ignores stale icon-number format metadata in the editor display', () => {
@@ -352,15 +344,6 @@ describe('CompactionCounterWidget', () => {
 
             expect(enabled?.metadata?.nerdFont).toBe('true');
             expect(disabled?.metadata?.nerdFont).toBeUndefined();
-        });
-
-        it('toggles hide zero metadata on and off', () => {
-            const widget = new CompactionCounterWidget();
-            const enabled = widget.handleEditorAction('toggle-hide-zero', ITEM);
-            const disabled = widget.handleEditorAction('toggle-hide-zero', enabled ?? ITEM);
-
-            expect(enabled?.metadata?.hideZero).toBe('true');
-            expect(disabled?.metadata?.hideZero).toBe('false');
         });
 
         it('does not enable nerd font for non-default formats', () => {
@@ -449,10 +432,10 @@ describe('CompactionCounterWidget', () => {
             })).toBe('3');
         });
 
-        it('hides a zero metric value when hide zero is enabled', () => {
+        it('hides a zero metric value when the zero hideable state is enabled', () => {
             expect(render({
                 compactionData: { count: 4, byTrigger: { auto: 0, manual: 4, unknown: 0 } },
-                item: { ...ITEM, metadata: { metric: 'auto', hideZero: 'true' } }
+                item: { ...ITEM, metadata: { metric: 'auto', hide: 'zero' } }
             })).toBeNull();
         });
 
@@ -466,7 +449,7 @@ describe('CompactionCounterWidget', () => {
         it('shows the sample metric value in preview mode, ignoring hide zero', () => {
             expect(render({
                 isPreview: true,
-                item: { ...ITEM, metadata: { metric: 'unknown', hideZero: 'true' } }
+                item: { ...ITEM, metadata: { metric: 'unknown', hide: 'zero' } }
             })).toBe('0');
             expect(render({
                 isPreview: true,
@@ -477,20 +460,19 @@ describe('CompactionCounterWidget', () => {
         it('shows the metric in the editor display', () => {
             expect(new CompactionCounterWidget().getEditorDisplay({
                 ...ITEM,
-                metadata: { metric: 'reclaimed', hideZero: 'true' }
+                metadata: { metric: 'reclaimed', hide: 'zero' }
             })).toEqual({
                 displayText: '压缩计数',
-                modifierText: '(已回收值, 零时隐藏)'
+                modifierText: '(已回收值)'
             });
         });
 
-        it('uses only metric and hide-zero keybinds in metric mode', () => {
+        it('uses only the metric keybind in metric mode, since hiding moves to the shared checklist', () => {
             expect(new CompactionCounterWidget().getCustomKeybinds({
                 ...ITEM,
                 metadata: { metric: 'auto' }
             })).toEqual([
-                { key: 'v', label: '(v)指标', action: 'cycle-metric' },
-                { key: 'h', label: '(h)零时隐藏', action: 'toggle-hide-zero' }
+                { key: 'v', label: '(v)指标', action: 'cycle-metric' }
             ]);
         });
 
