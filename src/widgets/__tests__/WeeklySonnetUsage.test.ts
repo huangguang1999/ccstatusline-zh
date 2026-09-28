@@ -80,6 +80,7 @@ describe('WeeklySonnetUsageWidget', () => {
         expectedRawProgress: '[███████░░░░░░░░░] 42.1%',
         expectedRawTime: '42.1%',
         expectedTime: '周 Sonnet: 42.1%',
+        expectedWholePercentTime: '周 Sonnet: 42%',
         modifierItem: {
             id: 'weekly-sonnet',
             type: 'weekly-sonnet-usage',

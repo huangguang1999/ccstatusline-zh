@@ -119,6 +119,34 @@ describe('BlockResetTimerWidget', () => {
         expect(render(widget, { id: 'reset', type: 'reset-timer', rawValue: true }, { usageData: {} })).toBe('[Loading]');
     });
 
+    it('declares the no-data hideable state', () => {
+        expect(new BlockResetTimerWidget().getHideableStates().map(state => state.key)).toEqual(['no-data']);
+    });
+
+    // One state covers both placeholders, since either means the same thing to
+    // a reader: the widget has nothing to report yet.
+    it.each([
+        ['a usage error', { error: 'timeout' as const }],
+        ['no data at all', {}]
+    ])('hides %s when the no-data state is enabled', (_label, usageData) => {
+        const widget = new BlockResetTimerWidget();
+
+        mockResolveUsageWindowWithFallback.mockReturnValue(null);
+        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+
+        expect(render(widget, { id: 'reset', type: 'reset-timer', metadata: { hide: 'no-data' } }, { usageData })).toBeNull();
+    });
+
+    it('keeps both placeholders when the no-data state is off', () => {
+        const widget = new BlockResetTimerWidget();
+
+        mockResolveUsageWindowWithFallback.mockReturnValue(null);
+        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+
+        expect(render(widget, { id: 'reset', type: 'reset-timer', metadata: { hide: '' } }, { usageData: {} })).toBe('重置: [加载中]');
+        expect(render(widget, { id: 'reset', type: 'reset-timer' }, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
+    });
+
     it('shows raw value without label in time mode', () => {
         const widget = new BlockResetTimerWidget();
 
@@ -179,7 +207,7 @@ describe('BlockResetTimerWidget', () => {
             { key: 'p', label: '(p)进度条切换', action: 'toggle-progress' },
             { key: 's', label: '(s)短时间', action: 'toggle-compact' },
             { key: 't', label: '(t)时间戳', action: 'toggle-date' },
-            { key: 'h', label: '12/24 小时(h)', action: 'toggle-hour-format' },
+            { key: 'f', label: '12/24 小时(f)', action: 'toggle-hour-format' },
             { key: 'z', label: '时区(z)', action: 'edit-timezone' },
             { key: 'l', label: '(l)地区', action: 'edit-locale' }
         ]);

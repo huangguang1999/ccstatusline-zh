@@ -12,7 +12,8 @@ import {
     type ListEntry
 } from './List';
 
-type ConfigureStatusLineValue = 'refreshInterval' | 'gitCacheTtl';
+type TtlField = 'gitCacheTtl' | 'customCommandCacheTtl' | 'terminalWidthCacheTtl';
+type ConfigureStatusLineValue = 'refreshInterval' | TtlField;
 
 function getRefreshInputValue(interval: number | null): string {
     return interval === null ? '' : String(interval);
@@ -36,10 +37,18 @@ function getGitCacheTtlSublabel(ttlSeconds: number): string {
         : `（${ttlSeconds} 秒）`;
 }
 
+function getCacheTtlSublabel(ttlSeconds: number): string {
+    return ttlSeconds === 0
+        ? '（已关闭）'
+        : `（${ttlSeconds} 秒）`;
+}
+
 export function buildConfigureStatusLineItems(
     refreshInterval: number | null,
     supportsRefreshInterval: boolean,
-    gitCacheTtlSeconds: number
+    gitCacheTtlSeconds: number,
+    customCommandCacheTtlSeconds: number,
+    terminalWidthCacheTtlSeconds: number
 ): ListEntry<ConfigureStatusLineValue>[] {
     return [
         {
@@ -55,7 +64,19 @@ export function buildConfigureStatusLineItems(
             label: '🧮 Git 缓存 TTL',
             sublabel: getGitCacheTtlSublabel(gitCacheTtlSeconds),
             value: 'gitCacheTtl',
-            description: 'Git 组件子进程输出在 .git/HEAD 与 .git/index 未变动期间可复用的时长。输入 0-60 秒；\n填 0 关闭按时长过期，缓存输出会一直复用，直到这些 git 元数据 mtime 发生变化。'
+            description: 'Git 组件子进程输出在 .git/HEAD 与 .git/index 未变动期间可复用的时长。输入 0-60 秒；\n填 0 关闭按时长过期，缓存输出会一直复用，直到这些 Git 元数据的修改时间发生变化。'
+        },
+        {
+            label: '🔧 自定义命令缓存时长',
+            sublabel: getCacheTtlSublabel(customCommandCacheTtlSeconds),
+            value: 'customCommandCacheTtl',
+            description: '自定义命令输出在再次执行前可复用的时长。输入 0-60 秒；\n填 0 关闭缓存，每次渲染状态行都会执行命令。'
+        },
+        {
+            label: '🖥️  终端宽度缓存时长',
+            sublabel: getCacheTtlSublabel(terminalWidthCacheTtlSeconds),
+            value: 'terminalWidthCacheTtl',
+            description: '未检测到终端宽度时，等待多久再尝试检测。输入 0-300 秒；\n填 0 关闭缓存，每次都重新检测。已检测到的宽度会在下次渲染时重新检测。'
         }
     ];
 }
@@ -82,7 +103,7 @@ export function validateRefreshIntervalInput(value: string): string | null {
     return null;
 }
 
-export function validateGitCacheTtlInput(value: string): string | null {
+function validateTtlInput(value: string, label: string, maximum = 60): string | null {
     const parsed = parseInt(value, 10);
 
     if (value === '' || isNaN(parsed)) {
@@ -90,22 +111,48 @@ export function validateGitCacheTtlInput(value: string): string | null {
     }
 
     if (parsed < 0) {
-        return `Git 缓存 TTL 最小为 0 秒（输入了 ${parsed} 秒）`;
+        return `${label}最小为 0 秒（输入了 ${parsed} 秒）`;
     }
 
-    if (parsed > 60) {
-        return `Git 缓存 TTL 最大为 60 秒（输入了 ${parsed} 秒）`;
+    if (parsed > maximum) {
+        return `${label}最大为 ${maximum} 秒（输入了 ${parsed} 秒）`;
     }
 
     return null;
+}
+
+export function validateGitCacheTtlInput(value: string): string | null {
+    return validateTtlInput(value, 'Git 缓存 TTL');
+}
+
+export function validateCustomCommandCacheTtlInput(value: string): string | null {
+    return validateTtlInput(value, '自定义命令缓存时长');
+}
+
+export function validateTerminalWidthCacheTtlInput(value: string): string | null {
+    return validateTtlInput(value, '终端宽度缓存时长', 300);
+}
+
+interface TtlFieldConfig {
+    currentValue: number;
+    maxInputLength: number;
+    prompt: string;
+    helperText: string;
+    hint: string;
+    validate: (value: string) => string | null;
+    onSave: (ttlSeconds: number) => void;
 }
 
 export interface RefreshIntervalMenuProps {
     currentInterval: number | null;
     supportsRefreshInterval: boolean;
     gitCacheTtlSeconds: number;
+    customCommandCacheTtlSeconds: number;
+    terminalWidthCacheTtlSeconds: number;
     onUpdate: (interval: number | null) => void;
     onGitCacheTtlUpdate: (ttlSeconds: number) => void;
+    onCustomCommandCacheTtlUpdate: (ttlSeconds: number) => void;
+    onTerminalWidthCacheTtlUpdate: (ttlSeconds: number) => void;
     onBack: () => void;
 }
 
@@ -113,15 +160,49 @@ export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
     currentInterval,
     supportsRefreshInterval,
     gitCacheTtlSeconds,
+    customCommandCacheTtlSeconds,
+    terminalWidthCacheTtlSeconds,
     onUpdate,
     onGitCacheTtlUpdate,
+    onCustomCommandCacheTtlUpdate,
+    onTerminalWidthCacheTtlUpdate,
     onBack
 }) => {
     const [editingRefreshInterval, setEditingRefreshInterval] = useState(false);
-    const [editingGitCacheTtl, setEditingGitCacheTtl] = useState(false);
+    const [editingTtlField, setEditingTtlField] = useState<TtlField | null>(null);
     const [refreshInput, setRefreshInput] = useState(() => getRefreshInputValue(currentInterval));
-    const [gitCacheTtlInput, setGitCacheTtlInput] = useState(() => String(gitCacheTtlSeconds));
+    const [ttlInput, setTtlInput] = useState(() => String(gitCacheTtlSeconds));
     const [validationError, setValidationError] = useState<string | null>(null);
+
+    const ttlFields: Record<TtlField, TtlFieldConfig> = {
+        gitCacheTtl: {
+            currentValue: gitCacheTtlSeconds,
+            maxInputLength: 2,
+            prompt: '输入 Git 缓存 TTL（秒，0-60）:',
+            helperText: '此设置影响 Git 组件多快能察觉到未暂存和未跟踪的工作区改动。',
+            hint: '填 0 关闭按时长过期；缓存有效性仅依据 .git/HEAD 和 .git/index 的修改时间。',
+            validate: validateGitCacheTtlInput,
+            onSave: onGitCacheTtlUpdate
+        },
+        customCommandCacheTtl: {
+            currentValue: customCommandCacheTtlSeconds,
+            maxInputLength: 2,
+            prompt: '输入自定义命令缓存时长（秒，0-60）:',
+            helperText: '此设置影响自定义命令组件更新输出的速度，以及启动 Shell 的频率。',
+            hint: '填 0 关闭缓存；每次渲染状态行都会重新执行命令。',
+            validate: validateCustomCommandCacheTtlInput,
+            onSave: onCustomCommandCacheTtlUpdate
+        },
+        terminalWidthCacheTtl: {
+            currentValue: terminalWidthCacheTtlSeconds,
+            maxInputLength: 3,
+            prompt: '输入终端宽度缓存时长（秒，0-300）:',
+            helperText: '控制未检测到终端宽度时的缓存时长。已检测到的宽度会在下次渲染时重新检测，使窗口大小变化立即生效。',
+            hint: '填 0 关闭缓存，每次都重新检测。',
+            validate: validateTerminalWidthCacheTtlInput,
+            onSave: onTerminalWidthCacheTtlUpdate
+        }
+    };
 
     useInput((input, key) => {
         if (editingRefreshInterval) {
@@ -162,31 +243,33 @@ export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
             return;
         }
 
-        if (editingGitCacheTtl) {
+        if (editingTtlField) {
+            const field = ttlFields[editingTtlField];
+
             if (key.return) {
-                const error = validateGitCacheTtlInput(gitCacheTtlInput);
+                const error = field.validate(ttlInput);
 
                 if (error) {
                     setValidationError(error);
                 } else {
-                    const value = parseInt(gitCacheTtlInput, 10);
-                    onGitCacheTtlUpdate(value);
-                    setEditingGitCacheTtl(false);
+                    const value = parseInt(ttlInput, 10);
+                    field.onSave(value);
+                    setEditingTtlField(null);
                     setValidationError(null);
                 }
             } else if (key.escape) {
-                setGitCacheTtlInput(String(gitCacheTtlSeconds));
-                setEditingGitCacheTtl(false);
+                setTtlInput(String(field.currentValue));
+                setEditingTtlField(null);
                 setValidationError(null);
             } else if (key.backspace) {
-                setGitCacheTtlInput(gitCacheTtlInput.slice(0, -1));
+                setTtlInput(ttlInput.slice(0, -1));
                 setValidationError(null);
             } else if (key.delete) {
                 // No cursor position in simple input
             } else if (shouldInsertInput(input, key) && /\d/.test(input)) {
-                const newValue = gitCacheTtlInput + input;
-                if (newValue.length <= 2) {
-                    setGitCacheTtlInput(newValue);
+                const newValue = ttlInput + input;
+                if (newValue.length <= field.maxInputLength) {
+                    setTtlInput(newValue);
                     setValidationError(null);
                 }
             }
@@ -217,23 +300,23 @@ export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
                         <Text dimColor>按 Enter 确认，ESC 取消。留空即移除。</Text>
                     )}
                 </Box>
-            ) : editingGitCacheTtl ? (
+            ) : editingTtlField ? (
                 <Box marginTop={1} flexDirection='column'>
                     <Text>
-                        输入 Git 缓存 TTL（秒，0-60）:
+                        {ttlFields[editingTtlField].prompt}
                         {' '}
-                        {gitCacheTtlInput}
-                        {gitCacheTtlInput.length > 0 ? ' 秒' : ''}
+                        {ttlInput}
+                        {ttlInput.length > 0 ? ' 秒' : ''}
                     </Text>
                     <Text> </Text>
                     <Text dimColor wrap='wrap'>
-                        此设置影响 Git 组件多快能察觉到未暂存和未跟踪的工作区改动。
+                        {ttlFields[editingTtlField].helperText}
                     </Text>
                     {validationError ? (
                         <Text color='red'>{validationError}</Text>
                     ) : (
                         <Text dimColor>
-                            填 0 关闭按时长过期；缓存有效性仅依据 .git/HEAD 和 .git/index 的 mtime。
+                            {ttlFields[editingTtlField].hint}
                         </Text>
                     )}
                     <Text dimColor>按 Enter 确认，ESC 取消。</Text>
@@ -241,7 +324,13 @@ export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
             ) : (
                 <List
                     marginTop={1}
-                    items={buildConfigureStatusLineItems(currentInterval, supportsRefreshInterval, gitCacheTtlSeconds)}
+                    items={buildConfigureStatusLineItems(
+                        currentInterval,
+                        supportsRefreshInterval,
+                        gitCacheTtlSeconds,
+                        customCommandCacheTtlSeconds,
+                        terminalWidthCacheTtlSeconds
+                    )}
                     onSelect={(value) => {
                         if (value === 'back') {
                             onBack();
@@ -254,8 +343,8 @@ export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
                             return;
                         }
 
-                        setGitCacheTtlInput(String(gitCacheTtlSeconds));
-                        setEditingGitCacheTtl(true);
+                        setTtlInput(String(ttlFields[value].currentValue));
+                        setEditingTtlField(value);
                     }}
                     showBackButton={true}
                 />

@@ -11,8 +11,10 @@ import {
 import {
     RefreshIntervalMenu,
     buildConfigureStatusLineItems,
+    validateCustomCommandCacheTtlInput,
     validateGitCacheTtlInput,
-    validateRefreshIntervalInput
+    validateRefreshIntervalInput,
+    validateTerminalWidthCacheTtlInput
 } from '../RefreshIntervalMenu';
 
 class MockTtyStream extends PassThrough {
@@ -103,46 +105,171 @@ describe('validateGitCacheTtlInput', () => {
     });
 });
 
+describe('validateCustomCommandCacheTtlInput', () => {
+    it('should accept valid values within range', () => {
+        expect(validateCustomCommandCacheTtlInput('0')).toBeNull();
+        expect(validateCustomCommandCacheTtlInput('5')).toBeNull();
+        expect(validateCustomCommandCacheTtlInput('60')).toBeNull();
+    });
+
+    it('should reject values outside the range', () => {
+        expect(validateCustomCommandCacheTtlInput('-1')).toContain('最小');
+        expect(validateCustomCommandCacheTtlInput('61')).toContain('最大');
+    });
+
+    it('should reject empty and non-numeric input', () => {
+        expect(validateCustomCommandCacheTtlInput('')).toContain('有效数字');
+        expect(validateCustomCommandCacheTtlInput('abc')).toContain('有效数字');
+    });
+
+    it('should name the field it rejects', () => {
+        expect(validateCustomCommandCacheTtlInput('61')).toContain('自定义命令缓存时长');
+    });
+});
+
 describe('buildConfigureStatusLineItems', () => {
     it('should show (not set) when interval is null and supported', () => {
-        const items = buildConfigureStatusLineItems(null, true, 5);
+        const items = buildConfigureStatusLineItems(null, true, 5, 5, 5);
         expect(items[0]?.sublabel).toBe('（未设置）');
     });
 
     it('should show seconds for set intervals', () => {
-        const items = buildConfigureStatusLineItems(10, true, 5);
+        const items = buildConfigureStatusLineItems(10, true, 5, 5, 5);
         expect(items[0]?.sublabel).toBe('（10 秒）');
     });
 
     it('should show seconds for small values', () => {
-        const items = buildConfigureStatusLineItems(1, true, 5);
+        const items = buildConfigureStatusLineItems(1, true, 5, 5, 5);
         expect(items[0]?.sublabel).toBe('（1 秒）');
     });
 
     it('should show version requirement when not supported', () => {
-        const items = buildConfigureStatusLineItems(null, false, 5);
+        const items = buildConfigureStatusLineItems(null, false, 5, 5, 5);
         expect(items[0]?.sublabel).toContain('需要 Claude Code');
         expect(items[0]?.disabled).toBe(true);
     });
 
     it('should not be disabled when supported', () => {
-        const items = buildConfigureStatusLineItems(10, true, 5);
+        const items = buildConfigureStatusLineItems(10, true, 5, 5, 5);
         expect(items[0]?.disabled).toBeFalsy();
     });
 
     it('should show the configured Git cache TTL', () => {
-        const items = buildConfigureStatusLineItems(10, true, 5);
+        const items = buildConfigureStatusLineItems(10, true, 5, 5, 5);
         expect(items[1]?.label).toContain('Git 缓存 TTL');
         expect(items[1]?.sublabel).toBe('（5 秒）');
     });
 
     it('should describe zero Git cache TTL as mtime-only', () => {
-        const items = buildConfigureStatusLineItems(10, true, 0);
+        const items = buildConfigureStatusLineItems(10, true, 0, 5, 5);
         expect(items[1]?.sublabel).toBe('（仅 mtime）');
+    });
+
+    it('should show the configured 自定义命令缓存时长', () => {
+        const items = buildConfigureStatusLineItems(10, true, 5, 3, 5);
+        expect(items[2]?.label).toContain('自定义命令缓存时长');
+        expect(items[2]?.sublabel).toBe('（3 秒）');
+    });
+
+    it('should describe zero 自定义命令缓存时长 as disabled', () => {
+        const items = buildConfigureStatusLineItems(10, true, 5, 0, 5);
+        expect(items[2]?.sublabel).toBe('（已关闭）');
+    });
+
+    it('should show the configured Terminal Width cache TTL', () => {
+        const items = buildConfigureStatusLineItems(10, true, 5, 5, 30);
+        expect(items[3]?.label).toContain('终端宽度缓存时长');
+        expect(items[3]?.sublabel).toBe('（30 秒）');
+    });
+
+    it('should describe zero Terminal Width cache TTL as disabled', () => {
+        const items = buildConfigureStatusLineItems(10, true, 5, 5, 0);
+        expect(items[3]?.sublabel).toBe('（已关闭）');
+    });
+});
+
+describe('validateTerminalWidthCacheTtlInput', () => {
+    it('should accept valid values within range', () => {
+        expect(validateTerminalWidthCacheTtlInput('0')).toBeNull();
+        expect(validateTerminalWidthCacheTtlInput('5')).toBeNull();
+        expect(validateTerminalWidthCacheTtlInput('300')).toBeNull();
+    });
+
+    it('should reject values outside the range', () => {
+        expect(validateTerminalWidthCacheTtlInput('-1')).toContain('最小');
+        expect(validateTerminalWidthCacheTtlInput('301')).toContain('最大');
+    });
+
+    it('should reject empty and non-numeric input', () => {
+        expect(validateTerminalWidthCacheTtlInput('')).toContain('有效数字');
+        expect(validateTerminalWidthCacheTtlInput('abc')).toContain('有效数字');
     });
 });
 
 describe('RefreshIntervalMenu', () => {
+    it('saves a three-digit Terminal Width cache TTL without changing the other settings', async () => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+        const onUpdate = vi.fn();
+        const onGitCacheTtlUpdate = vi.fn();
+        const onCustomCommandCacheTtlUpdate = vi.fn();
+        const onTerminalWidthCacheTtlUpdate = vi.fn();
+        const instance = render(
+            React.createElement(RefreshIntervalMenu, {
+                currentInterval: 10,
+                supportsRefreshInterval: true,
+                gitCacheTtlSeconds: 5,
+                customCommandCacheTtlSeconds: 0,
+                terminalWidthCacheTtlSeconds: 5,
+                onUpdate,
+                onGitCacheTtlUpdate,
+                onCustomCommandCacheTtlUpdate,
+                onTerminalWidthCacheTtlUpdate,
+                onBack: vi.fn()
+            }),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            await flushInk();
+            for (let index = 0; index < 3; index++) {
+                stdin.write('\u001B[B');
+                await flushInk();
+            }
+            stdin.write('\r');
+            await flushInk();
+
+            expect(stdout.getOutput()).toContain('输入终端宽度缓存时长（秒，0-300）:');
+            expect(stdout.getOutput()).toContain('未检测到终端宽度');
+
+            stdin.write('\u007F');
+            await flushInk();
+            stdin.write('300');
+            await flushInk();
+            stdin.write('\r');
+            await flushInk();
+
+            expect(onTerminalWidthCacheTtlUpdate).toHaveBeenCalledWith(300);
+            expect(onGitCacheTtlUpdate).not.toHaveBeenCalled();
+            expect(onCustomCommandCacheTtlUpdate).not.toHaveBeenCalled();
+            expect(onUpdate).not.toHaveBeenCalled();
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
+
     it('keeps an unset interval empty when reopening the editor', async () => {
         const stdin = createMockStdin();
         const stdout = createMockStdout();
@@ -154,8 +281,12 @@ describe('RefreshIntervalMenu', () => {
                 currentInterval: null,
                 supportsRefreshInterval: true,
                 gitCacheTtlSeconds: 5,
+                customCommandCacheTtlSeconds: 5,
+                terminalWidthCacheTtlSeconds: 5,
                 onUpdate,
                 onGitCacheTtlUpdate: vi.fn(),
+                onCustomCommandCacheTtlUpdate: vi.fn(),
+                onTerminalWidthCacheTtlUpdate: vi.fn(),
                 onBack
             }),
             {
@@ -201,8 +332,12 @@ describe('RefreshIntervalMenu', () => {
                 currentInterval: 10,
                 supportsRefreshInterval: true,
                 gitCacheTtlSeconds: 0,
+                customCommandCacheTtlSeconds: 5,
+                terminalWidthCacheTtlSeconds: 5,
                 onUpdate,
                 onGitCacheTtlUpdate,
+                onCustomCommandCacheTtlUpdate: vi.fn(),
+                onTerminalWidthCacheTtlUpdate: vi.fn(),
                 onBack
             }),
             {
@@ -230,6 +365,63 @@ describe('RefreshIntervalMenu', () => {
 
             expect(onGitCacheTtlUpdate).toHaveBeenCalledWith(0);
             expect(onUpdate).not.toHaveBeenCalled();
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
+
+    it('edits the 自定义命令缓存时长 without touching the Git cache TTL', async () => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+        const onGitCacheTtlUpdate = vi.fn();
+        const onCustomCommandCacheTtlUpdate = vi.fn();
+        const instance = render(
+            React.createElement(RefreshIntervalMenu, {
+                currentInterval: 10,
+                supportsRefreshInterval: true,
+                gitCacheTtlSeconds: 5,
+                customCommandCacheTtlSeconds: 0,
+                terminalWidthCacheTtlSeconds: 5,
+                onUpdate: vi.fn(),
+                onGitCacheTtlUpdate,
+                onCustomCommandCacheTtlUpdate,
+                onTerminalWidthCacheTtlUpdate: vi.fn(),
+                onBack: vi.fn()
+            }),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            await flushInk();
+            stdin.write('\u001B[B');
+            await flushInk();
+            stdin.write('\u001B[B');
+            await flushInk();
+            stdin.write('\r');
+            await flushInk();
+
+            expect(stdout.getOutput()).toContain('输入自定义命令缓存时长（秒，0-60）:');
+            expect(stdout.getOutput()).toContain('启动 Shell 的频率');
+
+            stdin.write('7');
+            await flushInk();
+            stdin.write('\r');
+            await flushInk();
+
+            expect(onCustomCommandCacheTtlUpdate).toHaveBeenCalledWith(7);
+            expect(onGitCacheTtlUpdate).not.toHaveBeenCalled();
         } finally {
             instance.unmount();
             instance.cleanup();

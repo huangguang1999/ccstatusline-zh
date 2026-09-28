@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import chalk from 'chalk';
 
-import { runTUI } from './tui';
 import type { SkillsMetrics } from './types';
 import type { RenderContext } from './types/RenderContext';
 import type { StatusJSON } from './types/StatusJSON';
@@ -169,10 +168,14 @@ async function renderMultipleLines(data: StatusJSON) {
             : undefined,
         skillsMetrics,
         compactionData,
-        terminalWidth: getTerminalWidth(),
+        terminalWidth: getTerminalWidth({
+            sessionId: data.session_id,
+            ttlSeconds: settings.terminalWidthCacheTtlSeconds
+        }),
         isPreview: false,
         minimalist: settings.minimalistMode,
         gitCacheTtlSeconds: settings.gitCacheTtlSeconds,
+        customCommandCacheTtlSeconds: settings.customCommandCacheTtlSeconds,
         gitReviewNeedsChecks: lines.some(line => line.some(item => item.type === 'git-ci-status'))
     };
 
@@ -349,6 +352,11 @@ async function main() {
             const { updatemessage, ...newSettings } = settings;
             await saveSettings(newSettings);
         }
+        // Imported lazily: the TUI pulls in ink/React/yoga-layout, which the
+        // status line render path never touches. Claude Code re-runs this
+        // binary every couple of seconds, so keeping that graph off the
+        // render path is worth the dynamic import here.
+        const { runTUI } = await import('./tui');
         runTUI();
     }
 }
