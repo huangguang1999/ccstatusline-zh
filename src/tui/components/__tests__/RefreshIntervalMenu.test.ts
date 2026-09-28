@@ -113,39 +113,39 @@ describe('validateCustomCommandCacheTtlInput', () => {
     });
 
     it('should reject values outside the range', () => {
-        expect(validateCustomCommandCacheTtlInput('-1')).toContain('Minimum');
-        expect(validateCustomCommandCacheTtlInput('61')).toContain('Maximum');
+        expect(validateCustomCommandCacheTtlInput('-1')).toContain('最小');
+        expect(validateCustomCommandCacheTtlInput('61')).toContain('最大');
     });
 
     it('should reject empty and non-numeric input', () => {
-        expect(validateCustomCommandCacheTtlInput('')).toContain('valid number');
-        expect(validateCustomCommandCacheTtlInput('abc')).toContain('valid number');
+        expect(validateCustomCommandCacheTtlInput('')).toContain('有效数字');
+        expect(validateCustomCommandCacheTtlInput('abc')).toContain('有效数字');
     });
 
     it('should name the field it rejects', () => {
-        expect(validateCustomCommandCacheTtlInput('61')).toContain('custom command cache TTL');
+        expect(validateCustomCommandCacheTtlInput('61')).toContain('自定义命令缓存时长');
     });
 });
 
 describe('buildConfigureStatusLineItems', () => {
     it('should show (not set) when interval is null and supported', () => {
         const items = buildConfigureStatusLineItems(null, true, 5, 5, 5);
-        expect(items[0]?.sublabel).toBe('(not set)');
+        expect(items[0]?.sublabel).toBe('（未设置）');
     });
 
     it('should show seconds for set intervals', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 5, 5);
-        expect(items[0]?.sublabel).toBe('(10s)');
+        expect(items[0]?.sublabel).toBe('（10 秒）');
     });
 
     it('should show seconds for small values', () => {
         const items = buildConfigureStatusLineItems(1, true, 5, 5, 5);
-        expect(items[0]?.sublabel).toBe('(1s)');
+        expect(items[0]?.sublabel).toBe('（1 秒）');
     });
 
     it('should show version requirement when not supported', () => {
         const items = buildConfigureStatusLineItems(null, false, 5, 5, 5);
-        expect(items[0]?.sublabel).toContain('requires Claude Code');
+        expect(items[0]?.sublabel).toContain('需要 Claude Code');
         expect(items[0]?.disabled).toBe(true);
     });
 
@@ -156,35 +156,35 @@ describe('buildConfigureStatusLineItems', () => {
 
     it('should show the configured Git cache TTL', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 5, 5);
-        expect(items[1]?.label).toContain('Git Cache TTL');
-        expect(items[1]?.sublabel).toBe('(5s)');
+        expect(items[1]?.label).toContain('Git 缓存 TTL');
+        expect(items[1]?.sublabel).toBe('（5 秒）');
     });
 
     it('should describe zero Git cache TTL as mtime-only', () => {
         const items = buildConfigureStatusLineItems(10, true, 0, 5, 5);
-        expect(items[1]?.sublabel).toBe('(mtime only)');
+        expect(items[1]?.sublabel).toBe('（仅 mtime）');
     });
 
-    it('should show the configured custom command cache TTL', () => {
+    it('should show the configured 自定义命令缓存时长', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 3, 5);
-        expect(items[2]?.label).toContain('Custom Command Cache TTL');
-        expect(items[2]?.sublabel).toBe('(3s)');
+        expect(items[2]?.label).toContain('自定义命令缓存时长');
+        expect(items[2]?.sublabel).toBe('（3 秒）');
     });
 
-    it('should describe zero custom command cache TTL as disabled', () => {
+    it('should describe zero 自定义命令缓存时长 as disabled', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 0, 5);
-        expect(items[2]?.sublabel).toBe('(disabled)');
+        expect(items[2]?.sublabel).toBe('（已关闭）');
     });
 
     it('should show the configured Terminal Width cache TTL', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 5, 30);
-        expect(items[3]?.label).toContain('Terminal Width Cache TTL');
-        expect(items[3]?.sublabel).toBe('(30s)');
+        expect(items[3]?.label).toContain('终端宽度缓存时长');
+        expect(items[3]?.sublabel).toBe('（30 秒）');
     });
 
     it('should describe zero Terminal Width cache TTL as disabled', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 5, 0);
-        expect(items[3]?.sublabel).toBe('(disabled)');
+        expect(items[3]?.sublabel).toBe('（已关闭）');
     });
 });
 
@@ -196,13 +196,13 @@ describe('validateTerminalWidthCacheTtlInput', () => {
     });
 
     it('should reject values outside the range', () => {
-        expect(validateTerminalWidthCacheTtlInput('-1')).toContain('Minimum');
-        expect(validateTerminalWidthCacheTtlInput('301')).toContain('Maximum');
+        expect(validateTerminalWidthCacheTtlInput('-1')).toContain('最小');
+        expect(validateTerminalWidthCacheTtlInput('301')).toContain('最大');
     });
 
     it('should reject empty and non-numeric input', () => {
-        expect(validateTerminalWidthCacheTtlInput('')).toContain('valid number');
-        expect(validateTerminalWidthCacheTtlInput('abc')).toContain('valid number');
+        expect(validateTerminalWidthCacheTtlInput('')).toContain('有效数字');
+        expect(validateTerminalWidthCacheTtlInput('abc')).toContain('有效数字');
     });
 });
 
@@ -247,8 +247,8 @@ describe('RefreshIntervalMenu', () => {
             stdin.write('\r');
             await flushInk();
 
-            expect(stdout.getOutput()).toContain('Enter Terminal Width cache TTL in seconds (0-300):');
-            expect(stdout.getOutput()).toContain('no TTY detected');
+            expect(stdout.getOutput()).toContain('输入终端宽度缓存时长（秒，0-300）:');
+            expect(stdout.getOutput()).toContain('未检测到终端宽度');
 
             stdin.write('\u007F');
             await flushInk();
@@ -374,7 +374,7 @@ describe('RefreshIntervalMenu', () => {
         }
     });
 
-    it('edits the custom command cache TTL without touching the Git cache TTL', async () => {
+    it('edits the 自定义命令缓存时长 without touching the Git cache TTL', async () => {
         const stdin = createMockStdin();
         const stdout = createMockStdout();
         const stderr = createMockStdout();
@@ -412,8 +412,8 @@ describe('RefreshIntervalMenu', () => {
             stdin.write('\r');
             await flushInk();
 
-            expect(stdout.getOutput()).toContain('Enter custom command cache TTL in seconds (0-60):');
-            expect(stdout.getOutput()).toContain('how often they spawn a shell');
+            expect(stdout.getOutput()).toContain('输入自定义命令缓存时长（秒，0-60）:');
+            expect(stdout.getOutput()).toContain('启动 Shell 的频率');
 
             stdin.write('7');
             await flushInk();

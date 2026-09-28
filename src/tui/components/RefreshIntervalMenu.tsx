@@ -39,8 +39,8 @@ function getGitCacheTtlSublabel(ttlSeconds: number): string {
 
 function getCacheTtlSublabel(ttlSeconds: number): string {
     return ttlSeconds === 0
-        ? '(disabled)'
-        : `(${ttlSeconds}s)`;
+        ? '（已关闭）'
+        : `（${ttlSeconds} 秒）`;
 }
 
 export function buildConfigureStatusLineItems(
@@ -64,19 +64,19 @@ export function buildConfigureStatusLineItems(
             label: '🧮 Git 缓存 TTL',
             sublabel: getGitCacheTtlSublabel(gitCacheTtlSeconds),
             value: 'gitCacheTtl',
-            description: 'How long git widget subprocess output can be reused while .git/HEAD and .git/index are unchanged. Enter 0-60 seconds;\n0 disables age-based expiry, so cached output is reused until those git metadata mtimes change.'
+            description: 'Git 组件子进程输出在 .git/HEAD 与 .git/index 未变动期间可复用的时长。输入 0-60 秒；\n填 0 关闭按时长过期，缓存输出会一直复用，直到这些 Git 元数据的修改时间发生变化。'
         },
         {
-            label: '🔧 Custom Command Cache TTL',
+            label: '🔧 自定义命令缓存时长',
             sublabel: getCacheTtlSublabel(customCommandCacheTtlSeconds),
             value: 'customCommandCacheTtl',
-            description: 'How long custom command output is reused before the command runs again. Enter 0-60 seconds;\n0 disables caching, so every status line render spawns the command.'
+            description: '自定义命令输出在再次执行前可复用的时长。输入 0-60 秒；\n填 0 关闭缓存，每次渲染状态行都会执行命令。'
         },
         {
-            label: '🖥️  Terminal Width Cache TTL',
+            label: '🖥️  终端宽度缓存时长',
             sublabel: getCacheTtlSublabel(terminalWidthCacheTtlSeconds),
             value: 'terminalWidthCacheTtl',
-            description: 'How long a cached "no TTY detected" result is trusted before re-probing the terminal width. Enter 0-300 seconds;\n0 disables the cache (always re-probes). A detected width is never cached across renders, only this no-TTY result is.'
+            description: '未检测到终端宽度时，等待多久再尝试检测。输入 0-300 秒；\n填 0 关闭缓存，每次都重新检测。已检测到的宽度会在下次渲染时重新检测。'
         }
     ];
 }
@@ -111,26 +111,26 @@ function validateTtlInput(value: string, label: string, maximum = 60): string | 
     }
 
     if (parsed < 0) {
-        return `Minimum ${label} is 0s (you entered ${parsed}s)`;
+        return `${label}最小为 0 秒（输入了 ${parsed} 秒）`;
     }
 
     if (parsed > maximum) {
-        return `Maximum ${label} is ${maximum}s (you entered ${parsed}s)`;
+        return `${label}最大为 ${maximum} 秒（输入了 ${parsed} 秒）`;
     }
 
     return null;
 }
 
 export function validateGitCacheTtlInput(value: string): string | null {
-    return validateTtlInput(value, 'Git cache TTL');
+    return validateTtlInput(value, 'Git 缓存 TTL');
 }
 
 export function validateCustomCommandCacheTtlInput(value: string): string | null {
-    return validateTtlInput(value, 'custom command cache TTL');
+    return validateTtlInput(value, '自定义命令缓存时长');
 }
 
 export function validateTerminalWidthCacheTtlInput(value: string): string | null {
-    return validateTtlInput(value, 'Terminal Width cache TTL', 300);
+    return validateTtlInput(value, '终端宽度缓存时长', 300);
 }
 
 interface TtlFieldConfig {
@@ -178,27 +178,27 @@ export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
         gitCacheTtl: {
             currentValue: gitCacheTtlSeconds,
             maxInputLength: 2,
-            prompt: 'Enter Git cache TTL in seconds (0-60):',
-            helperText: 'This affects how quickly git widgets notice unstaged and untracked working-tree changes.',
-            hint: '0 disables age-based expiry; cache validity uses .git/HEAD and .git/index mtimes only.',
+            prompt: '输入 Git 缓存 TTL（秒，0-60）:',
+            helperText: '此设置影响 Git 组件多快能察觉到未暂存和未跟踪的工作区改动。',
+            hint: '填 0 关闭按时长过期；缓存有效性仅依据 .git/HEAD 和 .git/index 的修改时间。',
             validate: validateGitCacheTtlInput,
             onSave: onGitCacheTtlUpdate
         },
         customCommandCacheTtl: {
             currentValue: customCommandCacheTtlSeconds,
             maxInputLength: 2,
-            prompt: 'Enter custom command cache TTL in seconds (0-60):',
-            helperText: 'This affects how quickly custom command widgets show new output, and how often they spawn a shell.',
-            hint: '0 disables caching; every status line render spawns the command again.',
+            prompt: '输入自定义命令缓存时长（秒，0-60）:',
+            helperText: '此设置影响自定义命令组件更新输出的速度，以及启动 Shell 的频率。',
+            hint: '填 0 关闭缓存；每次渲染状态行都会重新执行命令。',
             validate: validateCustomCommandCacheTtlInput,
             onSave: onCustomCommandCacheTtlUpdate
         },
         terminalWidthCacheTtl: {
             currentValue: terminalWidthCacheTtlSeconds,
             maxInputLength: 3,
-            prompt: 'Enter Terminal Width cache TTL in seconds (0-300):',
-            helperText: 'Controls how long a "no TTY detected" result is cached. A detected width is always re-probed on the next render so resizes take effect immediately.',
-            hint: '0 disables the cache (always re-probes).',
+            prompt: '输入终端宽度缓存时长（秒，0-300）:',
+            helperText: '控制未检测到终端宽度时的缓存时长。已检测到的宽度会在下次渲染时重新检测，使窗口大小变化立即生效。',
+            hint: '填 0 关闭缓存，每次都重新检测。',
             validate: validateTerminalWidthCacheTtlInput,
             onSave: onTerminalWidthCacheTtlUpdate
         }
@@ -306,7 +306,7 @@ export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
                         {ttlFields[editingTtlField].prompt}
                         {' '}
                         {ttlInput}
-                        {ttlInput.length > 0 ? 's' : ''}
+                        {ttlInput.length > 0 ? ' 秒' : ''}
                     </Text>
                     <Text> </Text>
                     <Text dimColor wrap='wrap'>

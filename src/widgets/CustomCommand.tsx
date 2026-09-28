@@ -56,7 +56,7 @@ export class CustomCommandWidget implements Widget {
 
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
         if (context.isPreview) {
-            return item.commandPath ? `[cmd: ${item.commandPath.substring(0, 20)}${item.commandPath.length > 20 ? '...' : ''}]` : '[No command]';
+            return item.commandPath ? `[命令: ${item.commandPath.substring(0, 20)}${item.commandPath.length > 20 ? '...' : ''}]` : '[未设置命令]';
         } else if (item.commandPath && context.data) {
             const jsonInput = JSON.stringify(
                 typeof context.terminalWidth === 'number'

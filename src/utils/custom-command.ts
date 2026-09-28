@@ -231,19 +231,19 @@ function getFailureMarker(result: SpawnSyncReturns<string>): string | null {
     const errorCode = getErrorCode(result.error);
 
     if (errorCode === 'ENOENT') {
-        return '[Cmd not found]';
+        return '[命令未找到]';
     } else if (errorCode === 'ETIMEDOUT') {
-        return '[Timeout]';
+        return '[超时]';
     } else if (errorCode === 'EACCES') {
-        return '[Permission denied]';
+        return '[权限不足]';
     } else if (result.error) {
-        return '[Error]';
+        return '[错误]';
     } else if (result.signal) {
-        return `[Signal: ${result.signal}]`;
+        return `[信号: ${result.signal}]`;
     } else if (typeof result.status !== 'number') {
-        return '[Error]';
+        return '[错误]';
     } else if (result.status !== 0) {
-        return `[Exit: ${result.status}]`;
+        return `[退出码: ${result.status}]`;
     }
 
     return null;
@@ -276,7 +276,7 @@ function executeCommand(request: CustomCommandRequest): CustomCommandResult {
         }
         return JSON.parse(result.stdout) as CustomCommandResult;
     } catch {
-        return { status: 'failed', marker: '[Error]' };
+        return { status: 'failed', marker: '[错误]' };
     }
 }
 

@@ -98,7 +98,7 @@ for (const runtime of ['bun', 'node']) {
 
         for (const ttlSeconds of [0, 5]) {
             it(`rejects 4 MiB of stdout with cache TTL ${ttlSeconds}`, () => {
-                expect(run(String(4 * 1024 * 1024), { ttlSeconds }).result).toEqual({ status: 'failed', marker: '[Error]' });
+                expect(run(String(4 * 1024 * 1024), { ttlSeconds }).result).toEqual({ status: 'failed', marker: '[错误]' });
             });
         }
 
@@ -107,7 +107,7 @@ for (const runtime of ['bun', 'node']) {
         });
 
         it('rejects even one byte beyond the capture limit', () => {
-            expect(run(String(1024 * 1024 + 1)).result).toEqual({ status: 'failed', marker: '[Error]' });
+            expect(run(String(1024 * 1024 + 1)).result).toEqual({ status: 'failed', marker: '[错误]' });
         });
 
         it('counts UTF-8 bytes while preserving the character display limit', () => {
@@ -119,12 +119,12 @@ for (const runtime of ['bun', 'node']) {
         });
 
         it('reports the command exit status', () => {
-            expect(run('exit').result).toEqual({ status: 'failed', marker: '[Exit: 7]' });
+            expect(run('exit').result).toEqual({ status: 'failed', marker: '[退出码: 7]' });
         });
 
         it('enforces the timeout without waiting for inherited stdout', () => {
             const result = run('sleep', { timeoutMs: 200 });
-            expect(result.result).toEqual({ status: 'failed', marker: '[Timeout]' });
+            expect(result.result).toEqual({ status: 'failed', marker: '[超时]' });
             expect(result.elapsed).toBeLessThan(1000);
         });
 
@@ -136,11 +136,18 @@ for (const runtime of ['bun', 'node']) {
 
         it.skipIf(process.platform === 'win32')('returns successful output when a background job keeps stdout open', async () => {
             const sentinelPath = path.join(tempRoot, `${runtime}-background`);
-            const result = run('background', { timeoutMs: 200, argument: sentinelPath });
+            // Allow the foreground runtime to start before its deadline. Node
+            // startup alone can approach 200ms on macOS under load.
+            const result = run('background', { timeoutMs: 500, argument: sentinelPath });
             expect(result.result).toEqual({ status: 'ok', stdout: 'EARLY' });
-            expect(result.elapsed).toBeLessThan(1000);
-            // Let the deliberately surviving background job finish before cleanup.
-            await new Promise(resolve => setTimeout(resolve, 1300));
+            expect(result.elapsed).toBeLessThan(1200);
+            expect(fs.existsSync(sentinelPath)).toBe(false);
+            // Wait for completion rather than assuming the descendant starts
+            // within 100ms; it must still survive closing the inherited pipe.
+            const deadline = Date.now() + 3000;
+            while (!fs.existsSync(sentinelPath) && Date.now() < deadline) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
             expect(fs.existsSync(sentinelPath)).toBe(true);
         });
 
@@ -148,7 +155,7 @@ for (const runtime of ['bun', 'node']) {
             it.skipIf(process.platform === 'win32')(`kills descendants on ${mode}`, async () => {
                 const sentinelPath = path.join(tempRoot, `${runtime}-${mode}`);
                 const result = run(mode, { timeoutMs: 300, argument: sentinelPath });
-                expect(result.result).toEqual({ status: 'failed', marker: mode === 'timeout-tree' ? '[Timeout]' : '[Error]' });
+                expect(result.result).toEqual({ status: 'failed', marker: mode === 'timeout-tree' ? '[超时]' : '[错误]' });
                 await new Promise(resolve => setTimeout(resolve, 1300));
                 expect(fs.existsSync(sentinelPath)).toBe(false);
             });

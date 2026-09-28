@@ -64,30 +64,30 @@ export function captureCustomCommand(
             return;
         }
         if (chunk.length > maxBytes - length) {
-            finish('[Error]', true);
+            finish('[错误]', true);
             return;
         }
         chunk.copy(output, length);
         length += chunk.length;
     });
     child.stdout.on('error', () => {
-        finish('[Error]', true);
+        finish('[错误]', true);
     });
     child.stdin.on('error', (error: NodeJS.ErrnoException) => {
         // Commands need not consume their stdin payload.
         if (error.code !== 'EPIPE') {
-            finish('[Error]', true);
+            finish('[错误]', true);
         }
     });
     child.on('error', (error: NodeJS.ErrnoException) => {
-        const marker = error.code === 'ENOENT' ? '[Cmd not found]'
-            : error.code === 'EACCES' ? '[Permission denied]' : '[Error]';
+        const marker = error.code === 'ENOENT' ? '[命令未找到]'
+            : error.code === 'EACCES' ? '[权限不足]' : '[错误]';
         finish(marker, true);
     });
     child.on('exit', (code, signal) => {
         exited = true;
-        exitMarker = signal ? `[Signal: ${signal}]`
-            : code === 0 ? null : typeof code === 'number' ? `[Exit: ${code}]` : '[Error]';
+        exitMarker = signal ? `[信号: ${signal}]`
+            : code === 0 ? null : typeof code === 'number' ? `[退出码: ${code}]` : '[错误]';
     });
     // 'exit' can precede the last stdout data. Drain the pipe until 'close', but
     // never wait beyond the deadline for a background descendant to close it.
@@ -96,7 +96,7 @@ export function captureCustomCommand(
     });
     if (request.timeoutMs > 0) {
         timer = setTimeout(() => {
-            finish(exited ? exitMarker : '[Timeout]', !exited);
+            finish(exited ? exitMarker : '[超时]', !exited);
         }, request.timeoutMs);
     }
     child.stdin.end(request.input);

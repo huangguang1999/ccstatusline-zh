@@ -1397,7 +1397,7 @@ export const App: React.FC = () => {
                                 terminalWidthCacheTtlSeconds: ttlSeconds
                             });
                             setFlashMessage({
-                                text: '✓ Terminal Width cache TTL updated',
+                                text: '✓ 终端宽度缓存时长已更新',
                                 color: 'green'
                             });
                             setScreen('main');
@@ -1408,7 +1408,7 @@ export const App: React.FC = () => {
                                 customCommandCacheTtlSeconds: ttlSeconds
                             });
                             setFlashMessage({
-                                text: '✓ Custom command cache TTL updated',
+                                text: '✓ 自定义命令缓存时长已更新',
                                 color: 'green'
                             });
                             setScreen('main');

@@ -353,6 +353,7 @@ Execute shell commands and display their output dynamically:
 
 - Runs whenever Claude Code updates the status line by default; optionally reuse output with **Custom Command Cache TTL** under **Configure Status Line** (`customCommandCacheTtlSeconds`, `0-60` seconds, default `0`)
 - Receives the full Claude Code JSON data via stdin (model info, session ID, transcript path, etc.)
+- Also includes `terminal_width` — the detected terminal width in columns, added by ccstatusline (omitted when it can't be determined) — so scripts can adapt their output to the available space
 - Displays command output inline in your status line
 - Configurable timeout (default: 1000ms)
 - Optional max-width truncation
@@ -370,9 +371,9 @@ With caching enabled, both output and failure markers are reused until the TTL e
 
 > ⚠️ **Important:** Commands should complete quickly to avoid delays. Long-running commands are terminated at the configured timeout, and inherited output pipes cannot keep capture waiting indefinitely after that deadline. On Linux/macOS, timeout termination targets the command's process group; on Windows, it targets the shell process. If you're not seeing output from your custom command, try increasing the timeout value (press 't' in the editor).
 
-Output capture is limited to 1 MiB; exceeding it displays `[Error]`. Successful output is limited to 16,384 characters before color handling and optional max-width truncation.
+Output capture is limited to 1 MiB; exceeding it displays `[错误]` in ccstatusline-zh. Successful output is limited to 16,384 characters before color handling and optional max-width truncation.
 
-> 💡 **Tip:** Custom commands can be other Claude Code compatible status line formatters. They receive the same JSON via stdin that `ccstatusline` receives from Claude Code, allowing you to chain or combine multiple status line tools.
+> 💡 **Tip:** Custom commands can be other Claude Code compatible status line formatters. They receive the same JSON via stdin that `ccstatusline` receives from Claude Code (augmented with a `terminal_width` field), allowing you to chain or combine multiple status line tools.
 
 ### Link Widget
 

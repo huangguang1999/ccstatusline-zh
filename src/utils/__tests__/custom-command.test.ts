@@ -278,7 +278,7 @@ describe('runCustomCommand', () => {
         });
 
         // Two widgets can run the same command under different timeouts. Without
-        // the timeout in the key the second would inherit the first's [Timeout].
+        // the timeout in the key the second would inherit the first's [超时].
         it('caches per timeout, so a longer-lived widget runs on its own terms', () => {
             useTempHome();
             useFixedCwd();
@@ -287,7 +287,7 @@ describe('runCustomCommand', () => {
                 { stdout: 'finished in time' }
             );
 
-            expect(runCustomCommand(createRequest({ timeoutMs: 100 }))).toEqual({ status: 'failed', marker: '[Timeout]' });
+            expect(runCustomCommand(createRequest({ timeoutMs: 100 }))).toEqual({ status: 'failed', marker: '[超时]' });
             expect(runCustomCommand(createRequest({ timeoutMs: 5000 }))).toEqual({ status: 'ok', stdout: 'finished in time' });
             expect(mockSpawnSync.mock.calls).toHaveLength(2);
         });
@@ -342,11 +342,11 @@ describe('runCustomCommand', () => {
             useFixedCwd();
             alwaysRespond({ result: { status: 3 } });
 
-            expect(runCustomCommand(createRequest())).toEqual({ status: 'failed', marker: '[Exit: 3]' });
+            expect(runCustomCommand(createRequest())).toEqual({ status: 'failed', marker: '[退出码: 3]' });
 
             clearCustomCommandCache();
 
-            expect(runCustomCommand(createRequest())).toEqual({ status: 'failed', marker: '[Exit: 3]' });
+            expect(runCustomCommand(createRequest())).toEqual({ status: 'failed', marker: '[退出码: 3]' });
             expect(mockSpawnSync.mock.calls).toHaveLength(1);
         });
 
@@ -456,19 +456,19 @@ describe('runCustomCommand', () => {
         it('reports a malformed capture response as an error', () => {
             mockSpawnSync.mockImplementation(() => spawnResult({ stdout: 'invalid json' }));
 
-            expect(runCustomCommand(createRequest({ ttlSeconds: 0 }))).toEqual({ status: 'failed', marker: '[Error]' });
+            expect(runCustomCommand(createRequest({ ttlSeconds: 0 }))).toEqual({ status: 'failed', marker: '[错误]' });
         });
     });
 
     describe('failure markers', () => {
         const cases: { name: string; result: Partial<SpawnSyncReturns<string>>; marker: string }[] = [
-            { name: 'a missing shell', result: { error: errnoError('ENOENT') }, marker: '[Cmd not found]' },
-            { name: 'a timeout', result: { error: errnoError('ETIMEDOUT'), signal: 'SIGTERM' }, marker: '[Timeout]' },
-            { name: 'a permission failure', result: { error: errnoError('EACCES') }, marker: '[Permission denied]' },
-            { name: 'an unclassified spawn error', result: { error: new Error('boom') }, marker: '[Error]' },
-            { name: 'a signalled command', result: { signal: 'SIGKILL', status: null }, marker: '[Signal: SIGKILL]' },
-            { name: 'a non-zero exit', result: { status: 12 }, marker: '[Exit: 12]' },
-            { name: 'a missing exit status', result: { status: null }, marker: '[Error]' }
+            { name: 'a missing shell', result: { error: errnoError('ENOENT') }, marker: '[命令未找到]' },
+            { name: 'a timeout', result: { error: errnoError('ETIMEDOUT'), signal: 'SIGTERM' }, marker: '[超时]' },
+            { name: 'a permission failure', result: { error: errnoError('EACCES') }, marker: '[权限不足]' },
+            { name: 'an unclassified spawn error', result: { error: new Error('boom') }, marker: '[错误]' },
+            { name: 'a signalled command', result: { signal: 'SIGKILL', status: null }, marker: '[信号: SIGKILL]' },
+            { name: 'a non-zero exit', result: { status: 12 }, marker: '[退出码: 12]' },
+            { name: 'a missing exit status', result: { status: null }, marker: '[错误]' }
         ];
 
         for (const testCase of cases) {

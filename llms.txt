@@ -1,24 +1,27 @@
-# ccstatusline
+# ccstatusline-zh
 
-> A highly customizable status line formatter for Claude Code CLI. Renders a configurable terminal status line (model info, git branch/state, token/context usage, cost, timers, and other widgets) via an interactive TUI, with support for themes and Powerline-style separators.
+> Claude Code CLI 可定制状态行工具的中文汉化版。显示模型、Git 状态、Token 与上下文用量、费用和计时器等组件，提供终端配置界面、主题和 Powerline 分隔符。
 
-## Getting Started
+## 快速开始
 
-- [Quick Start](https://github.com/sirmalloc/ccstatusline#-quick-start): Run with `npx -y ccstatusline@latest` or `bunx -y ccstatusline@latest` — no installation required. Launches an interactive TUI to configure and install the status line into Claude Code's `settings.json`.
-- [Windows Support](https://github.com/sirmalloc/ccstatusline/blob/main/docs/WINDOWS.md): PowerShell setup, fonts, and WSL/Windows Terminal notes.
-- [Usage](https://github.com/sirmalloc/ccstatusline/blob/main/docs/USAGE.md): Full widget reference and configuration behavior.
+- [安装与配置](https://github.com/huangguang1999/ccstatusline-zh#-快速开始)：运行 `npx -y ccstatusline-zh@latest setup` 或 `bunx -y ccstatusline-zh@latest setup`，打开中文终端配置界面。
+- [Windows 支持](https://github.com/huangguang1999/ccstatusline-zh#-windows-支持)：Windows 安装方式与配置路径。
+- [组件与用法](https://github.com/huangguang1999/ccstatusline-zh#-可用组件)：中文组件说明与配置方式。
+- [详细使用指南](https://github.com/huangguang1999/ccstatusline-zh/blob/main/docs/USAGE.md)：保留的上游英文指南；命令行包名请使用 `ccstatusline-zh`。
 
-## Configuration
+## 配置
 
-- [ccstatusline settings](https://github.com/sirmalloc/ccstatusline#-quick-start): Widget and appearance settings are stored at `~/.config/ccstatusline/settings.json` by default. Use `--config <path>` to load and save these settings at a custom file path.
-- [Claude Code settings.json format](https://github.com/sirmalloc/ccstatusline#-quick-start): ccstatusline writes a `statusLine` command object (`type`, `command`, `padding`, and `refreshInterval` when supported) to Claude Code's `~/.claude/settings.json`, supporting `npx`, `bunx`, or a pinned global `ccstatusline` command. Set `CLAUDE_CONFIG_DIR` to override the Claude Code configuration directory; the file is then `<CLAUDE_CONFIG_DIR>/settings.json`.
+- 默认配置路径为 `~/.config/ccstatusline/settings.json`，与上游兼容。使用 `--config <path>` 指定独立配置文件。
+- Claude Code 的 `~/.claude/settings.json` 使用 `statusLine` 对象，其中包含 `type`、`command`、`padding` 及受支持时的 `refreshInterval`。命令支持 `npx -y ccstatusline-zh@latest`、`bunx -y ccstatusline-zh@latest` 或固定全局安装的 `ccstatusline-zh`。
+- `CLAUDE_CONFIG_DIR` 可覆盖 Claude Code 配置目录，其设置文件为 `<CLAUDE_CONFIG_DIR>/settings.json`。内部组件 ID、配置字段和纯值输出遵循上游契约。
 
-## Development
+## 开发
 
-- [Development guide](https://github.com/sirmalloc/ccstatusline/blob/main/docs/DEVELOPMENT.md): build and contribution workflow for the TypeScript/Bun-based codebase.
-- [Contributing](https://github.com/sirmalloc/ccstatusline#-contributing): guidelines for submitting changes.
+- [开发指南](https://github.com/huangguang1999/ccstatusline-zh#️-开发指南)：使用 Bun 安装依赖、检查、测试与构建。
+- [详细开发说明](https://github.com/huangguang1999/ccstatusline-zh/blob/main/docs/DEVELOPMENT.md)：上游架构和缓存机制说明。
+- [同步基线](https://github.com/huangguang1999/ccstatusline-zh/blob/main/README.md)：README 记录完整上游提交；中文包版本独立递增。
 
-## Optional
+## 相关信息
 
-- [Related Projects](https://github.com/sirmalloc/ccstatusline#-related-projects): other tools in the Claude Code ecosystem.
-- [License](https://github.com/sirmalloc/ccstatusline/blob/main/LICENSE): MIT.
+- [上游项目](https://github.com/sirmalloc/ccstatusline)：英文原版及生态项目。
+- [许可证](https://github.com/huangguang1999/ccstatusline-zh/blob/main/LICENSE)：MIT。
