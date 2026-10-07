@@ -8,6 +8,7 @@ import {
     vi
 } from 'vitest';
 
+import { waitFor } from '../../__tests__/helpers/wait-for-ink';
 import {
     RefreshIntervalMenu,
     buildConfigureStatusLineItems,
@@ -35,7 +36,10 @@ class MockTtyStream extends PassThrough {
     }
 }
 
-interface CapturedWriteStream extends NodeJS.WriteStream { getOutput: () => string }
+interface CapturedWriteStream extends NodeJS.WriteStream {
+    clearOutput: () => void;
+    getOutput: () => string;
+}
 
 function createMockStdin(): NodeJS.ReadStream {
     return new MockTtyStream() as unknown as NodeJS.ReadStream;
@@ -50,16 +54,27 @@ function createMockStdout(): CapturedWriteStream {
     });
 
     return Object.assign(stream as unknown as NodeJS.WriteStream, {
+        clearOutput() {
+            chunks.length = 0;
+        },
         getOutput() {
             return chunks.join('');
         }
     });
 }
 
-function flushInk() {
-    return new Promise((resolve) => {
-        setTimeout(resolve, 25);
+// Sends one key and waits for the redraw it causes to show the expected text
+async function press(stdin: NodeJS.ReadStream, stdout: CapturedWriteStream, key: string, expected: string | RegExp): Promise<void> {
+    stdout.clearOutput();
+    stdin.write(key);
+    await waitFor(() => {
+        expect(stdout.getOutput()).toMatch(expected);
     });
+}
+
+// The menu row marker, the row's icon, then its label
+function selected(label: string): RegExp {
+    return new RegExp(`▶\\s+\\S+\\s+${label}`);
 }
 
 describe('validateRefreshIntervalInput', () => {
@@ -239,25 +254,21 @@ describe('RefreshIntervalMenu', () => {
         );
 
         try {
-            await flushInk();
-            for (let index = 0; index < 3; index++) {
-                stdin.write('\u001B[B');
-                await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toMatch(selected('刷新间隔'));
+            });
+            for (const label of ['Git 缓存 TTL', '自定义命令缓存时长', '终端宽度缓存时长']) {
+                await press(stdin, stdout, '\u001B[B', selected(label));
             }
-            stdin.write('\r');
-            await flushInk();
-
-            expect(stdout.getOutput()).toContain('输入终端宽度缓存时长（秒，0-300）:');
+            await press(stdin, stdout, '\r', '输入终端宽度缓存时长（秒，0-300）:');
             expect(stdout.getOutput()).toContain('未检测到终端宽度');
 
-            stdin.write('\u007F');
-            await flushInk();
-            stdin.write('300');
-            await flushInk();
+            await press(stdin, stdout, '\u007F', '输入终端宽度缓存时长');
+            await press(stdin, stdout, '300', '300');
             stdin.write('\r');
-            await flushInk();
-
-            expect(onTerminalWidthCacheTtlUpdate).toHaveBeenCalledWith(300);
+            await waitFor(() => {
+                expect(onTerminalWidthCacheTtlUpdate).toHaveBeenCalledWith(300);
+            });
             expect(onGitCacheTtlUpdate).not.toHaveBeenCalled();
             expect(onCustomCommandCacheTtlUpdate).not.toHaveBeenCalled();
             expect(onUpdate).not.toHaveBeenCalled();
@@ -300,17 +311,16 @@ describe('RefreshIntervalMenu', () => {
         );
 
         try {
-            await flushInk();
-            stdin.write('\r');
-            await flushInk();
-
-            expect(stdout.getOutput()).toContain('输入刷新间隔（秒，1-60）:');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toMatch(selected('刷新间隔'));
+            });
+            await press(stdin, stdout, '\r', '输入刷新间隔（秒，1-60）:');
             expect(stdout.getOutput()).not.toContain('10s');
 
             stdin.write('\r');
-            await flushInk();
-
-            expect(onUpdate).toHaveBeenCalledWith(null);
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalledWith(null);
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -351,19 +361,17 @@ describe('RefreshIntervalMenu', () => {
         );
 
         try {
-            await flushInk();
-            stdin.write('\u001B[B');
-            await flushInk();
-            stdin.write('\r');
-            await flushInk();
-
-            expect(stdout.getOutput()).toContain('输入 Git 缓存 TTL（秒，0-60）:');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toMatch(selected('刷新间隔'));
+            });
+            await press(stdin, stdout, '\u001B[B', selected('Git 缓存 TTL'));
+            await press(stdin, stdout, '\r', '输入 Git 缓存 TTL（秒，0-60）:');
             expect(stdout.getOutput()).toContain('未暂存和未跟踪的工作区改动');
 
             stdin.write('\r');
-            await flushInk();
-
-            expect(onGitCacheTtlUpdate).toHaveBeenCalledWith(0);
+            await waitFor(() => {
+                expect(onGitCacheTtlUpdate).toHaveBeenCalledWith(0);
+            });
             expect(onUpdate).not.toHaveBeenCalled();
         } finally {
             instance.unmount();
@@ -404,23 +412,19 @@ describe('RefreshIntervalMenu', () => {
         );
 
         try {
-            await flushInk();
-            stdin.write('\u001B[B');
-            await flushInk();
-            stdin.write('\u001B[B');
-            await flushInk();
-            stdin.write('\r');
-            await flushInk();
-
-            expect(stdout.getOutput()).toContain('输入自定义命令缓存时长（秒，0-60）:');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toMatch(selected('刷新间隔'));
+            });
+            await press(stdin, stdout, '\u001B[B', selected('Git 缓存 TTL'));
+            await press(stdin, stdout, '\u001B[B', selected('自定义命令缓存时长'));
+            await press(stdin, stdout, '\r', '输入自定义命令缓存时长（秒，0-60）:');
             expect(stdout.getOutput()).toContain('启动 Shell 的频率');
 
-            stdin.write('7');
-            await flushInk();
+            await press(stdin, stdout, '7', '输入自定义命令缓存时长');
             stdin.write('\r');
-            await flushInk();
-
-            expect(onCustomCommandCacheTtlUpdate).toHaveBeenCalledWith(7);
+            await waitFor(() => {
+                expect(onCustomCommandCacheTtlUpdate).toHaveBeenCalledWith(7);
+            });
             expect(onGitCacheTtlUpdate).not.toHaveBeenCalled();
         } finally {
             instance.unmount();

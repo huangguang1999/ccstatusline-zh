@@ -1,6 +1,6 @@
 ---
-description: 同步上游 sirmalloc/ccstatusline 新 release 到 fork 并完成中文化
-argument-hint: "<upstream-tag, e.g. v2.2.17>"
+description: 同步上游 sirmalloc/ccstatusline release 或 main 到 fork 并完成中文化
+argument-hint: "<upstream-tag 或 main，例如 v2.2.30>"
 ---
 
 # Sync upstream ccstatusline release
@@ -72,7 +72,7 @@ argument-hint: "<upstream-tag, e.g. v2.2.17>"
 
 ### 步骤 0：核对参数
 
-确认 `$ARGUMENTS` 是合法的上游 tag（形如 `v2.2.17`）。如果用户传的是版本号没带 `v`，加上。
+确认 `$ARGUMENTS` 是合法的上游 tag（形如 `v2.2.30`）或 `main`。如果用户传的是版本号没带 `v`，加上。同步 `main` 时，以 fetch 后的 `upstream/main` 完整提交号作为目标，并在 README 中记录。
 
 > **为什么用 git cherry-pick 而不是 jj rebase**：本 fork 的历史是「每次同步
 > squash 成一个 `feat: 同步上游 …` 提交」，与上游的 merge-base 停在很早的位置。
@@ -91,11 +91,12 @@ git checkout -b sync/upstream-$(date +%Y-%m-%d) origin/main
 
 ### 步骤 2：定位增量并 cherry-pick
 
-fork 的 `package.json` version 对应上游某个版本。在 `upstream/main` 历史里按
-package.json version 找到 fork 上次同步到的那个上游 commit，作为 cherry-pick 起点：
+优先读取 README 顶部记录的「上次同步的完整上游提交」，作为 cherry-pick 起点。
+中文包版本号与上游独立递增，不能通过当前 `package.json` version 推断同步基线。
+只有 README 没有记录完整提交号时，才结合历史同步提交和上游 tag 核实起点：
 
 ```bash
-# 逐个 commit 看 package.json version，找到等于 fork 当前版本的最后一个 commit
+# 核对历史同步记录与对应的上游版本
 git log --oneline <range> -- package.json
 git show <commit>:package.json | grep '"version"'
 ```
@@ -116,7 +117,7 @@ cherry-pick 在每个有冲突的 commit 停下。决策规则：
 3. **文件是上游新增的（fork 还没有）** → 取上游版本，扫描其中所有用户可见字符串翻译
 4. **大规模重构冲突**（上游把整个文件结构改了）→ 停下来问用户
 
-`package.json` 的版本冲突：保留 fork 的 `name` / `description`，只取上游的 `version`。
+`package.json` 的版本冲突：保留 fork 的包名、描述和安装入口，合入上游依赖变化；中文包版本按当前中文版本递增，不能被上游版本覆盖或降低。
 `README.md` 冲突：fork 的 README 是全中文自定义结构，一律保留 fork 侧
 （`git checkout --ours README.md`），版本相关信息在步骤 6 手动更新。
 
@@ -151,9 +152,10 @@ env -u HTTPS_PROXY -u HTTP_PROXY -u ALL_PROXY \
 
 ### 步骤 6：README + 版本号一致
 
-- `package.json` version 应该已经被上游 rebase 同步
+- `package.json` 使用独立递增的中文包版本号
 - `README.md`：
   - 顶部「同步至上游 vX.Y.Z」一行
+  - 「上次同步的完整上游提交」和本次核对日期
   - 「关于本项目」章节里如果有版本特性列表，补一行 `$ARGUMENTS` 新增功能
   - 「与上游的差异」表格中「同步版本」单元格
   - 「可用组件」表格：如果上游加了新 widget，补到对应类别

@@ -31,11 +31,14 @@ import {
     toggleUsageInverted
 } from './shared/usage-display';
 
+const LABEL = '超额: ';
+
 export class ExtraUsageUtilizationWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
     getDescription(): string { return '显示超额用量（按量付费）占比百分比'; }
     getDisplayName(): string { return '超额用量占比'; }
     getCategory(): string { return '用量'; }
+    getLabelPrefix(): string { return LABEL; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return {
@@ -72,23 +75,23 @@ export class ExtraUsageUtilizationWidget implements Widget {
             if (isUsageProgressMode(displayMode)) {
                 const width = getUsageProgressBarWidth(displayMode);
                 const progressBar = makeTimerProgressBar(renderedPercent, width);
-                return formatRawOrLabeledValue(item, '超额: ', `[${progressBar}] ${formatPercent(renderedPercent, format)}`);
+                return formatRawOrLabeledValue(item, this.getLabelPrefix(), `[${progressBar}] ${formatPercent(renderedPercent, format)}`);
             }
 
             if (isUsageSliderMode(displayMode)) {
                 const slider = makeSliderBar(renderedPercent);
                 const sliderDisplay = displayMode === 'slider' ? `${slider} ${formatPercent(renderedPercent, format)}` : slider;
-                return formatRawOrLabeledValue(item, '超额: ', sliderDisplay);
+                return formatRawOrLabeledValue(item, this.getLabelPrefix(), sliderDisplay);
             }
 
-            return formatRawOrLabeledValue(item, '超额: ', formatPercent(renderedPercent, format));
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), formatPercent(renderedPercent, format));
         }
 
         const data = context.usageData ?? {};
         if (data.extraUsageEnabled === false) {
             return isHidden(item, EXTRA_USAGE_DISABLED_HIDEABLE_STATE.key)
                 ? null
-                : formatRawOrLabeledValue(item, '超额: ', 'n/a');
+                : formatRawOrLabeledValue(item, this.getLabelPrefix(), 'n/a');
         }
         if (data.extraUsageEnabled !== true || data.extraUsageUtilization === undefined) {
             if (data.error) {
@@ -106,16 +109,16 @@ export class ExtraUsageUtilizationWidget implements Widget {
         if (isUsageProgressMode(displayMode)) {
             const width = getUsageProgressBarWidth(displayMode);
             const progressBar = makeTimerProgressBar(renderedPercent, width);
-            return formatRawOrLabeledValue(item, '超额: ', `[${progressBar}] ${formatPercent(renderedPercent, format)}`);
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), `[${progressBar}] ${formatPercent(renderedPercent, format)}`);
         }
 
         if (isUsageSliderMode(displayMode)) {
             const slider = makeSliderBar(renderedPercent);
             const sliderDisplay = displayMode === 'slider' ? `${slider} ${formatPercent(renderedPercent, format)}` : slider;
-            return formatRawOrLabeledValue(item, '超额: ', sliderDisplay);
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), sliderDisplay);
         }
 
-        return formatRawOrLabeledValue(item, '超额: ', formatPercent(renderedPercent, format));
+        return formatRawOrLabeledValue(item, this.getLabelPrefix(), formatPercent(renderedPercent, format));
     }
 
     getCustomKeybinds(item?: WidgetItem): CustomKeybind[] {

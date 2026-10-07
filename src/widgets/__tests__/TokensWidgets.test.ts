@@ -197,6 +197,139 @@ describe('Token widgets', () => {
         }, zeroContext, DEFAULT_SETTINGS)).toBeNull();
     });
 
+    it('renders nothing for input and output when neither tokenMetrics nor context_window has data', async () => {
+        const { TokensInputWidget, TokensOutputWidget } = await loadWidgets();
+
+        for (const context of [{}, { data: {} }, { tokenMetrics: null }] as RenderContext[]) {
+            expect(new TokensInputWidget().render({ id: 'in', type: 'tokens-input' }, context, DEFAULT_SETTINGS)).toBeNull();
+            expect(new TokensOutputWidget().render({ id: 'out', type: 'tokens-output' }, context, DEFAULT_SETTINGS)).toBeNull();
+        }
+    });
+
+    it('keeps a zero tokenMetrics count over the context_window totals for input and output', async () => {
+        const { TokensInputWidget, TokensOutputWidget } = await loadWidgets();
+        const context: RenderContext = {
+            data: {
+                context_window: {
+                    total_input_tokens: 1111,
+                    total_output_tokens: 2222
+                }
+            },
+            tokenMetrics: {
+                inputTokens: 0,
+                outputTokens: 0,
+                cachedTokens: 0,
+                totalTokens: 0,
+                contextLength: 0
+            }
+        };
+
+        expect(new TokensInputWidget().render({ id: 'in', type: 'tokens-input' }, context, DEFAULT_SETTINGS)).toBe('输入: fmt:0');
+        expect(new TokensOutputWidget().render({ id: 'out', type: 'tokens-output' }, context, DEFAULT_SETTINGS)).toBe('输出: fmt:0');
+        expect(new TokensInputWidget().render({ id: 'in', type: 'tokens-input', metadata: { hide: 'zero' } }, context, DEFAULT_SETTINGS)).toBeNull();
+        expect(new TokensOutputWidget().render({ id: 'out', type: 'tokens-output', metadata: { hide: 'zero' } }, context, DEFAULT_SETTINGS)).toBeNull();
+    });
+
+    it('hides a zero context_window fallback when the zero hide state is enabled', async () => {
+        const { TokensInputWidget, TokensOutputWidget } = await loadWidgets();
+        const context: RenderContext = {
+            data: {
+                context_window: {
+                    total_input_tokens: 0,
+                    total_output_tokens: 0
+                }
+            }
+        };
+
+        expect(new TokensInputWidget().render({ id: 'in', type: 'tokens-input' }, context, DEFAULT_SETTINGS)).toBe('输入: fmt:0');
+        expect(new TokensOutputWidget().render({ id: 'out', type: 'tokens-output', rawValue: true }, context, DEFAULT_SETTINGS)).toBe('fmt:0');
+        expect(new TokensInputWidget().render({ id: 'in', type: 'tokens-input', metadata: { hide: 'zero' } }, context, DEFAULT_SETTINGS)).toBeNull();
+        expect(new TokensOutputWidget().render({ id: 'out', type: 'tokens-output', metadata: { hide: 'zero' } }, context, DEFAULT_SETTINGS)).toBeNull();
+    });
+
+    it('keeps non-zero counts and the preview sample when zero counts are hidden', async () => {
+        const { TokensCachedWidget, TokensInputWidget, TokensOutputWidget, TokensTotalWidget } = await loadWidgets();
+        const metadata = { hide: 'zero' };
+        const context: RenderContext = {
+            tokenMetrics: {
+                inputTokens: 1,
+                outputTokens: 2,
+                cachedTokens: 3,
+                totalTokens: 6,
+                contextLength: 0
+            }
+        };
+        const previewZeroContext: RenderContext = {
+            isPreview: true,
+            tokenMetrics: {
+                inputTokens: 0,
+                outputTokens: 0,
+                cachedTokens: 0,
+                totalTokens: 0,
+                contextLength: 0
+            }
+        };
+
+        expect(new TokensInputWidget().render({ id: 'in', type: 'tokens-input', metadata }, context, DEFAULT_SETTINGS)).toBe('输入: fmt:1');
+        expect(new TokensOutputWidget().render({ id: 'out', type: 'tokens-output', metadata }, context, DEFAULT_SETTINGS)).toBe('输出: fmt:2');
+        expect(new TokensCachedWidget().render({ id: 'cached', type: 'tokens-cached', metadata }, context, DEFAULT_SETTINGS)).toBe('缓存: fmt:3');
+        expect(new TokensTotalWidget().render({ id: 'total', type: 'tokens-total', metadata }, context, DEFAULT_SETTINGS)).toBe('合计: fmt:6');
+
+        expect(new TokensInputWidget().render({ id: 'in', type: 'tokens-input', metadata }, previewZeroContext, DEFAULT_SETTINGS)).toBe('输入: fmt:15200');
+        expect(new TokensOutputWidget().render({ id: 'out', type: 'tokens-output', metadata }, previewZeroContext, DEFAULT_SETTINGS)).toBe('输出: fmt:3400');
+        expect(new TokensCachedWidget().render({ id: 'cached', type: 'tokens-cached', metadata }, previewZeroContext, DEFAULT_SETTINGS)).toBe('缓存: fmt:12000');
+        expect(new TokensTotalWidget().render({ id: 'total', type: 'tokens-total', metadata }, previewZeroContext, DEFAULT_SETTINGS)).toBe('合计: fmt:30600');
+    });
+
+    it('resolves a global token number format over the widget format', async () => {
+        const { TokensCachedWidget, TokensInputWidget, TokensOutputWidget, TokensTotalWidget } = await loadWidgets();
+        const context: RenderContext = {
+            tokenMetrics: {
+                inputTokens: 1000,
+                outputTokens: 2000,
+                cachedTokens: 3000,
+                totalTokens: 6000,
+                contextLength: 0
+            }
+        };
+        const settings = { ...DEFAULT_SETTINGS, numberFormat: { token: { style: 'whole' as const }, cost: { decimals: 4 } } };
+        const numberFormat = { style: 'compact' as const };
+
+        new TokensInputWidget().render({ id: 'in', type: 'tokens-input', numberFormat }, context, settings);
+        new TokensOutputWidget().render({ id: 'out', type: 'tokens-output', numberFormat }, context, settings);
+        new TokensCachedWidget().render({ id: 'cached', type: 'tokens-cached', numberFormat }, context, settings);
+        new TokensTotalWidget().render({ id: 'total', type: 'tokens-total', numberFormat }, { isPreview: true }, settings);
+
+        expect(renderer.formatTokens).toHaveBeenNthCalledWith(1, 1000, { style: 'whole' });
+        expect(renderer.formatTokens).toHaveBeenNthCalledWith(2, 2000, { style: 'whole' });
+        expect(renderer.formatTokens).toHaveBeenNthCalledWith(3, 3000, { style: 'whole' });
+        expect(renderer.formatTokens).toHaveBeenNthCalledWith(4, 30600, { style: 'whole' });
+    });
+
+    it('describes each token widget and its editor row', async () => {
+        const { TokensCachedWidget, TokensInputWidget, TokensOutputWidget, TokensTotalWidget } = await loadWidgets();
+        const cases = [
+            { widget: new TokensInputWidget(), type: 'tokens-input', name: '输入 Token', color: 'blue', description: '显示当前会话的输入 Token 数' },
+            { widget: new TokensOutputWidget(), type: 'tokens-output', name: '输出 Token', color: 'white', description: '显示当前会话的输出 Token 数' },
+            { widget: new TokensCachedWidget(), type: 'tokens-cached', name: '缓存 Token', color: 'cyan', description: '显示当前会话的缓存 Token 数' },
+            { widget: new TokensTotalWidget(), type: 'tokens-total', name: '总 Token', color: 'cyan', description: '显示当前会话的总 Token 数（输入 + 输出 + 缓存）' }
+        ];
+
+        for (const { widget, type, name, color, description } of cases) {
+            const item = { id: type, type, rawValue: true, metadata: { hide: 'zero' }, numberFormat: { style: 'compact' as const } };
+
+            expect(widget.getDisplayName()).toBe(name);
+            expect(widget.getDescription()).toBe(description);
+            expect(widget.getDefaultColor()).toBe(color);
+            expect(widget.getCategory()).toBe('Token');
+            expect(widget.getEditorDisplay(item)).toEqual({ displayText: name });
+            expect(widget.getHideableStates()).toEqual([{ key: 'zero', label: 'Token 数为零时' }]);
+            expect(widget.supportsRawValue()).toBe(true);
+            expect(widget.supportsColors(item)).toBe(true);
+            expect(widget.supportsNumberFormat()).toBe(true);
+        }
+    });
+
     it('declares the zero hideable state for all token widgets', async () => {
         const { TokensCachedWidget, TokensInputWidget, TokensOutputWidget, TokensTotalWidget } = await loadWidgets();
 
@@ -217,6 +350,28 @@ describe('Token widgets', () => {
         expect(new TokensCachedWidget().render({ id: 'cached', type: 'tokens-cached', rawValue: true }, context, DEFAULT_SETTINGS)).toBe('fmt:12000');
         expect(new TokensTotalWidget().render({ id: 'total', type: 'tokens-total' }, context, DEFAULT_SETTINGS)).toBe('合计: fmt:30600');
         expect(new TokensTotalWidget().render({ id: 'total', type: 'tokens-total', rawValue: true }, context, DEFAULT_SETTINGS)).toBe('fmt:30600');
+    });
+
+    it('exposes editable labels and applies overrides to live and preview counts', async () => {
+        const { TokensCachedWidget, TokensInputWidget, TokensOutputWidget, TokensTotalWidget } = await loadWidgets();
+        const context: RenderContext = { tokenMetrics: { inputTokens: 1, outputTokens: 2, cachedTokens: 3, totalTokens: 6, contextLength: 0 } };
+        const cases = [
+            { widget: new TokensInputWidget(), type: 'tokens-input', label: '输入: ', count: 1, preview: 15200 },
+            { widget: new TokensOutputWidget(), type: 'tokens-output', label: '输出: ', count: 2, preview: 3400 },
+            { widget: new TokensCachedWidget(), type: 'tokens-cached', label: '缓存: ', count: 3, preview: 12000 },
+            { widget: new TokensTotalWidget(), type: 'tokens-total', label: '合计: ', count: 6, preview: 30600 }
+        ];
+
+        for (const { widget, type, label, count, preview } of cases) {
+            expect(widget.getLabelPrefix()).toBe(label);
+            for (const isPreview of [false, true]) {
+                const value = `fmt:${isPreview ? preview : count}`;
+                const renderContext = { ...context, isPreview };
+                expect(widget.render({ id: type, type, metadata: { label: 'T ' } }, renderContext, DEFAULT_SETTINGS)).toBe(`T ${value}`);
+                expect(widget.render({ id: type, type, metadata: { label: '' } }, renderContext, DEFAULT_SETTINGS)).toBe(value);
+                expect(widget.render({ id: type, type, rawValue: true, metadata: { label: 'T ' } }, renderContext, DEFAULT_SETTINGS)).toBe(value);
+            }
+        }
     });
 
     it('formats every preview sample with the selected token style', async () => {

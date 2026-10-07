@@ -343,12 +343,12 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
         if (gradientCustomStep) {
             return (
                 <Box flexDirection='column'>
-                    <Text bold>Custom Gradient - Override FG Color</Text>
+                    <Text bold>自定义渐变 - 覆盖前景色</Text>
                     <Box marginTop={1} flexDirection='column'>
-                        <Text>{gradientCustomStep === 'start' ? 'Enter START hex color (without #):' : 'Enter END hex color (without #):'}</Text>
+                        <Text>{gradientCustomStep === 'start' ? '输入起始颜色的十六进制值（不含 #）：' : '输入结束颜色的十六进制值（不含 #）：'}</Text>
                         {gradientCustomStep === 'end' && (
                             <Text dimColor>
-                                Start: #
+                                起始颜色：#
                                 {gradientStartHex}
                             </Text>
                         )}
@@ -358,7 +358,7 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
                             <Text dimColor>{gradientHexInput.length < 6 ? '_'.repeat(6 - gradientHexInput.length) : ''}</Text>
                         </Text>
                         <Text> </Text>
-                        <Text dimColor>Press Enter when done, ESC to go back</Text>
+                        <Text dimColor>按 Enter 确认，ESC 返回</Text>
                     </Box>
                 </Box>
             );
@@ -366,9 +366,9 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
 
         return (
             <Box flexDirection='column'>
-                <Text bold>Select Gradient - Override FG Color</Text>
+                <Text bold>选择渐变 - 覆盖前景色</Text>
                 <Box marginTop={1}>
-                    <Text dimColor>↑↓ to select, Enter to apply, ESC to cancel</Text>
+                    <Text dimColor>↑↓ 选择，Enter 应用，ESC 取消</Text>
                 </Box>
                 <Box marginTop={1} flexDirection='column'>
                     {GRADIENT_PRESET_NAMES.map((name, idx) => (
@@ -379,7 +379,7 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
                     ))}
                     <Text key='custom'>
                         {gradientIndex === GRADIENT_PRESET_NAMES.length ? '▶ ' : '  '}
-                        Custom (enter two hex stops)
+                        自定义（输入起止颜色的十六进制值）
                     </Text>
                 </Box>
             </Box>

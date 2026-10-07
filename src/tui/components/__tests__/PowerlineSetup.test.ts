@@ -10,6 +10,7 @@ import {
 } from 'vitest';
 
 import { DEFAULT_SETTINGS } from '../../../types/Settings';
+import { waitFor } from '../../__tests__/helpers/wait-for-ink';
 import {
     PowerlineSeparatorEditor,
     type PowerlineSeparatorEditorProps
@@ -59,12 +60,6 @@ function createMockStdout(): CapturedWriteStream {
         getOutput() {
             return chunks.join('');
         }
-    });
-}
-
-function flushInk() {
-    return new Promise((resolve) => {
-        setTimeout(resolve, 25);
     });
 }
 
@@ -162,11 +157,14 @@ describe('PowerlineSetup helpers', () => {
         );
 
         try {
-            await flushInk();
-            expect(stdout.getOutput()).toContain('主题色延续:');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('主题色延续:');
+            });
 
             stdin.write('c');
-            await flushInk();
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalled();
+            });
 
             const updatedSettings = onUpdate.mock.calls[0]?.[0];
             expect(updatedSettings).toBeDefined();
@@ -217,10 +215,10 @@ describe('PowerlineSetup helpers', () => {
         );
 
         try {
-            await flushInk();
-
-            expect(stdout.getOutput()).toContain('Powerline 设置');
-            expect(stdout.getOutput()).toContain('⚠ 前景色全局覆盖已激活');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('Powerline 设置');
+                expect(stdout.getOutput()).toContain('⚠ 前景色全局覆盖已激活');
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -271,11 +269,14 @@ describe('PowerlineSeparatorEditor', () => {
         );
 
         try {
-            await flushInk();
-            expect(stdout.getOutput()).toContain('(a)添加');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('(a)添加');
+            });
 
             stdin.write('a');
-            await flushInk();
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalled();
+            });
 
             const updatedSettings = onUpdate.mock.calls[0]?.[0];
             expect(updatedSettings).toBeDefined();

@@ -31,7 +31,7 @@ const EDIT_LIST_LIMIT_ACTION = 'edit-list-limit';
 const EMPTY_HIDEABLE_STATE: HideableState = { key: 'empty', label: '尚未使用技能时' };
 
 function parseListLimit(item: WidgetItem): number {
-    const parsed = parseInt(item.metadata?.[LIST_LIMIT_KEY] ?? '0', 10);
+    const parsed = Number.parseInt(item.metadata?.[LIST_LIMIT_KEY] ?? '0', 10);
     if (Number.isNaN(parsed) || parsed < 0) {
         return 0;
     }
@@ -173,7 +173,7 @@ const SkillsEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, onCance
         }
 
         if (key.return) {
-            const parsed = parseInt(limitInput, 10);
+            const parsed = Number.parseInt(limitInput, 10);
             const limit = Number.isNaN(parsed) || parsed < 0 ? 0 : parsed;
             onComplete(setListLimit(widget, limit));
         } else if (key.escape) {
@@ -189,14 +189,14 @@ const SkillsEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, onCance
         return (
             <Box flexDirection='column'>
                 <Box>
-                    <Text>Enter max skills to show (0 for unlimited): </Text>
+                    <Text>输入最多显示的技能数量（0 表示不限制）： </Text>
                     <Text>{limitInput}</Text>
                     <Text backgroundColor='gray' color='black'>{' '}</Text>
                 </Box>
-                <Text dimColor>Press Enter to save, ESC to cancel</Text>
+                <Text dimColor>按 Enter 保存，ESC 取消</Text>
             </Box>
         );
     }
 
-    return <Text>Unknown editor mode</Text>;
+    return <Text>未知编辑模式</Text>;
 };

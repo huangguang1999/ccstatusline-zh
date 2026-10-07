@@ -11,6 +11,8 @@ import {
 } from 'vitest';
 
 import { DEFAULT_SETTINGS } from '../../../types/Settings';
+import { getVisibleWidth } from '../../../utils/ansi';
+import { waitFor } from '../../__tests__/helpers/wait-for-ink';
 import { GlobalOverridesMenu } from '../GlobalOverridesMenu';
 
 class MockTtyStream extends PassThrough {
@@ -58,12 +60,6 @@ function createMockStdout(): CapturedWriteStream {
     });
 }
 
-function flushInk() {
-    return new Promise((resolve) => {
-        setTimeout(resolve, 25);
-    });
-}
-
 describe('GlobalOverridesMenu', () => {
     afterEach(() => {
         vi.restoreAllMocks();
@@ -93,9 +89,10 @@ describe('GlobalOverridesMenu', () => {
         );
 
         try {
-            await flushInk();
-            expect(stdout.getOutput()).toContain('极简模式:');
-            expect(stdout.getOutput()).toContain('✗ 已禁用');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('极简模式:');
+                expect(stdout.getOutput()).toContain('✗ 已禁用');
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -127,17 +124,19 @@ describe('GlobalOverridesMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('极简模式:');
+            });
             stdout.clearOutput();
             stdin.write('n');
-            await flushInk();
-
-            const numberRows = stripAnsi(stdout.getOutput())
+            const numberRows = () => stripAnsi(stdout.getOutput())
                 .split('\n')
-                .filter(line => /(?:令牌|速度|占比|内存|费用): 固定小数/.test(line));
-            const colonColumns = new Set(numberRows.map(line => line.indexOf(':')));
+                .filter(line => /(?:令牌|速度|占比|内存|费用): 固定小数（默认）/.test(line));
+            await waitFor(() => {
+                expect(numberRows()).toHaveLength(5);
+            });
 
-            expect(numberRows).toHaveLength(5);
+            const colonColumns = new Set(numberRows().map(line => getVisibleWidth(line.slice(0, line.indexOf(':')))));
             expect(colonColumns.size).toBe(1);
         } finally {
             instance.unmount();
@@ -172,11 +171,13 @@ describe('GlobalOverridesMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('极简模式:');
+            });
             stdin.write('m');
-            await flushInk();
-
-            expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ minimalistMode: true }));
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ minimalistMode: true }));
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -210,11 +211,13 @@ describe('GlobalOverridesMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('极简模式:');
+            });
             stdin.write('m');
-            await flushInk();
-
-            expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ minimalistMode: false }));
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ minimalistMode: false }));
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -248,9 +251,10 @@ describe('GlobalOverridesMenu', () => {
         );
 
         try {
-            await flushInk();
-            expect(stdout.getOutput()).toContain('内边距方向:');
-            expect(stdout.getOutput()).toContain('两侧');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('内边距方向:');
+                expect(stdout.getOutput()).toContain('两侧');
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -288,11 +292,13 @@ describe('GlobalOverridesMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('极简模式:');
+            });
             stdin.write('d');
-            await flushInk();
-
-            expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ defaultPaddingSide: expected }));
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ defaultPaddingSide: expected }));
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -326,10 +332,10 @@ describe('GlobalOverridesMenu', () => {
         );
 
         try {
-            await flushInk();
-            const output = stdout.getOutput();
-            expect(output).toContain('覆盖前景色:');
-            expect(output).toContain('(f) 切换，(g) 渐变色，(x) 清除');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('覆盖前景色:');
+                expect(stdout.getOutput()).toContain('(f) 切换，(g) 渐变色，(x) 清除');
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -363,15 +369,18 @@ describe('GlobalOverridesMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('极简模式:');
+            });
             stdin.write('g');
-            await flushInk();
-            expect(stdout.getOutput()).toContain('Select Gradient - Override FG Color');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('选择渐变 - 覆盖前景色');
+            });
 
             stdin.write('\r');
-            await flushInk();
-
-            expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ overrideForegroundColor: 'gradient:atlas' }));
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ overrideForegroundColor: 'gradient:atlas' }));
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -405,11 +414,13 @@ describe('GlobalOverridesMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('极简模式:');
+            });
             stdin.write('x');
-            await flushInk();
-
-            expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ overrideForegroundColor: undefined }));
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ overrideForegroundColor: undefined }));
+            });
         } finally {
             instance.unmount();
             instance.cleanup();

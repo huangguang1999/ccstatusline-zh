@@ -148,6 +148,7 @@ describe('WeeklyResetTimerWidget', () => {
 
         expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer' }, { usageData: {} })).toBe('周重置: [加载中]');
         expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer', rawValue: true }, { usageData: {} })).toBe('[Loading]');
+        expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer', metadata: { display: 'progress' } }, { usageData: {} })).toBe('周重置 [加载中]');
     });
 
     it('declares the no-data hideable state', () => {
@@ -163,7 +164,7 @@ describe('WeeklyResetTimerWidget', () => {
         const widget = new WeeklyResetTimerWidget();
 
         mockResolveWeeklyUsageWindow.mockReturnValue(null);
-        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+        mockGetUsageErrorMessage.mockReturnValue('[超时]');
 
         expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer', metadata: { hide: 'no-data' } }, { usageData })).toBeNull();
     });
@@ -172,10 +173,10 @@ describe('WeeklyResetTimerWidget', () => {
         const widget = new WeeklyResetTimerWidget();
 
         mockResolveWeeklyUsageWindow.mockReturnValue(null);
-        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+        mockGetUsageErrorMessage.mockReturnValue('[超时]');
 
         expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer', metadata: { hide: '' } }, { usageData: {} })).toBe('周重置: [加载中]');
-        expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer' }, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
+        expect(render(widget, { id: 'weekly-reset', type: 'weekly-reset-timer' }, { usageData: { error: 'timeout' } })).toBe('[超时]');
     });
 
     it('shows raw value without label in time mode', () => {

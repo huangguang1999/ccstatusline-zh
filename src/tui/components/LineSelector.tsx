@@ -3,7 +3,6 @@ import {
     Text,
     useInput
 } from 'ink';
-import pluralize from 'pluralize';
 import React, {
     useEffect,
     useMemo,
@@ -193,8 +192,7 @@ const LineSelector: React.FC<LineSelectorProps> = ({
                     <Text bold>
                         <Text>
                             <Text>
-                                ☰ 第
-                                {selectedIndex + 1}
+                                {`☰ 第 ${selectedIndex + 1} 行`}
                             </Text>
                             {' '}
                             <Text dimColor>
@@ -260,8 +258,8 @@ const LineSelector: React.FC<LineSelectorProps> = ({
                         {localLines.map((line, index) => {
                             const isSelected = selectedIndex === index;
                             const suffix = line.length
-                                ? pluralize('widget', line.length, true)
-                                : 'empty';
+                                ? `${line.length} 个组件`
+                                : '空';
 
                             return (
                                 <Box key={index}>
@@ -269,9 +267,7 @@ const LineSelector: React.FC<LineSelectorProps> = ({
                                         <Text>{isSelected ? '◆  ' : '   '}</Text>
                                         <Text>
                                             <Text>
-                                                ☰ 第
-                                                {' '}
-                                                {index + 1}
+                                                {`☰ 第 ${index + 1} 行`}
                                             </Text>
                                             {' '}
                                             <Text dimColor={!isSelected}>

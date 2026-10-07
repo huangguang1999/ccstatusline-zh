@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 
 import type { RenderContext } from '../types/RenderContext';
 import type { Settings } from '../types/Settings';
@@ -22,6 +22,8 @@ import {
     renderSymbolSlotsEditor,
     type SymbolSlot
 } from './shared/symbol-override';
+
+const LABEL = '缓存: ';
 
 // Anthropic's ephemeral prompt cache defaults to a 5-minute TTL, but Claude Code
 // also writes 1-hour breakpoints (cache_control ttl: "1h") for the stable prefix.
@@ -250,6 +252,7 @@ export class CacheTimerWidget implements Widget {
     getDescription(): string { return '显示提示词缓存 TTL 的剩余时间（默认 5 分钟，可切换为 1 小时）'; }
     getDisplayName(): string { return '缓存计时器'; }
     getCategory(): string { return '会话'; }
+    getLabelPrefix(): string { return LABEL; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         const modifiers: string[] = [];
@@ -280,30 +283,30 @@ export class CacheTimerWidget implements Widget {
         const hideWhenEmpty = isHidden(item, CACHE_EMPTY_HIDEABLE_STATE.key);
 
         if (context.isPreview) {
-            return formatRawOrLabeledValue(item, '缓存: ', withGlyph(getSlotSymbol(item, FRESH_SLOT), '4:52'));
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), withGlyph(getSlotSymbol(item, FRESH_SLOT), '4:52'));
         }
 
         const transcriptPath = context.data?.transcript_path;
         if (!transcriptPath) {
-            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, '缓存: ', localizeStateValue(item, 'n/a'));
+            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, this.getLabelPrefix(), localizeStateValue(item, 'n/a'));
         }
 
         const state = getTranscriptState(transcriptPath);
 
         if (state.isWorking) {
-            return formatRawOrLabeledValue(item, '缓存: ', withGlyph(getSlotSymbol(item, HOT_SLOT), localizeStateValue(item, 'HOT')));
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), withGlyph(getSlotSymbol(item, HOT_SLOT), localizeStateValue(item, 'HOT')));
         }
 
         const { lastAssistant } = state;
         if (!lastAssistant) {
-            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, '缓存: ', localizeStateValue(item, 'n/a'));
+            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, this.getLabelPrefix(), localizeStateValue(item, 'n/a'));
         }
 
         const ttlSeconds = getTtlSeconds(item);
         const remaining = getRemainingSeconds(lastAssistant, ttlSeconds);
         const glyph = getStateSymbol(item, remaining, ttlSeconds);
 
-        return formatRawOrLabeledValue(item, '缓存: ', withGlyph(glyph, localizeStateValue(item, formatCountdown(remaining))));
+        return formatRawOrLabeledValue(item, this.getLabelPrefix(), withGlyph(glyph, localizeStateValue(item, formatCountdown(remaining))));
     }
 
     getCustomKeybinds(): CustomKeybind[] {

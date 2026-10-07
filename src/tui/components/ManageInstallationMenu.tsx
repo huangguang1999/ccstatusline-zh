@@ -144,7 +144,7 @@ export const ManageInstallationMenu: React.FC<ManageInstallationMenuProps> = ({
 
     return (
         <Box flexDirection='column'>
-            <Text bold>Manage Installation</Text>
+            <Text bold>管理安装</Text>
             <Box marginTop={1}>
                 <Text>
                     当前:

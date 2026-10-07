@@ -31,9 +31,16 @@ import {
     getHideKeybind,
     getHideModifierText
 } from '../../widgets/shared/hideable';
+import {
+    EDIT_LABEL_ACTION,
+    clearLabel,
+    getLabelKeybind,
+    getLabelModifierText
+} from '../../widgets/shared/raw-or-labeled';
 
 import { ConfirmDialog } from './ConfirmDialog';
 import { HideStatesEditor } from './HideStatesEditor';
+import { LabelEditor } from './LabelEditor';
 import {
     handleMoveInputMode,
     handleNormalInputMode,
@@ -132,6 +139,12 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
             keybinds.push(getHideKeybind());
         }
 
+        // The label only shows when raw value is off, so the editor is offered
+        // only then. Like 'h', widgets must leave this key unbound.
+        if (widgetImpl.getLabelPrefix && !widget.rawValue) {
+            keybinds.push(getLabelKeybind());
+        }
+
         return keybinds;
     };
 
@@ -162,7 +175,10 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
             const currentWidget = widgets[selectedIndex];
             if (currentWidget) {
                 const newWidgets = [...widgets];
-                newWidgets[selectedIndex] = { ...currentWidget, type: selectedType };
+                // Other metadata carries over, but a label names the old widget's value
+                newWidgets[selectedIndex] = currentWidget.type === selectedType
+                    ? currentWidget
+                    : { ...clearLabel(currentWidget), type: selectedType };
                 onUpdate(newWidgets);
             }
         } else {
@@ -344,6 +360,17 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
             <HideStatesEditor
                 widget={customEditorWidget.widget}
                 states={customEditorWidget.impl.getHideableStates?.() ?? []}
+                onComplete={handleEditorComplete}
+                onCancel={handleEditorCancel}
+            />
+        );
+    }
+
+    if (customEditorWidget?.action === EDIT_LABEL_ACTION && customEditorWidget.impl.getLabelPrefix) {
+        return (
+            <LabelEditor
+                widget={customEditorWidget.widget}
+                defaultLabel={customEditorWidget.impl.getLabelPrefix(customEditorWidget.widget)}
                 onComplete={handleEditorComplete}
                 onCancel={handleEditorCancel}
             />
@@ -583,6 +610,7 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
                                     ? getNumberFormatModifierText(widget)
                                     : undefined;
                                 const hideModifierText = widgetImpl ? getHideModifierText(widget, widgetImpl.getHideableStates?.() ?? []) : undefined;
+                                const labelModifierText = widgetImpl?.getLabelPrefix && !widget.rawValue ? getLabelModifierText(widget) : undefined;
 
                                 return (
                                     <Box key={widget.id} flexDirection='row' flexWrap='nowrap'>
@@ -612,10 +640,16 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({ widgets, onUpdate, onB
                                                 {hideModifierText}
                                             </Text>
                                         )}
+                                        {labelModifierText && (
+                                            <Text dimColor>
+                                                {' '}
+                                                {labelModifierText}
+                                            </Text>
+                                        )}
                                         {supportsRawValue && widget.rawValue && <Text dimColor> (纯值)</Text>}
-                                        {widget.merge === true && <Text dimColor> (已合并→)</Text>}
-                                        {widget.merge === 'no-padding' && <Text dimColor> (合并无间距→)</Text>}
-                                        {widget.excludeFromAutoAlign && settings.powerline.enabled && settings.powerline.autoAlign && !isMergedIntoPreviousWidget(widgets, index) && <Text dimColor> (不参与对齐)</Text>}
+                                        {widget.merge === true && <Text dimColor> (merged→)</Text>}
+                                        {widget.merge === 'no-padding' && <Text dimColor> (merged-no-pad→)</Text>}
+                                        {widget.excludeFromAutoAlign && settings.powerline.enabled && settings.powerline.autoAlign && !isMergedIntoPreviousWidget(widgets, index) && <Text dimColor> (no-align)</Text>}
                                     </Box>
                                 );
                             })}

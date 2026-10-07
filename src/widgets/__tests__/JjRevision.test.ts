@@ -1,4 +1,4 @@
-import { execFileSync } from 'child_process';
+import { execFileSync } from 'node:child_process';
 import {
     beforeEach,
     describe,
@@ -12,7 +12,7 @@ import { DEFAULT_SETTINGS } from '../../types/Settings';
 import type { WidgetItem } from '../../types/Widget';
 import { JjRevisionWidget } from '../JjRevision';
 
-vi.mock('child_process', () => ({ execFileSync: vi.fn() }));
+vi.mock('node:child_process', () => ({ execFileSync: vi.fn() }));
 
 const mockExecFileSync = execFileSync as unknown as {
     mock: { calls: unknown[][] };
@@ -95,7 +95,7 @@ describe('JjRevisionWidget', () => {
     it('should render no jj when not in jj repo', () => {
         mockExecFileSync.mockImplementation(() => { throw new Error('Not a jj repo'); });
 
-        expect(render()).toBe(' no jj');
+        expect(render()).toBe(' 无 JJ');
     });
 
     it('should hide no jj when configured', () => {
@@ -108,6 +108,6 @@ describe('JjRevisionWidget', () => {
         mockExecFileSync.mockReturnValueOnce('/tmp/repo\n');
         mockExecFileSync.mockReturnValueOnce('');
 
-        expect(render()).toBe(' no jj');
+        expect(render()).toBe(' 无 JJ');
     });
 });

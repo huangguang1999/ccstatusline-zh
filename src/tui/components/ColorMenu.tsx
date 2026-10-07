@@ -123,8 +123,8 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
                 setAnsi256Input('');
             } else if (key.return) {
                 // Validate and apply the ansi256 color
-                const code = parseInt(ansi256Input, 10);
-                if (!isNaN(code) && code >= 0 && code <= 255) {
+                const code = Number.parseInt(ansi256Input, 10);
+                if (!Number.isNaN(code) && code >= 0 && code <= 255) {
                     const ansiColor = `ansi256:${code}`;
 
                     const selectedWidget = colorableWidgets.find(widget => widget.id === highlightedItemId);
@@ -143,7 +143,7 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
                 // Only accept numeric characters (0-9)
                 if (/^[0-9]$/.test(input)) {
                     const newInput = ansi256Input + input;
-                    const code = parseInt(newInput, 10);
+                    const code = Number.parseInt(newInput, 10);
                     // Only allow if it won't exceed 255
                     if (code <= 255) {
                         setAnsi256Input(newInput);
@@ -363,7 +363,7 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
             value: widget.id
         };
     });
-    menuItems.push({ label: '← Back', value: 'back' });
+    menuItems.push({ label: '← 返回', value: 'back' });
 
     const handleSelect = (selected: { value: string }) => {
         if (selected.value === 'back') {
@@ -416,7 +416,7 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
         }
     } else {
         if (!currentColor || currentColor === '') {
-            colorDisplay = chalk.gray('(default)');
+            colorDisplay = chalk.gray('（默认）');
         } else {
             // Determine display name based on format
             let displayName;
@@ -456,14 +456,14 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
             return (
                 <Box flexDirection='column'>
                     <Text bold>
-                        Custom Gradient
+                        自定义渐变
                         {widgetName ? ` - ${widgetName}` : ''}
                     </Text>
                     <Box marginTop={1} flexDirection='column'>
-                        <Text>{gradientCustomStep === 'start' ? 'Enter START hex color (without #):' : 'Enter END hex color (without #):'}</Text>
+                        <Text>{gradientCustomStep === 'start' ? '输入起始颜色的十六进制值（不含 #）：' : '输入结束颜色的十六进制值（不含 #）：'}</Text>
                         {gradientCustomStep === 'end' && (
                             <Text dimColor>
-                                Start: #
+                                起始颜色：#
                                 {gradientStartHex}
                             </Text>
                         )}
@@ -473,7 +473,7 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
                             <Text dimColor>{gradientHexInput.length < 6 ? '_'.repeat(6 - gradientHexInput.length) : ''}</Text>
                         </Text>
                         <Text> </Text>
-                        <Text dimColor>Press Enter when done, ESC to go back</Text>
+                        <Text dimColor>按 Enter 确认，ESC 返回</Text>
                     </Box>
                 </Box>
             );
@@ -482,11 +482,11 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
         return (
             <Box flexDirection='column'>
                 <Text bold>
-                    Select Gradient
+                    选择渐变
                     {widgetName ? ` - ${widgetName}` : ''}
                 </Text>
                 <Box marginTop={1}>
-                    <Text dimColor>↑↓ to select, Enter to apply, ESC to cancel</Text>
+                    <Text dimColor>↑↓ 选择，Enter 应用，ESC 取消</Text>
                 </Box>
                 <Box marginTop={1} flexDirection='column'>
                     {GRADIENT_PRESET_NAMES.map((name, idx) => (
@@ -497,7 +497,7 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
                     ))}
                     <Text key='custom'>
                         {gradientIndex === GRADIENT_PRESET_NAMES.length ? '▶ ' : '  '}
-                        Custom (enter two hex stops)
+                        自定义（输入起止颜色的十六进制值）
                     </Text>
                 </Box>
             </Box>
@@ -541,7 +541,7 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
     const globalOverrideMessage = hasGlobalFgOverride && hasGlobalBgOverride
         ? '⚠ Global override for FG and BG active'
         : hasGlobalFgOverride
-            ? '⚠ Global override for FG active'
+            ? '⚠ 前景色全局覆盖已激活'
             : hasGlobalBgOverride
                 ? '⚠ Global override for BG active'
                 : null;
