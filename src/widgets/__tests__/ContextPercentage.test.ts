@@ -53,6 +53,14 @@ describe('ContextPercentageWidget', () => {
         }).modifierText).toBe('(剩余)');
     });
 
+    it('reports the default label for the current used/remaining mode', () => {
+        const widget = new ContextPercentageWidget();
+        const base: WidgetItem = { id: 'context-percentage', type: 'context-percentage' };
+
+        expect(widget.getLabelPrefix(base)).toBe('已用: ');
+        expect(widget.getLabelPrefix({ ...base, metadata: { inverse: 'true' } })).toBe('剩余: ');
+    });
+
     it('prefers context_window percentage over token metrics when both exist', () => {
         const widget = new ContextPercentageWidget();
         const item: WidgetItem = {

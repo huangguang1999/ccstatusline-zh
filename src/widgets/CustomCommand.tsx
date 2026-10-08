@@ -14,9 +14,14 @@ import type {
     WidgetEditorProps,
     WidgetItem
 } from '../types/Widget';
-import { getVisibleText } from '../utils/ansi';
+import {
+    getVisibleText,
+    stripSgrCodes
+} from '../utils/ansi';
 import { runCustomCommand } from '../utils/custom-command';
 import { shouldInsertInput } from '../utils/input-guards';
+
+import { applyMaxWidth } from './shared/max-width';
 
 export class CustomCommandWidget implements Widget {
     getDefaultColor(): string { return 'white'; }
@@ -84,8 +89,15 @@ export class CustomCommandWidget implements Widget {
                 output = getVisibleText(output);
             }
 
-            if (item.maxWidth && output.length > item.maxWidth) {
-                output = output.substring(0, item.maxWidth - 3) + '...';
+            // Truncate by display columns, skipping escape sequences and never
+            // splitting a grapheme. A cut can drop the command's own trailing
+            // reset, so close any SGR styling it left open; otherwise the
+            // colour bleeds into the separators and widgets that follow.
+            const truncated = applyMaxWidth(output, item.maxWidth);
+            if (truncated !== output && stripSgrCodes(truncated) !== truncated) {
+                output = `${truncated}\x1b[0m`;
+            } else {
+                output = truncated;
             }
 
             return output || null;
@@ -159,8 +171,8 @@ const CustomCommandEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, 
             }
         } else if (mode === 'width') {
             if (key.return) {
-                const width = parseInt(widthInput, 10);
-                if (!isNaN(width) && width > 0) {
+                const width = Number.parseInt(widthInput, 10);
+                if (!Number.isNaN(width) && width > 0) {
                     onComplete({ ...widget, maxWidth: width });
                 } else {
                     const { maxWidth, ...rest } = widget;
@@ -175,8 +187,8 @@ const CustomCommandEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, 
             }
         } else if (mode === 'timeout') {
             if (key.return) {
-                const timeout = parseInt(timeoutInput, 10);
-                if (!isNaN(timeout) && timeout > 0) {
+                const timeout = Number.parseInt(timeoutInput, 10);
+                if (!Number.isNaN(timeout) && timeout > 0) {
                     onComplete({ ...widget, timeout });
                 } else {
                     const { timeout, ...rest } = widget;
@@ -196,38 +208,38 @@ const CustomCommandEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, 
         return (
             <Box flexDirection='column'>
                 <Text>
-                    Enter command path:
+                    输入命令路径：
                     {' '}
                     {commandInput.slice(0, commandCursorPos)}
                     <Text backgroundColor='gray' color='black'>{commandInput[commandCursorPos] ?? ' '}</Text>
                     {commandInput.slice(commandCursorPos + 1)}
                 </Text>
-                <Text dimColor>←→ move cursor, Enter save, ESC cancel</Text>
+                <Text dimColor>←→ 移动光标，Enter 保存，ESC 取消</Text>
             </Box>
         );
     } else if (mode === 'width') {
         return (
             <Box flexDirection='column'>
                 <Box>
-                    <Text>Enter max width (blank for no limit): </Text>
+                    <Text>输入最大宽度（留空表示不限制）： </Text>
                     <Text>{widthInput}</Text>
                     <Text backgroundColor='gray' color='black'>{' '}</Text>
                 </Box>
-                <Text dimColor>Press Enter to save, ESC to cancel</Text>
+                <Text dimColor>按 Enter 保存，ESC 取消</Text>
             </Box>
         );
     } else if (mode === 'timeout') {
         return (
             <Box flexDirection='column'>
                 <Box>
-                    <Text>Enter timeout in milliseconds (default 1000): </Text>
+                    <Text>输入超时时长（毫秒，默认 1000）： </Text>
                     <Text>{timeoutInput}</Text>
                     <Text backgroundColor='gray' color='black'>{' '}</Text>
                 </Box>
-                <Text dimColor>Press Enter to save, ESC to cancel</Text>
+                <Text dimColor>按 Enter 保存，ESC 取消</Text>
             </Box>
         );
     }
 
-    return <Text>Unknown editor mode</Text>;
+    return <Text>未知编辑模式</Text>;
 };

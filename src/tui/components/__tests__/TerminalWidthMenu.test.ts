@@ -10,6 +10,7 @@ import {
 } from 'vitest';
 
 import { DEFAULT_SETTINGS } from '../../../types/Settings';
+import { waitFor } from '../../__tests__/helpers/wait-for-ink';
 import {
     TerminalWidthMenu,
     buildTerminalWidthItems,
@@ -62,19 +63,13 @@ function createMockStdout(): CapturedWriteStream {
     });
 }
 
-function flushInk() {
-    return new Promise((resolve) => {
-        setTimeout(resolve, 25);
-    });
-}
-
 describe('TerminalWidthMenu helpers', () => {
     afterEach(() => {
         vi.restoreAllMocks();
     });
 
     it('validates compact threshold input', () => {
-        expect(validateCompactThresholdInput('')).toBe('Please enter a valid number');
+        expect(validateCompactThresholdInput('')).toBe('请输入有效数字');
         expect(validateCompactThresholdInput('0')).toBe('Value must be between 1 and 99 (you entered 0)');
         expect(validateCompactThresholdInput('100')).toBe('Value must be between 1 and 99 (you entered 100)');
         expect(validateCompactThresholdInput('42')).toBeNull();
@@ -134,30 +129,36 @@ describe('TerminalWidthMenu helpers', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('▶  始终全宽');
+            });
+            stdout.clearOutput();
             stdin.write('\u001B[B');
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('▶  全宽减 40');
+            });
+            stdout.clearOutput();
             stdin.write('\u001B[B');
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('▶  上下文压缩前全宽');
+            });
             stdin.write('\r');
-            await flushInk();
-
-            expect(stdout.getOutput()).toContain('输入压缩阈值（1-99）');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('输入压缩阈值（1-99）');
+            });
 
             stdout.clearOutput();
 
             stdin.write('\r');
-            await flushInk();
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({
+                    flexMode: 'full-until-compact',
+                    compactThreshold: 60
+                }));
+                expect(stdout.getOutput()).toContain('▶  上下文压缩前全宽');
+            });
 
-            expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({
-                flexMode: 'full-until-compact',
-                compactThreshold: 60
-            }));
-
-            const output = stdout.getOutput();
-
-            expect(output).toContain('▶  上下文压缩前全宽');
-            expect(output).not.toContain('▶  始终全宽');
+            expect(stdout.getOutput()).not.toContain('▶  始终全宽');
         } finally {
             instance.unmount();
             instance.cleanup();

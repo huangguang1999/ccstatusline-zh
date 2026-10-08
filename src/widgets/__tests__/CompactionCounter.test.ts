@@ -14,7 +14,7 @@ import { DEFAULT_SETTINGS } from '../../types/Settings';
 import { ZERO_COMPACTION_STATS } from '../../utils/compaction';
 import { CompactionCounterWidget } from '../CompactionCounter';
 
-vi.mock('child_process', () => ({
+vi.mock('node:child_process', () => ({
     execSync: vi.fn(),
     execFileSync: vi.fn(),
     spawnSync: vi.fn()
@@ -255,7 +255,7 @@ describe('CompactionCounterWidget', () => {
         it('uses metric, format, and toggle keybinds in count mode', () => {
             expect(new CompactionCounterWidget().getCustomKeybinds(ITEM)).toEqual([
                 { key: 'v', label: '(v)指标', action: 'cycle-metric' },
-                { key: 'f', label: '(f)格式切换', action: 'cycle-format' },
+                { key: 'f', label: '(f)显示格式', action: 'cycle-format' },
                 { key: 'n', label: '(n)Nerd 字体', action: 'toggle-nerd-font' },
                 { key: 's', label: '(s)触发器分类', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收令牌', action: 'toggle-reclaimed' },
@@ -269,7 +269,7 @@ describe('CompactionCounterWidget', () => {
                 metadata: { format: 'text-and-number' }
             })).toEqual([
                 { key: 'v', label: '(v)指标', action: 'cycle-metric' },
-                { key: 'f', label: '(f)格式切换', action: 'cycle-format' },
+                { key: 'f', label: '(f)显示格式', action: 'cycle-format' },
                 { key: 's', label: '(s)触发器分类', action: 'toggle-triggers' },
                 { key: 't', label: '(t)已回收令牌', action: 'toggle-reclaimed' },
                 { key: 'g', label: '(g)字符', action: 'edit-symbol-override' }

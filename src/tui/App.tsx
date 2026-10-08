@@ -239,23 +239,22 @@ const PinnedVersionMismatchScreen: React.FC<PinnedVersionMismatchScreenProps> = 
 
     return (
         <Box flexDirection='column'>
-            <Text bold>Pinned Install Version Mismatch</Text>
+            <Text bold>固定安装版本不一致</Text>
             <Box marginTop={1} flexDirection='column'>
                 <Text color='yellow'>
-                    Claude Code is pinned to ccstatusline-zh v
+                    Claude Code 固定使用 ccstatusline-zh v
                     {mismatch.installedVersion}
-                    , but this TUI is v
+                    ，当前配置界面版本为 v
                     {mismatch.runningVersion}
-                    .
+                    。
                 </Text>
                 <Text dimColor wrap='wrap'>
-                    To avoid writing config that the pinned runtime may not support,
-                    update the pinned global install or exit and relaunch the pinned version.
+                    为避免写入固定版本不支持的配置，请更新全局安装，或退出后重新启动固定版本。
                 </Text>
             </Box>
             <Box marginTop={1} flexDirection='column'>
                 <Text>
-                    Current pinned version:
+                    当前固定版本：
                     {' '}
                     {mismatch.relaunchCommand}
                 </Text>

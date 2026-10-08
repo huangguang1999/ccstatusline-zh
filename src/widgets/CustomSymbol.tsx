@@ -18,6 +18,7 @@ import type {
 import { shouldInsertInput } from '../utils/input-guards';
 
 import { MERGE_TARGET_HIDDEN_HIDEABLE_STATE } from './shared/hideable';
+import { getGraphemes } from './shared/text-cursor';
 
 export class CustomSymbolWidget implements Widget {
     getDefaultColor(): string { return 'white'; }
@@ -59,22 +60,6 @@ export class CustomSymbolWidget implements Widget {
 const CustomSymbolEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, onCancel }) => {
     const [symbol, setSymbol] = useState(widget.customSymbol ?? '');
 
-    // Helper to get grapheme segments if Intl.Segmenter is available
-    const getFirstGrapheme = (str: string): string => {
-        if (str.length === 0) {
-            return '';
-        }
-
-        if ('Segmenter' in Intl) {
-            const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-            const segments = Array.from(segmenter.segment(str));
-            return segments[0]?.segment ?? '';
-        }
-
-        // Fallback: just take first character
-        return Array.from(str)[0] ?? '';
-    };
-
     useInput((input, key) => {
         if (key.return) {
             onComplete({ ...widget, customSymbol: symbol });
@@ -84,7 +69,7 @@ const CustomSymbolEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, o
             setSymbol('');
         } else if (shouldInsertInput(input, key)) {
             // Take only the first grapheme (handles multi-byte emojis correctly)
-            const firstGrapheme = getFirstGrapheme(input);
+            const firstGrapheme = getGraphemes(input)[0] ?? '';
             setSymbol(firstGrapheme);
         }
     });
@@ -92,15 +77,15 @@ const CustomSymbolEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, o
     return (
         <Box flexDirection='column'>
             <Text>
-                Enter custom symbol:
+                输入自定义符号：
                 {' '}
                 {symbol ? (
                     <Text inverse>{symbol}</Text>
                 ) : (
-                    <Text inverse dimColor>(empty)</Text>
+                    <Text inverse dimColor>(空)</Text>
                 )}
             </Text>
-            <Text dimColor>Type any character or emoji, Backspace clear, Enter save, ESC cancel</Text>
+            <Text dimColor>输入任意字符或 Emoji，Backspace 清空，Enter 保存，ESC 取消</Text>
         </Box>
     );
 };

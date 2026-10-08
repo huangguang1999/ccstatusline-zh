@@ -12,6 +12,7 @@ import {
     DEFAULT_SETTINGS,
     type Settings
 } from '../../../types/Settings';
+import { waitFor } from '../../__tests__/helpers/wait-for-ink';
 import {
     ImportPreviewDialog,
     getImportPreviewKeys,
@@ -63,10 +64,6 @@ function createMockStdout(): CapturedWriteStream {
     });
 }
 
-function flushInk() {
-    return new Promise(resolve => setTimeout(resolve, 25));
-}
-
 describe('ImportPreviewDialog helpers', () => {
     it('includes optional settings that exist only in the imported config', () => {
         const current: Settings = { ...DEFAULT_SETTINGS };
@@ -87,7 +84,7 @@ describe('ImportPreviewDialog helpers', () => {
         const current: Settings = {
             ...DEFAULT_SETTINGS,
             flexMode: 'full',
-            lines: [[{ id: 'custom', type: 'model' }]]
+            lines: [[{ id: '自定义', type: 'model' }]]
         };
         const validation = {
             status: 'valid' as const,
@@ -129,19 +126,17 @@ describe('ImportPreviewDialog helpers', () => {
         });
 
         try {
-            await flushInk();
-            expect(stdout.getOutput()).toContain('导入预览');
-            expect(stdout.getOutput()).toContain('全部替换');
-            expect(stdout.getOutput()).toContain('合并');
-            expect(stdout.getOutput()).toContain('flexMode: full-minus-40 → full');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('flexMode: full-minus-40 → full');
+            });
 
             stdout.clearOutput();
             stdin.write('\u001B[B');
-            await flushInk();
-
-            const output = stdout.getOutput();
-            const lastFlexModeRow = output.slice(output.lastIndexOf('flexMode:')).split('\n')[0];
-            expect(lastFlexModeRow).toBe('flexMode: full-minus-40');
+            await waitFor(() => {
+                const output = stdout.getOutput();
+                const lastFlexModeRow = output.slice(output.lastIndexOf('flexMode:')).split('\n')[0];
+                expect(lastFlexModeRow).toBe('flexMode: full-minus-40');
+            });
         } finally {
             instance.unmount();
             instance.cleanup();

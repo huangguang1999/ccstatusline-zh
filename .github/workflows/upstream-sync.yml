@@ -38,7 +38,7 @@ jobs:
       tag: ${{ steps.upstream.outputs.tag }}
       fork_version: ${{ steps.fork.outputs.version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Resolve fork version
         id: fork
@@ -86,7 +86,7 @@ jobs:
     if: needs.detect.outputs.needs_sync == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -101,7 +101,7 @@ jobs:
           # (会把 fork 的发布 tag 覆盖成上游 commit，毁掉中文化发布历史)。
           git fetch upstream --tags || true
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
 
       - name: Run Claude Code sync
         uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b # v1.0.183

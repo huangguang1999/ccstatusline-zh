@@ -34,13 +34,20 @@ import {
     toggleUsageInverted
 } from './shared/usage-display';
 
+const LABEL = '时段: ';
+const BAR_LABEL = '时段 ';
+
 const NO_DATA_HIDEABLE_STATE: HideableState = { key: 'no-data', label: '无活跃时段时' };
 
 export class BlockTimerWidget implements Widget {
     getDefaultColor(): string { return 'yellow'; }
-    getDescription(): string { return '显示当前 5 时时段的已用时间或进度'; }
+    getDescription(): string { return '显示当前 5 小时时段的已用时间或进度'; }
     getDisplayName(): string { return '时段计时器'; }
     getCategory(): string { return '用量'; }
+    getLabelPrefix(item: WidgetItem): string {
+        const displayMode = getUsageDisplayMode(item);
+        return isUsageProgressMode(displayMode) || isUsageSliderMode(displayMode) ? BAR_LABEL : LABEL;
+    }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return {
@@ -77,7 +84,7 @@ export class BlockTimerWidget implements Widget {
             if (isUsageProgressMode(displayMode)) {
                 const barWidth = getUsageProgressBarWidth(displayMode);
                 const progressBar = makeTimerProgressBar(previewPercent, barWidth);
-                return formatRawOrLabeledValue(item, '时段 ', `[${progressBar}] ${formatPercent(previewPercent, format)}`);
+                return formatRawOrLabeledValue(item, this.getLabelPrefix(item), `[${progressBar}] ${formatPercent(previewPercent, format)}`);
             }
 
             if (isUsageSliderMode(displayMode)) {
@@ -85,10 +92,10 @@ export class BlockTimerWidget implements Widget {
                 const sliderDisplay = displayMode === 'slider'
                     ? `${slider} ${formatPercent(previewPercent, format)}`
                     : slider;
-                return formatRawOrLabeledValue(item, '时段 ', sliderDisplay);
+                return formatRawOrLabeledValue(item, this.getLabelPrefix(item), sliderDisplay);
             }
 
-            return formatRawOrLabeledValue(item, '时段: ', compact ? '3时45分' : '3时 45分');
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(item), compact ? '3时45分' : '3时 45分');
         }
 
         const usageData = context.usageData ?? {};
@@ -103,7 +110,7 @@ export class BlockTimerWidget implements Widget {
             if (isUsageProgressMode(displayMode)) {
                 const barWidth = getUsageProgressBarWidth(displayMode);
                 const emptyBar = '░'.repeat(barWidth);
-                return formatRawOrLabeledValue(item, '时段 ', `[${emptyBar}] ${emptyPercent}`);
+                return formatRawOrLabeledValue(item, this.getLabelPrefix(item), `[${emptyBar}] ${emptyPercent}`);
             }
 
             if (isUsageSliderMode(displayMode)) {
@@ -111,17 +118,17 @@ export class BlockTimerWidget implements Widget {
                 const sliderDisplay = displayMode === 'slider'
                     ? `${emptySlider} ${emptyPercent}`
                     : emptySlider;
-                return formatRawOrLabeledValue(item, '时段 ', sliderDisplay);
+                return formatRawOrLabeledValue(item, this.getLabelPrefix(item), sliderDisplay);
             }
 
-            return formatRawOrLabeledValue(item, '时段: ', compact ? '0时' : '0时 0分');
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(item), compact ? '0时' : '0时 0分');
         }
 
         if (isUsageProgressMode(displayMode)) {
             const barWidth = getUsageProgressBarWidth(displayMode);
             const percent = inverted ? window.remainingPercent : window.elapsedPercent;
             const progressBar = makeTimerProgressBar(percent, barWidth);
-            return formatRawOrLabeledValue(item, '时段 ', `[${progressBar}] ${formatPercent(percent, format)}`);
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(item), `[${progressBar}] ${formatPercent(percent, format)}`);
         }
 
         if (isUsageSliderMode(displayMode)) {
@@ -130,11 +137,11 @@ export class BlockTimerWidget implements Widget {
             const sliderDisplay = displayMode === 'slider'
                 ? `${slider} ${formatPercent(percent, format)}`
                 : slider;
-            return formatRawOrLabeledValue(item, '时段 ', sliderDisplay);
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(item), sliderDisplay);
         }
 
         const elapsedTime = formatUsageDuration(window.elapsedMs, compact);
-        return formatRawOrLabeledValue(item, '时段: ', elapsedTime);
+        return formatRawOrLabeledValue(item, this.getLabelPrefix(item), elapsedTime);
     }
 
     getCustomKeybinds(item?: WidgetItem): CustomKeybind[] {

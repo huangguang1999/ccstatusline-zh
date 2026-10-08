@@ -1,4 +1,4 @@
-import { execFileSync } from 'child_process';
+import { execFileSync } from 'node:child_process';
 import {
     beforeEach,
     describe,
@@ -14,7 +14,7 @@ import { expectGitExecOptions } from '../../utils/__tests__/git-test-helpers';
 import { clearGitCache } from '../../utils/git';
 import { GitCleanStatusWidget } from '../GitCleanStatus';
 
-vi.mock('child_process', () => ({
+vi.mock('node:child_process', () => ({
     execFileSync: vi.fn(),
     spawnSync: vi.fn()
 }));
@@ -95,7 +95,7 @@ describe('GitCleanStatusWidget', () => {
     it('renders no git when probe returns false', () => {
         mockExecFileSync.mockReturnValue('false\n');
 
-        expect(render()).toBe('(no git)');
+        expect(render()).toBe('(无 Git)');
     });
 
     it('hides no git when configured', () => {
@@ -107,6 +107,6 @@ describe('GitCleanStatusWidget', () => {
     it('renders no git when command fails', () => {
         mockExecFileSync.mockImplementation(() => { throw new Error('No git'); });
 
-        expect(render()).toBe('(no git)');
+        expect(render()).toBe('(无 Git)');
     });
 });

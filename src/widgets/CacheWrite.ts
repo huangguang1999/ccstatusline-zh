@@ -24,11 +24,14 @@ import {
 import { isHidden } from './shared/hideable';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
+const LABEL = '缓存写入: ';
+
 export class CacheWriteWidget implements Widget {
     getDefaultColor(): string { return 'yellow'; }
     getDescription(): string { return '显示写入缓存的缓存写入令牌数及其上下文占比'; }
     getDisplayName(): string { return '缓存写入'; }
     getCategory(): string { return '缓存'; }
+    getLabelPrefix(): string { return LABEL; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName(), modifierText: getCacheModifierText(item) };
     }
@@ -46,13 +49,13 @@ export class CacheWriteWidget implements Widget {
         const percentFormat = resolveNumberFormat('percent', item, settings);
         if (context.isPreview) {
             const value = formatTokensWithPercentage(3000, 16, tokenFormat, percentFormat);
-            return formatRawOrLabeledValue(item, '缓存写入: ', value);
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), value);
         }
 
         const hideWhenEmpty = isHidden(item, CACHE_EMPTY_HIDEABLE_STATE.key);
         const tokens = getCacheTokens(context, isCacheSessionScope(item));
         if (!tokens) {
-            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, '缓存写入: ', 'n/a');
+            return hideWhenEmpty ? null : formatRawOrLabeledValue(item, this.getLabelPrefix(), 'n/a');
         }
 
         if (tokens.creation === 0 && hideWhenEmpty) {
@@ -60,7 +63,7 @@ export class CacheWriteWidget implements Widget {
         }
 
         const value = formatTokensWithPercentage(tokens.creation, getCacheWritePercentage(tokens), tokenFormat, percentFormat);
-        return formatRawOrLabeledValue(item, '缓存写入: ', value);
+        return formatRawOrLabeledValue(item, this.getLabelPrefix(), value);
     }
 
     getCustomKeybinds(item?: WidgetItem): CustomKeybind[] {

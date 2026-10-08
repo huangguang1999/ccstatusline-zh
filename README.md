@@ -4,9 +4,9 @@
 
 _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标_
 
-> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前中文包版本为 **2.2.31**，同步至上游 **v2.2.30 + main@35440e4**（2026-09-28 核对，包含自定义命令缓存、终端宽度探测优化、用量修复和配置界面按需加载）。所有用户可见的界面文本（组件名称、分类、描述、菜单标签、提示信息等）均已翻译为中文，方便中文用户使用。
+> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前中文包版本为 **2.2.32**，同步至上游 **v2.2.30 + main@3b60234**（2026-10-07 核对，包含可编辑文字前缀、Git Fork 自定义字符、中文显示宽度修复、组件公共逻辑重构和测试补充）。用户界面保持中文，组件标识符、配置字段和纯值输出与上游兼容。
 >
-> 上次同步的完整上游提交：[`35440e4a93ac8aba7e57973ac004a68adcc51089`](https://github.com/sirmalloc/ccstatusline/commit/35440e4a93ac8aba7e57973ac004a68adcc51089)。后续同步以此提交为基线，中文包与上游版本号独立递增。
+> 上次同步的完整上游提交：[`3b602348afbbe082eb919b576b55926bbf8d19d6`](https://github.com/sirmalloc/ccstatusline/commit/3b602348afbbe082eb919b576b55926bbf8d19d6)。后续同步以此提交为基线，中文包与上游版本号独立递增。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/huangguang1999/ccstatusline-zh/blob/main/LICENSE)
 [![Node.js Version](https://img.shields.io/node/v/ccstatusline.svg)](https://nodejs.org)
@@ -51,6 +51,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 - **周 Fable 用量组件**、**迁移账号的 `limits[]` 用量 API 兼容**、**压缩后上下文长度修正**、**隐藏组件分隔符保留**、**配置导入/导出及差异预览**（v2.2.26–v2.2.27）
 - **Claude 服务状态及 48 小时故障历史**、**统一隐藏条件与旧配置自动迁移**、**按组件和数值类型设置显示精度**、**大转录文件流式读取与单次扫描**、**Git 冲突为零时的显示选项**、**用量锁与 Git 临时文件恢复修复**（上游 v2.2.28–v2.2.29）
 - **自定义命令可选输出缓存与超时控制**、**终端宽度探测优化及失败结果缓存**、**更多 Git / Jujutsu 组件符号定制**、**重置计时器无数据时隐藏**、**macOS 按配置目录选取用量凭据**、**访问令牌刷新时保留用量缓存**、**模型周额度为零时正确显示**、**新配置默认使用完整终端宽度**、**Git 命令 5 秒超时**、**配置界面按需加载**（上游 v2.2.30 + main@35440e4）
+- **可编辑组件文字前缀**、**Git Fork 自定义字符**、**自定义命令按显示宽度截断**、**主目录缩写边界修复**、**共享组件逻辑和搜索编辑器重构**（上游 main@3b60234）
 - **确认对话框** "是 / 否"
 - **分类筛选** "全部" 等界面元素
 
@@ -63,7 +64,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 | 界面语言   | 英文         | 中文                      |
 | 配置兼容性 | —            | ✅ 共用相同 settings.json |
 | 功能差异   | —            | 无，功能完全一致          |
-| 同步版本   | 最新         | v2.2.30 + [main@35440e4](https://github.com/sirmalloc/ccstatusline/commit/35440e4a93ac8aba7e57973ac004a68adcc51089)（中文包 2.2.31） |
+| 同步版本   | 最新         | v2.2.30 + [main@3b60234](https://github.com/sirmalloc/ccstatusline/commit/3b602348afbbe082eb919b576b55926bbf8d19d6)（中文包 2.2.32） |
 
 ---
 
@@ -107,6 +108,8 @@ bun install -g ccstatusline-zh
 ### 配置 Claude Code
 
 在 Claude Code 设置中添加状态栏配置。编辑 `~/.claude/settings.json`：
+
+> 如果状态栏只在某个目录为空，请检查 Claude Code 是否已信任该工作区。上游说明和排查方法见 [目录信任问题](docs/USAGE.md#status-line-empty-in-one-folder-but-fine-elsewhere)。
 
 ```json
 {
@@ -341,11 +344,14 @@ ccstatusline-zh --config /path/to/custom-settings.json
 | `a`     | 添加组件  |
 | `d`     | 删除组件  |
 | `e`     | 编辑组件  |
+| `b`     | 编辑文字前缀 |
 | `w`     | 组件选项  |
 | `/`     | 搜索      |
 | `q`     | 退出      |
 
 重置计时器可按 `h` 设置无数据时隐藏；日期模式下按 `f` 切换 12/24 小时格式，周重置计时器在时间模式下按 `o` 切换仅显示小时。
+
+支持文字前缀的组件可按 `b` 修改数值前的文字。输入会原样保存，需要自行填写冒号和末尾空格；留空可隐藏前缀，按 `Tab` 恢复默认前缀。同一组件在不同显示模式下共用自定义前缀，纯值模式下不显示前缀，也不提供 `b` 快捷键。
 
 自定义命令缓存默认关闭，可设置为 0–60 秒；终端宽度探测失败结果默认缓存 5 秒，可设置为 0–300 秒，填 0 关闭缓存。已检测到的宽度会在下次渲染时重新检测。新配置默认使用完整终端宽度，已有 `flexMode` 设置保持不变。
 

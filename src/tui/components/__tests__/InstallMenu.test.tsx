@@ -9,6 +9,7 @@ import {
     vi
 } from 'vitest';
 
+import { waitFor } from '../../__tests__/helpers/wait-for-ink';
 import { InstallMenu } from '../InstallMenu';
 
 const ALL_AVAILABLE = {
@@ -36,7 +37,10 @@ class MockTtyStream extends PassThrough {
     }
 }
 
-interface CapturedWriteStream extends NodeJS.WriteStream { getOutput: () => string }
+interface CapturedWriteStream extends NodeJS.WriteStream {
+    clearOutput: () => void;
+    getOutput: () => string;
+}
 
 function createMockStdin(): NodeJS.ReadStream {
     return new MockTtyStream() as unknown as NodeJS.ReadStream;
@@ -51,15 +55,12 @@ function createMockStdout(): CapturedWriteStream {
     });
 
     return Object.assign(stream as unknown as NodeJS.WriteStream, {
+        clearOutput() {
+            chunks.length = 0;
+        },
         getOutput() {
             return stripAnsi(chunks.join(''));
         }
-    });
-}
-
-function flushInk() {
-    return new Promise((resolve) => {
-        setTimeout(resolve, 25);
     });
 }
 
@@ -88,12 +89,14 @@ describe('InstallMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('选择安装方式');
+            });
 
             stdin.write('\u001B');
-            await flushInk();
-
-            expect(onCancel).toHaveBeenCalledTimes(1);
+            await waitFor(() => {
+                expect(onCancel).toHaveBeenCalledTimes(1);
+            });
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -126,12 +129,12 @@ describe('InstallMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('自动更新');
+                expect(stdout.getOutput()).toContain('固定全局安装');
+            });
 
-            const output = stdout.getOutput();
-            expect(output).toContain('自动更新');
-            expect(output).toContain('固定全局安装');
-            expect(output.toLowerCase()).not.toContain('recommended');
+            expect(stdout.getOutput().toLowerCase()).not.toContain('recommended');
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -164,11 +167,13 @@ describe('InstallMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('▶  固定全局安装');
+                expect(stdout.getOutput()).toContain('自动更新');
+            });
 
             const output = stdout.getOutput();
             expect(output.indexOf('固定全局安装')).toBeLessThan(output.indexOf('自动更新'));
-            expect(output).toContain('▶  固定全局安装');
             expect(output).not.toContain('▶  自动更新');
         } finally {
             instance.unmount();
@@ -207,14 +212,17 @@ describe('InstallMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('选择安装方式');
+            });
             stdin.write('\r');
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('npm install -g ccstatusline-zh@2.2.13');
+                expect(stdout.getOutput()).toContain('bun add -g ccstatusline-zh@2.2.13');
+            });
 
             const output = stdout.getOutput();
-            expect(output).toContain('npm install -g ccstatusline-zh@2.2.13');
             expect(output).not.toContain('（未检测到 npm）');
-            expect(output).toContain('bun add -g ccstatusline-zh@2.2.13');
             expect(output).not.toContain('（未检测到 bun）');
         } finally {
             instance.unmount();
@@ -249,16 +257,21 @@ describe('InstallMenu', () => {
         );
 
         try {
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('选择安装方式');
+            });
             stdin.write('\r');
-            await flushInk();
-            expect(stdout.getOutput()).toContain('选择包管理器');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('选择包管理器');
+            });
 
+            stdout.clearOutput();
             stdin.write('\u001B');
-            await flushInk();
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('选择安装方式');
+            });
 
             expect(onCancel).not.toHaveBeenCalled();
-            expect(stdout.getOutput()).toContain('选择安装方式');
         } finally {
             instance.unmount();
             instance.cleanup();

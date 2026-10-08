@@ -15,11 +15,14 @@ import { isHidden } from './shared/hideable';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 import { USAGE_NO_DATA_HIDEABLE_STATE } from './shared/usage-display';
 
+const LABEL = '超额剩余: ';
+
 export class ExtraUsageRemainingWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
     getDescription(): string { return '显示每月超额用量额度的剩余金额'; }
     getDisplayName(): string { return '超额用量剩余'; }
     getCategory(): string { return '用量'; }
+    getLabelPrefix(): string { return LABEL; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName() };
@@ -32,14 +35,14 @@ export class ExtraUsageRemainingWidget implements Widget {
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
         const format = resolveNumberFormat('cost', item, settings);
         if (context.isPreview) {
-            return formatRawOrLabeledValue(item, '超额剩余: ', formatUsageCurrency(3894, undefined, format));
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), formatUsageCurrency(3894, undefined, format));
         }
 
         const data = context.usageData ?? {};
         if (data.extraUsageEnabled === false) {
             return isHidden(item, EXTRA_USAGE_DISABLED_HIDEABLE_STATE.key)
                 ? null
-                : formatRawOrLabeledValue(item, '超额剩余: ', 'n/a');
+                : formatRawOrLabeledValue(item, this.getLabelPrefix(), 'n/a');
         }
         if (data.extraUsageEnabled !== true || data.extraUsageLimit === undefined || data.extraUsageUsed === undefined) {
             if (data.error) {
@@ -56,7 +59,7 @@ export class ExtraUsageRemainingWidget implements Widget {
         const remaining = Math.max(0, limitDollars - usedDollars);
         const formatted = formatUsageCurrency(remaining, data.extraUsageCurrency, format);
 
-        return formatRawOrLabeledValue(item, '超额剩余: ', formatted);
+        return formatRawOrLabeledValue(item, this.getLabelPrefix(), formatted);
     }
 
     supportsRawValue(): boolean { return true; }

@@ -9,11 +9,16 @@ import { getContextWindowContextLengthTokens } from '../utils/context-window';
 import { resolveNumberFormat } from '../utils/number-format';
 import { formatTokens } from '../utils/renderer';
 
+import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
+
+const LABEL = '上下文: ';
+
 export class ContextLengthWidget implements Widget {
     getDefaultColor(): string { return 'brightBlack'; }
     getDescription(): string { return '显示当前上下文窗口大小（Token 数）'; }
     getDisplayName(): string { return '上下文长度'; }
     getCategory(): string { return '上下文'; }
+    getLabelPrefix(): string { return LABEL; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName() };
     }
@@ -22,16 +27,16 @@ export class ContextLengthWidget implements Widget {
         const format = resolveNumberFormat('token', item, settings);
         if (context.isPreview) {
             const value = formatTokens(18600, format);
-            return item.rawValue ? value : `上下文: ${value}`;
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), value);
         }
 
         const contextLengthTokens = getContextWindowContextLengthTokens(context.data);
         if (contextLengthTokens !== null) {
-            return item.rawValue ? formatTokens(contextLengthTokens, format) : `上下文: ${formatTokens(contextLengthTokens, format)}`;
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), formatTokens(contextLengthTokens, format));
         }
 
         if (context.tokenMetrics) {
-            return item.rawValue ? formatTokens(context.tokenMetrics.contextLength, format) : `上下文: ${formatTokens(context.tokenMetrics.contextLength, format)}`;
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), formatTokens(context.tokenMetrics.contextLength, format));
         }
         return null;
     }

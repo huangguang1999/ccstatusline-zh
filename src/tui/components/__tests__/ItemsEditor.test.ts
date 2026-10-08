@@ -11,6 +11,7 @@ import {
 
 import { DEFAULT_SETTINGS } from '../../../types/Settings';
 import type { WidgetItem } from '../../../types/Widget';
+import { waitFor } from '../../__tests__/helpers/wait-for-ink';
 import { ItemsEditor } from '../ItemsEditor';
 
 class MockTtyStream extends PassThrough {
@@ -155,6 +156,261 @@ describe('ItemsEditor', () => {
         try {
             await flushInk();
             expect(stripAnsi(stdout.getOutput())).toContain('1. 缓存读取 (会话) (紧凑)');
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
+    it('edits a widget label and hides the label keybind in raw value mode', async () => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+
+        const instance = render(
+            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type: 'model' }] }),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            await flushInk();
+            expect(stripAnsi(stdout.getOutput())).toContain('(b)文字前缀…');
+
+            stdout.clearOutput();
+            stdin.write('b');
+            await flushInk();
+            expect(stripAnsi(stdout.getOutput())).toContain('(默认: "模型: ")');
+
+            // Trim "模型: " down to "M", one backspace per keypress
+            for (const key of Array.from('模型: ', () => '\x7f')) {
+                stdin.write(key);
+                await flushInk();
+            }
+            stdin.write('M ');
+            await flushInk();
+            stdout.clearOutput();
+            stdin.write('\r');
+            await flushInk();
+            expect(stripAnsi(stdout.getOutput())).toContain('1. 模型 (前缀: "M ")');
+
+            stdout.clearOutput();
+            stdin.write('r');
+            await flushInk();
+            const rawOutput = stripAnsi(stdout.getOutput());
+            expect(rawOutput).toContain('(纯值)');
+            expect(rawOutput).not.toContain('(b)文字前缀…');
+            expect(rawOutput).not.toContain('(前缀:');
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
+
+    it.each([
+        { query: 'session-cost', name: '会话费用', keepsLabel: false },
+        { query: 'model', name: '模型', keepsLabel: true }
+    ])('preserves the label only when reselecting the same type: $name', async ({ query, name, keepsLabel }) => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+
+        const instance = render(
+            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type: 'model', metadata: { label: 'M ' } }] }),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            await flushInk();
+            expect(stripAnsi(stdout.getOutput())).toContain('1. 模型 (前缀: "M ")');
+
+            stdin.write('\x1b[C');
+            await flushInk();
+            for (const char of query) {
+                stdin.write(char);
+                await flushInk();
+            }
+            stdout.clearOutput();
+            stdin.write('\r');
+            await flushInk();
+            const output = stripAnsi(stdout.getOutput());
+            expect(output).toContain(`1. ${name}`);
+            if (keepsLabel) {
+                expect(output).toContain('(前缀: "M ")');
+            } else {
+                expect(output).not.toContain('(前缀:');
+            }
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
+
+    it('keeps every key typed into the label editor before a re-render', async () => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+
+        const instance = render(
+            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type: 'model' }] }),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            await flushInk();
+            stdin.write('b');
+            await flushInk();
+
+            // One macrotask apart: separate keypresses, but no re-render between them
+            stdin.write('\x7f');
+            await new Promise(resolve => setImmediate(resolve));
+            stdin.write('\x7f');
+            await flushInk();
+            stdout.clearOutput();
+            stdin.write('\r');
+            await flushInk();
+            expect(stripAnsi(stdout.getOutput())).toContain('1. 模型 (前缀: "模型")');
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
+
+    it.each([
+        { type: 'model', openKey: 'b', prompt: '(默认: "模型: ")', edit: 'X', expected: '1. 模型 (前缀: "模型: X")' },
+        { type: 'model', openKey: 'b', prompt: '(默认: "模型: ")', edit: '\x7f', expected: '1. 模型 (前缀: "模型:")' },
+        { type: 'custom-text', openKey: 'e', prompt: '输入自定义文本：', edit: 'X', expected: '1. 自定义文本 (HelloX)' },
+        { type: 'custom-text', openKey: 'e', prompt: '输入自定义文本：', edit: '\x7f', expected: '1. 自定义文本 (Hell)' }
+    ])('saves the latest $type edit when Enter arrives before a redraw ($edit)', async ({ type, openKey, prompt, edit, expected }) => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+        const instance = render(
+            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type, customText: 'Hello' }] }),
+            { stdin, stdout, stderr, debug: true, exitOnCtrlC: false, patchConsole: false }
+        );
+
+        try {
+            await waitFor(() => {
+                expect(stripAnsi(stdout.getOutput())).toContain('1. ');
+            });
+            stdout.clearOutput();
+            stdin.write(openKey);
+            await waitFor(() => {
+                expect(stripAnsi(stdout.getOutput())).toContain(prompt);
+            });
+
+            stdout.clearOutput();
+            stdin.write(edit);
+            await new Promise(resolve => setImmediate(resolve));
+            stdin.write('\r');
+            await waitFor(() => {
+                expect(stripAnsi(stdout.getOutput())).toContain(expected);
+            });
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
+
+    it('shows a joined emoji label in full beside its default', async () => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+
+        const instance = render(
+            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type: 'model', metadata: { label: '\u{1F469}\u200D\u{1F4BB} ' } }] }),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            await flushInk();
+            stdout.clearOutput();
+            stdin.write('b');
+            await flushInk();
+            expect(stripAnsi(stdout.getOutput())).toContain('"\u{1F469}\u200D\u{1F4BB}  " (默认: "模型: ")');
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
+
+    it('keeps a label equal to the bar-mode default for every mode, and Tab clears it', async () => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+
+        const instance = render(
+            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type: 'block-timer', metadata: { display: 'progress' } }] }),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            await flushInk();
+            stdin.write('b');
+            await flushInk();
+            stdout.clearOutput();
+            stdin.write('\r');
+            await flushInk();
+            expect(stripAnsi(stdout.getOutput())).toContain('(前缀: "时段 ")');
+
+            stdin.write('b');
+            await flushInk();
+            stdout.clearOutput();
+            stdin.write('\t');
+            await flushInk();
+            expect(stripAnsi(stdout.getOutput())).not.toContain('(前缀:');
         } finally {
             instance.unmount();
             instance.cleanup();

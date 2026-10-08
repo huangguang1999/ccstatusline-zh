@@ -117,6 +117,7 @@ describe('BlockResetTimerWidget', () => {
 
         expect(render(widget, { id: 'reset', type: 'reset-timer' }, { usageData: {} })).toBe('重置: [加载中]');
         expect(render(widget, { id: 'reset', type: 'reset-timer', rawValue: true }, { usageData: {} })).toBe('[Loading]');
+        expect(render(widget, { id: 'reset', type: 'reset-timer', metadata: { display: 'progress' } }, { usageData: {} })).toBe('重置 [加载中]');
     });
 
     it('declares the no-data hideable state', () => {
@@ -132,7 +133,7 @@ describe('BlockResetTimerWidget', () => {
         const widget = new BlockResetTimerWidget();
 
         mockResolveUsageWindowWithFallback.mockReturnValue(null);
-        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+        mockGetUsageErrorMessage.mockReturnValue('[超时]');
 
         expect(render(widget, { id: 'reset', type: 'reset-timer', metadata: { hide: 'no-data' } }, { usageData })).toBeNull();
     });
@@ -141,10 +142,10 @@ describe('BlockResetTimerWidget', () => {
         const widget = new BlockResetTimerWidget();
 
         mockResolveUsageWindowWithFallback.mockReturnValue(null);
-        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+        mockGetUsageErrorMessage.mockReturnValue('[超时]');
 
         expect(render(widget, { id: 'reset', type: 'reset-timer', metadata: { hide: '' } }, { usageData: {} })).toBe('重置: [加载中]');
-        expect(render(widget, { id: 'reset', type: 'reset-timer' }, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
+        expect(render(widget, { id: 'reset', type: 'reset-timer' }, { usageData: { error: 'timeout' } })).toBe('[超时]');
     });
 
     it('shows raw value without label in time mode', () => {
@@ -157,9 +158,9 @@ describe('BlockResetTimerWidget', () => {
             elapsedPercent: 25,
             remainingPercent: 75
         });
-        mockFormatUsageDuration.mockReturnValue('3hr 45m');
+        mockFormatUsageDuration.mockReturnValue('3时 45分');
 
-        expect(render(widget, { id: 'reset', type: 'reset-timer', rawValue: true }, { usageData: {} })).toBe('3hr 45m');
+        expect(render(widget, { id: 'reset', type: 'reset-timer', rawValue: true }, { usageData: {} })).toBe('3时 45分');
     });
 
     it('shows reset timestamp in date mode', () => {

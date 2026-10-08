@@ -23,10 +23,10 @@ export function getTerminalWidthSelectionIndex(selectedOption: FlexMode): number
 }
 
 export function validateCompactThresholdInput(value: string): string | null {
-    const parsedValue = parseInt(value, 10);
+    const parsedValue = Number.parseInt(value, 10);
 
-    if (isNaN(parsedValue)) {
-        return 'Please enter a valid number';
+    if (Number.isNaN(parsedValue)) {
+        return '请输入有效数字';
     }
 
     if (parsedValue < 1 || parsedValue > 99) {
@@ -89,7 +89,7 @@ export const TerminalWidthMenu: React.FC<TerminalWidthMenuProps> = ({
                 if (error) {
                     setValidationError(error);
                 } else {
-                    const value = parseInt(thresholdInput, 10);
+                    const value = Number.parseInt(thresholdInput, 10);
                     setCompactThreshold(value);
 
                     const updatedSettings = {

@@ -13,6 +13,10 @@ import {
     type TranscriptThinkingEffort
 } from '../utils/jsonl';
 
+import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
+
+const LABEL = '思考: ';
+
 export type ThinkingEffortLevel = TranscriptThinkingEffort;
 
 function resolveThinkingEffortFromStatusJson(context: RenderContext): ResolvedThinkingEffort | null | undefined {
@@ -62,17 +66,18 @@ export class ThinkingEffortWidget implements Widget {
     getDescription(): string { return '显示当前思考力度级别（low, medium, high, xhigh, max）。\n未知级别会以末尾 "?" 标记显示（如 "super-max?"）。\n多个 Claude Code 会话同时运行时可能不准确。'; }
     getDisplayName(): string { return '思考力度'; }
     getCategory(): string { return '核心'; }
+    getLabelPrefix(): string { return LABEL; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName() };
     }
 
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
         if (context.isPreview) {
-            return item.rawValue ? 'high' : '思考: high';
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), 'high');
         }
 
         const effort = formatEffort(resolveThinkingEffort(context));
-        return item.rawValue ? effort : `思考: ${effort}`;
+        return formatRawOrLabeledValue(item, this.getLabelPrefix(), effort);
     }
 
     supportsRawValue(): boolean { return true; }
