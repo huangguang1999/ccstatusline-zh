@@ -35,7 +35,7 @@ const LABEL = '超额: ';
 
 export class ExtraUsageUtilizationWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return '显示超额用量（按量付费）占比百分比'; }
+    getDescription(): string { return '显示超额用量占每月额度的百分比（Pro/Max 超额消费或 Enterprise 消费）'; }
     getDisplayName(): string { return '超额用量占比'; }
     getCategory(): string { return '用量'; }
     getLabelPrefix(): string { return LABEL; }
