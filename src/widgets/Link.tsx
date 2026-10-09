@@ -16,6 +16,7 @@ import type {
 } from '../types/Widget';
 import { renderOsc8Link } from '../utils/hyperlink';
 import { shouldInsertInput } from '../utils/input-guards';
+import { isSafeHyperlinkUrl } from '../utils/terminal-sanitize';
 
 function isValidLinkUrl(url: string): boolean {
     try {
@@ -107,7 +108,8 @@ export class LinkWidget implements Widget {
             return displayText;
         }
 
-        return renderOsc8Link(new URL(url).href, displayText);
+        // The parsed form percent-encodes what a link can't carry as is
+        return renderOsc8Link(isSafeHyperlinkUrl(url) ? url : new URL(url).href, displayText);
     }
 
     getCustomKeybinds(): CustomKeybind[] {

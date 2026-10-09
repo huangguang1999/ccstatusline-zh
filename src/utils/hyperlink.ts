@@ -1,3 +1,5 @@
+import { isSafeHyperlinkUrl } from './terminal-sanitize';
+
 export const IDE_LINK_MODES = [
     'vscode',
     'cursor'
@@ -5,7 +7,7 @@ export const IDE_LINK_MODES = [
 
 export type IdeLinkMode = (typeof IDE_LINK_MODES)[number];
 
-// 移除 C0/C1 控制字符与 DEL，防止 URL/文本破坏 OSC 8 转义序列本身
+// 移除 C0/C1 控制字符与 DEL，防止显示文本破坏 OSC 8 转义序列本身
 function stripControlChars(value: string): string {
     let result = '';
     for (const ch of value) {
@@ -19,8 +21,14 @@ function stripControlChars(value: string): string {
     return result;
 }
 
+// A URL holding control characters (from a remote, a PR or settings) could end
+// the sequence early and start one of its own, so it gets no link
 export function renderOsc8Link(url: string, text: string): string {
-    return `\x1b]8;;${stripControlChars(url)}\x1b\\${stripControlChars(text)}\x1b]8;;\x1b\\`;
+    if (!isSafeHyperlinkUrl(url)) {
+        return stripControlChars(text);
+    }
+
+    return `\x1b]8;;${url}\x1b\\${stripControlChars(text)}\x1b]8;;\x1b\\`;
 }
 
 export function encodeGitRefForUrlPath(ref: string): string {
