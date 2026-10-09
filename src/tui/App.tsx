@@ -360,7 +360,8 @@ function getPinnedGlobalRelaunchCommand(packageManager: GlobalPackageManager): s
 export function getPinnedVersionMismatch(
     installation: ResolvedInstallationMetadata,
     runningVersion: string,
-    relaunchCommand: string
+    relaunchCommand: string,
+    versionInstalledThisSession: string | null = null
 ): PinnedVersionMismatch | null {
     if (
         installation.method !== 'pinned'
@@ -368,6 +369,9 @@ export function getPinnedVersionMismatch(
         || installation.packageManager === 'unknown'
         || !runningVersion
         || installation.installedVersion === runningVersion
+        // This session's own update installed it. The settings being edited were loaded
+        // before that update, so saving them now is the same as saving just before it.
+        || installation.installedVersion === versionInstalledThisSession
     ) {
         return null;
     }
@@ -485,6 +489,7 @@ export const App: React.FC = () => {
     const [flowNotice, setFlowNotice] = useState<FlowNoticeState | null>(null);
     const [globalPackageInstallations, setGlobalPackageInstallations] = useState<GlobalPackageInstallation[]>([]);
     const [updatesReturnScreen, setUpdatesReturnScreen] = useState<'main' | 'manageInstallation'>('main');
+    const [versionInstalledThisSession, setVersionInstalledThisSession] = useState<string | null>(null);
     const [hasLoadedClaudeStatus, setHasLoadedClaudeStatus] = useState(false);
     const [hasLoadedInstalledState, setHasLoadedInstalledState] = useState(false);
     const [importValidation, setImportValidation] = useState<ImportValidationResult | null>(null);
@@ -567,7 +572,12 @@ export const App: React.FC = () => {
                 ? inspectActiveGlobalCommand({ commandAvailability })
                 : null;
             const effectiveInstallation = getPathInferredInstallation(installation, activeCommand);
-            const mismatch = getPinnedVersionMismatch(effectiveInstallation, getPackageVersion(), 'ccstatusline-zh');
+            const mismatch = getPinnedVersionMismatch(
+                effectiveInstallation,
+                getPackageVersion(),
+                'ccstatusline-zh',
+                versionInstalledThisSession
+            );
             if (mismatch) {
                 return;
             }
@@ -739,6 +749,7 @@ export const App: React.FC = () => {
             action: async () => {
                 try {
                     await runGlobalUpdateAction(action);
+                    setVersionInstalledThisSession(action.version);
                     const installation = {
                         method: 'pinned' as const,
                         installedVersion: action.version
@@ -852,7 +863,8 @@ export const App: React.FC = () => {
         ? getPinnedVersionMismatch(
             effectiveInstallation,
             runningVersion,
-            getPinnedGlobalRelaunchCommand(effectiveInstallation.packageManager)
+            getPinnedGlobalRelaunchCommand(effectiveInstallation.packageManager),
+            versionInstalledThisSession
         )
         : null;
 
