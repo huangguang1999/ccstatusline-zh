@@ -183,10 +183,10 @@ describe('ItemsEditor', () => {
 
         try {
             await flushInk();
-            expect(stripAnsi(stdout.getOutput())).toContain('(b)文字前缀…');
+            expect(stripAnsi(stdout.getOutput())).toContain('(e)文字前缀…');
 
             stdout.clearOutput();
-            stdin.write('b');
+            stdin.write('e');
             await flushInk();
             expect(stripAnsi(stdout.getOutput())).toContain('(默认: "模型: ")');
 
@@ -207,7 +207,7 @@ describe('ItemsEditor', () => {
             await flushInk();
             const rawOutput = stripAnsi(stdout.getOutput());
             expect(rawOutput).toContain('(纯值)');
-            expect(rawOutput).not.toContain('(b)文字前缀…');
+            expect(rawOutput).not.toContain('(e)文字前缀…');
             expect(rawOutput).not.toContain('(前缀:');
         } finally {
             instance.unmount();
@@ -286,7 +286,7 @@ describe('ItemsEditor', () => {
 
         try {
             await flushInk();
-            stdin.write('b');
+            stdin.write('e');
             await flushInk();
 
             // One macrotask apart: separate keypresses, but no re-render between them
@@ -308,8 +308,8 @@ describe('ItemsEditor', () => {
     });
 
     it.each([
-        { type: 'model', openKey: 'b', prompt: '(默认: "模型: ")', edit: 'X', expected: '1. 模型 (前缀: "模型: X")' },
-        { type: 'model', openKey: 'b', prompt: '(默认: "模型: ")', edit: '\x7f', expected: '1. 模型 (前缀: "模型:")' },
+        { type: 'model', openKey: 'e', prompt: '(默认: "模型: ")', edit: 'X', expected: '1. 模型 (前缀: "模型: X")' },
+        { type: 'model', openKey: 'e', prompt: '(默认: "模型: ")', edit: '\x7f', expected: '1. 模型 (前缀: "模型:")' },
         { type: 'custom-text', openKey: 'e', prompt: '输入自定义文本：', edit: 'X', expected: '1. 自定义文本 (HelloX)' },
         { type: 'custom-text', openKey: 'e', prompt: '输入自定义文本：', edit: '\x7f', expected: '1. 自定义文本 (Hell)' }
     ])('saves the latest $type edit when Enter arrives before a redraw ($edit)', async ({ type, openKey, prompt, edit, expected }) => {
@@ -367,7 +367,7 @@ describe('ItemsEditor', () => {
         try {
             await flushInk();
             stdout.clearOutput();
-            stdin.write('b');
+            stdin.write('e');
             await flushInk();
             expect(stripAnsi(stdout.getOutput())).toContain('"\u{1F469}\u200D\u{1F4BB}  " (默认: "模型: ")');
         } finally {
@@ -398,14 +398,14 @@ describe('ItemsEditor', () => {
 
         try {
             await flushInk();
-            stdin.write('b');
+            stdin.write('e');
             await flushInk();
             stdout.clearOutput();
             stdin.write('\r');
             await flushInk();
             expect(stripAnsi(stdout.getOutput())).toContain('(前缀: "时段 ")');
 
-            stdin.write('b');
+            stdin.write('e');
             await flushInk();
             stdout.clearOutput();
             stdin.write('\t');
