@@ -716,12 +716,15 @@ export const App: React.FC = () => {
                                 color: 'green'
                             });
                         }
-                    } catch {
-                        setFlashMessage({
-                            text: '✗ 安装失败',
-                            color: 'red'
+                    } catch (err) {
+                        setFlashMessage(null);
+                        setFlowNotice({
+                            title: '安装失败',
+                            message: err instanceof Error ? err.message : String(err),
+                            color: 'red',
+                            continueScreen: 'install'
                         });
-                        setScreen('install');
+                        setScreen('flowNotice');
                     }
                     setConfirmDialog(null);
                 }
