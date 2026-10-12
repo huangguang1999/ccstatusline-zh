@@ -204,7 +204,7 @@ describe('update checker', () => {
                 method: 'auto-update',
                 packageManager: 'npm'
             },
-            errorMessage: 'npm registry returned an invalid version'
+            errorMessage: 'npm 仓库返回了无效的版本号'
         });
     });
 
@@ -227,7 +227,7 @@ describe('update checker', () => {
         }) as typeof childProcess.execFile);
 
         await expect(runGlobalPackageInstall('npm', '2.3.0 & calc', { platform: 'win32' }))
-            .rejects.toThrow('Not a release version');
+            .rejects.toThrow('不是有效的 ccstatusline-zh 发布版本');
         expect(execFileSpy).not.toHaveBeenCalled();
     });
 

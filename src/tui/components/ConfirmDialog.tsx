@@ -59,7 +59,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ message, onConfirm
             <Text>{message}</Text>
             <Box marginTop={1}>
                 {busy ? (
-                    <Text color='yellow'>Working... This may take a moment.</Text>
+                    <Text color='yellow'>正在处理，请稍候...</Text>
                 ) : (
                     <List
                         items={CONFIRM_OPTIONS}

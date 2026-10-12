@@ -199,30 +199,30 @@ describe('ImportPreviewDialog helpers', () => {
         try {
             await waitFor(() => {
                 expect(stdout.getOutput()).toContain(`${command}\\u001b[2J`);
-                expect(stdout.getOutput()).toContain('shell commands that run on every status line render');
+                expect(stdout.getOutput()).toContain('Shell 命令将在每次渲染状态行时运行');
             });
 
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Cancel');
-                expect(stdout.getOutput()).toContain('Apply and run these commands');
+                expect(stdout.getOutput()).toContain('▶  取消');
+                expect(stdout.getOutput()).toContain('应用并运行这些命令');
             });
             expect(onApply).not.toHaveBeenCalled();
 
             stdout.clearOutput();
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Replace All');
+                expect(stdout.getOutput()).toContain('▶  全部替换');
             });
             expect(onApply).not.toHaveBeenCalled();
 
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Cancel');
+                expect(stdout.getOutput()).toContain('▶  取消');
             });
             stdin.write('\u001B[B');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Apply and run these commands');
+                expect(stdout.getOutput()).toContain('▶  应用并运行这些命令');
             });
             stdin.write('\r');
             await waitFor(() => {
@@ -262,7 +262,7 @@ describe('ImportPreviewDialog helpers', () => {
 
         try {
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Replace All');
+                expect(stdout.getOutput()).toContain('▶  全部替换');
             });
             stdin.write('\r');
             await waitFor(() => {

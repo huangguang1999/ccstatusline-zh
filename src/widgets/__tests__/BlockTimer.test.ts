@@ -263,8 +263,8 @@ describe('BlockTimerWidget', () => {
             metadata: { display: 'progress', cursor: 'true' }
         }).modifierText;
 
-        expect(modifierText).toContain('bar');
-        expect(modifierText).not.toContain('time cursor');
+        expect(modifierText).toContain('进度条');
+        expect(modifierText).not.toContain('时间游标');
     });
 
     runUsageTimerEditorSuite({

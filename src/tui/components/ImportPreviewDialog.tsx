@@ -193,15 +193,15 @@ export function ImportPreviewDialog({
     if (pendingMode) {
         const commands = getImportedCommands(currentSettings, getImportPreviewSettings(currentSettings, validation, pendingMode));
         const confirmItems: ListEntry<'cancel' | 'confirm'>[] = [
-            { label: 'Cancel', value: 'cancel', description: 'Go back to the preview without importing' },
-            { label: 'Apply and run these commands', value: 'confirm', description: 'Import the settings, including the commands above' }
+            { label: '取消', value: 'cancel', description: '返回预览，不导入配置' },
+            { label: '应用并运行这些命令', value: 'confirm', description: '导入配置，包括上述命令' }
         ];
 
         return (
             <Box flexDirection='column'>
-                <Text bold>Import Preview</Text>
+                <Text bold>导入预览</Text>
                 <Text color='yellow'>
-                    {`Apply this import? It adds ${commands.length === 1 ? 'a shell command' : `${commands.length} shell commands`} that will run on every status line render:`}
+                    {`是否应用此次导入？它将新增 ${commands.length} 条 Shell 命令，每次渲染状态行时都会运行：`}
                 </Text>
                 <Box flexDirection='column' marginLeft={4}>
                     {commands.map((command, index) => (
@@ -303,7 +303,7 @@ export function ImportPreviewDialog({
             </Box>
             {importedCommands.length > 0 && (
                 <Box flexDirection='column' marginTop={1}>
-                    <Text color='yellow'>This import adds shell commands that run on every status line render:</Text>
+                    <Text color='yellow'>此次导入新增的 Shell 命令将在每次渲染状态行时运行：</Text>
                     <Box flexDirection='column' marginLeft={4}>
                         {importedCommands.map((command, index) => (
                             <Text key={index}>{`$ ${escapeControlCharacters(command)}`}</Text>

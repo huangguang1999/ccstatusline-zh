@@ -149,7 +149,7 @@ const cases: ShortcutCase[] = [
             onUpdate: spy,
             onBack: vi.fn()
         }),
-        fired: (_spy, output) => output.includes('Confirm Customization')
+        fired: (_spy, output) => output.includes('确认自定义')
     },
     {
         name: 'Powerline separators: (a)dd',

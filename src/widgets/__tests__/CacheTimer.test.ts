@@ -157,23 +157,23 @@ describe('CacheTimer widget', () => {
 
     it('does not report HOT after a turn interrupted with Esc', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), transcriptContext([assistant(400), pendingUser, interrupted]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
-        expect(widget.render(item(), transcriptContext([assistant(400), pendingUser, interruptedToolUse]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
-        expect(widget.render(item(), transcriptContext([pendingUser, interrupted]), DEFAULT_SETTINGS)).toBe('Cache: n/a');
+        expect(widget.render(item(), transcriptContext([assistant(400), pendingUser, interrupted]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
+        expect(widget.render(item(), transcriptContext([assistant(400), pendingUser, interruptedToolUse]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
+        expect(widget.render(item(), transcriptContext([pendingUser, interrupted]), DEFAULT_SETTINGS)).toBe('缓存: 无数据');
     });
 
     it('does not report HOT after a local slash command', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), transcriptContext([assistant(400), commandCaveat, localCommand, localStdout]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([assistant(400), commandCaveat, localCommand, localStdout]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
         // Some local commands record no stdout row at all.
-        expect(widget.render(item(), transcriptContext([assistant(400), commandCaveat, localCommand]), DEFAULT_SETTINGS)).toBe('Cache: ❄️ COLD');
+        expect(widget.render(item(), transcriptContext([assistant(400), commandCaveat, localCommand]), DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
     });
 
     it('still reports HOT for a prompt slash command that is sent to the model', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item(), transcriptContext([assistant(60), promptCommand, promptExpansion]), DEFAULT_SETTINGS)).toBe('Cache: 🔥 HOT');
+        expect(widget.render(item(), transcriptContext([assistant(60), promptCommand, promptExpansion]), DEFAULT_SETTINGS)).toBe('缓存: 🔥 工作中');
         // A new prompt after an interrupt is in flight again.
-        expect(widget.render(item(), transcriptContext([assistant(60), interrupted, pendingUser]), DEFAULT_SETTINGS)).toBe('Cache: 🔥 HOT');
+        expect(widget.render(item(), transcriptContext([assistant(60), interrupted, pendingUser]), DEFAULT_SETTINGS)).toBe('缓存: 🔥 工作中');
     });
 
     it('starts the countdown from rows with cache reads or cache writes', () => {

@@ -44,14 +44,14 @@ describe('ExtraUsageDailyBudgetWidget', () => {
     it('divides what is left of the monthly limit by the days left', () => {
         const widget = new ExtraUsageDailyBudgetWidget();
 
-        expect(render(widget, item, { usageData })).toBe('Daily Budget: $13.95');
+        expect(render(widget, item, { usageData })).toBe('每日预算: $13.95');
         expect(render(widget, { ...item, rawValue: true }, { usageData })).toBe('$13.95');
     });
 
     it('counts only weekdays when that option is on', () => {
         const widget = new ExtraUsageDailyBudgetWidget();
 
-        expect(render(widget, weekdaysItem, { usageData })).toBe('Daily Budget: $18.83');
+        expect(render(widget, weekdaysItem, { usageData })).toBe('每日预算: $18.83');
     });
 
     it('shows no budget once the limit is used up', () => {
@@ -63,13 +63,13 @@ describe('ExtraUsageDailyBudgetWidget', () => {
                 extraUsageLimit: 50000,
                 extraUsageUsed: 52000
             }
-        })).toBe('Daily Budget: $0.00');
+        })).toBe('每日预算: $0.00');
     });
 
     it('formats the budget in the currency reported by the API', () => {
         const widget = new ExtraUsageDailyBudgetWidget();
 
-        expect(render(widget, item, { usageData: { ...usageData, extraUsageCurrency: 'EUR' } })).toBe('Daily Budget: €13.95');
+        expect(render(widget, item, { usageData: { ...usageData, extraUsageCurrency: 'EUR' } })).toBe('每日预算: €13.95');
     });
 
     it('renders nothing without a monthly limit to divide', () => {
@@ -82,7 +82,7 @@ describe('ExtraUsageDailyBudgetWidget', () => {
         const widget = new ExtraUsageDailyBudgetWidget();
         const context: RenderContext = { usageData: { extraUsageEnabled: false } };
 
-        expect(render(widget, item, context)).toBe('Daily Budget: n/a');
+        expect(render(widget, item, context)).toBe('每日预算: n/a');
         expect(render(widget, { ...item, metadata: { hide: 'disabled' } }, context)).toBeNull();
     });
 
@@ -93,28 +93,28 @@ describe('ExtraUsageDailyBudgetWidget', () => {
 
         expect(render(widget, item, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
         expect(render(widget, { ...item, metadata: { hide: 'no-data' } }, { usageData: { error: 'timeout' } })).toBeNull();
-        expect(render(widget, item, { usageData: { ...usageData, error: 'timeout' } })).toBe('Daily Budget: $13.95');
+        expect(render(widget, item, { usageData: { ...usageData, error: 'timeout' } })).toBe('每日预算: $13.95');
     });
 
     it('renders a fixed sample in the preview, whatever the date', () => {
         const widget = new ExtraUsageDailyBudgetWidget();
 
         // The Extra Usage Remaining sample ($3,894.00) over 20 days.
-        expect(render(widget, item, { isPreview: true })).toBe('Daily Budget: $194.70');
-        expect(render(widget, weekdaysItem, { isPreview: true })).toBe('Daily Budget: $194.70');
+        expect(render(widget, item, { isPreview: true })).toBe('每日预算: $194.70');
+        expect(render(widget, weekdaysItem, { isPreview: true })).toBe('每日预算: $194.70');
     });
 
     it('toggles weekdays only from the editor and shows it on the editor row', () => {
         const widget = new ExtraUsageDailyBudgetWidget();
 
         expect(widget.getCustomKeybinds(item)).toEqual([
-            { key: 'w', label: '(w)eekdays only', action: 'toggle-weekdays' }
+            { key: 'w', label: '(w)仅工作日', action: 'toggle-weekdays' }
         ]);
         expect(widget.getCustomKeybinds(weekdaysItem)).toEqual([
-            { key: 'w', label: '(w) count weekends', action: 'toggle-weekdays' }
+            { key: 'w', label: '(w)计入周末', action: 'toggle-weekdays' }
         ]);
         expect(widget.getEditorDisplay(item).modifierText).toBeUndefined();
-        expect(widget.getEditorDisplay(weekdaysItem).modifierText).toBe('(weekdays)');
+        expect(widget.getEditorDisplay(weekdaysItem).modifierText).toBe('(仅工作日)');
 
         const toggledOn = widget.handleEditorAction('toggle-weekdays', item);
         expect(toggledOn?.metadata?.weekdaysOnly).toBe('true');
@@ -126,6 +126,6 @@ describe('ExtraUsageDailyBudgetWidget', () => {
         const widget = new ExtraUsageDailyBudgetWidget();
 
         expect(widget.getHideableStates().map(state => state.key)).toEqual(['disabled', 'no-data']);
-        expect(widget.getCategory()).toBe('Usage');
+        expect(widget.getCategory()).toBe('用量');
     });
 });

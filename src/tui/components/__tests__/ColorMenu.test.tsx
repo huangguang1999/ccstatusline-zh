@@ -86,7 +86,7 @@ function renderColorMenu(widgets: WidgetItem[]) {
         stdin,
         onUpdate,
         onBack,
-        latestFrame: () => stripAnsi(stdout.getOutput().split('Configure Colors').at(-1) ?? ''),
+        latestFrame: () => stripAnsi(stdout.getOutput().split('配置颜色').at(-1) ?? ''),
         cleanup: () => {
             instance.unmount();
             instance.cleanup();
@@ -174,7 +174,7 @@ describe('ColorMenu', () => {
 
         try {
             await waitFor(() => {
-                expect(menu.latestFrame()).toContain('▶  1: Model');
+                expect(menu.latestFrame()).toContain('▶  1: 模型');
             });
 
             // 3 is the Back entry's position. A digit changes nothing on screen, so let Ink
@@ -183,13 +183,13 @@ describe('ColorMenu', () => {
             await letReactCatchUp();
             menu.stdin.write('\x1B[B');
             await waitFor(() => {
-                expect(menu.latestFrame()).toContain('▶  2: Version');
+                expect(menu.latestFrame()).toContain('▶  2: 版本');
             });
             expect(menu.onBack).not.toHaveBeenCalled();
 
             menu.stdin.write('\x1B[B');
             await waitFor(() => {
-                expect(menu.latestFrame()).toContain('▶  ← Back');
+                expect(menu.latestFrame()).toContain('▶  ← 返回');
             });
             menu.stdin.write('\r');
             await waitFor(() => {
@@ -209,24 +209,24 @@ describe('ColorMenu', () => {
 
         try {
             await waitFor(() => {
-                expect(menu.latestFrame()).toContain('(s)how separators:OFF');
+                expect(menu.latestFrame()).toContain('(s)显示分隔符：OFF');
             });
 
             menu.stdin.write('s');
             await waitFor(() => {
-                expect(menu.latestFrame()).toContain('(s)how separators:ON');
+                expect(menu.latestFrame()).toContain('(s)显示分隔符：ON');
             });
             menu.stdin.write('\x1B[B');
             await waitFor(() => {
-                expect(menu.latestFrame()).toContain('▶  2: Separator');
+                expect(menu.latestFrame()).toContain('▶  2: 分隔符');
             });
             menu.stdin.write('s');
             await waitFor(() => {
-                expect(menu.latestFrame()).toContain('(s)how separators:OFF');
+                expect(menu.latestFrame()).toContain('(s)显示分隔符：OFF');
             });
 
-            expect(menu.latestFrame()).toContain('▶  1: Model');
-            expect(menu.latestFrame()).toContain('Current foreground');
+            expect(menu.latestFrame()).toContain('▶  1: 模型');
+            expect(menu.latestFrame()).toContain('当前 前景色');
 
             menu.stdin.write('b');
             await waitFor(() => {

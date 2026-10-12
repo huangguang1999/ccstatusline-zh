@@ -420,14 +420,14 @@ describe('ItemsEditor', () => {
         }
     });
 
-    it('offers (m)erge on the last widget only to clear a merge left on it', async () => {
+    it('offers (m)合并 on the last widget only to clear a merge left on it', async () => {
         const stdin = createMockStdin();
         const stdout = createMockStdout();
         const stderr = createMockStdout();
         // Debug mode writes whole frames; the last one starts at the last title
         const lastFrame = () => {
             const output = stripAnsi(stdout.getOutput());
-            return output.slice(output.lastIndexOf('Edit Line 1'));
+            return output.slice(output.lastIndexOf('编辑行 1'));
         };
 
         const instance = render(
@@ -449,21 +449,21 @@ describe('ItemsEditor', () => {
 
         try {
             await waitFor(() => {
-                expect(lastFrame()).toContain('▶  1. Model');
+                expect(lastFrame()).toContain('▶  1. 模型');
             });
 
             stdin.write('\u001B[B');
             await waitFor(() => {
-                expect(lastFrame()).toContain('▶  2. Git Branch (merged→)');
+                expect(lastFrame()).toContain('▶  2. Git 分支 (merged→)');
             });
-            expect(lastFrame()).toContain('(m)erge');
+            expect(lastFrame()).toContain('(m)合并');
 
             stdin.write('m');
             await waitFor(() => {
-                expect(lastFrame()).toContain('▶  2. Git Branch');
+                expect(lastFrame()).toContain('▶  2. Git 分支');
                 expect(lastFrame()).not.toContain('(merged→)');
             });
-            expect(lastFrame()).not.toContain('(m)erge');
+            expect(lastFrame()).not.toContain('(m)合并');
         } finally {
             instance.unmount();
             instance.cleanup();

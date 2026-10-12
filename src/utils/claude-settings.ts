@@ -429,7 +429,7 @@ export async function installStatusLine({
         settings = await loadClaudeSettings({ logErrors: false });
     } catch (error) {
         const reason = error instanceof Error ? error.message : String(error);
-        throw new Error(`Could not read existing Claude settings at ${getClaudeSettingsPath()} (${reason}). The file was left unchanged; fix or remove it, then install again.`, { cause: error });
+        throw new Error(`无法读取现有 Claude 设置 ${getClaudeSettingsPath()}（${reason}）。原文件未修改，请修复或移除该文件后重新安装。`, { cause: error });
     }
 
     await backupClaudeSettings('.orig');
@@ -465,7 +465,7 @@ export async function uninstallStatusLine(): Promise<void> {
     try {
         settings = await loadClaudeSettings({ logErrors: false });
     } catch {
-        console.error('Warning: Could not read existing Claude settings.');
+        console.error('警告：无法读取现有 Claude 设置。');
         return; // if we can't read, return... what are we uninstalling?
     }
 

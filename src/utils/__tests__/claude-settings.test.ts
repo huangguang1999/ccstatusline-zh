@@ -806,7 +806,7 @@ describe('backup and error handling behavior', () => {
             expect(fs.readFileSync(settingsPath, 'utf-8')).toBe('{ invalid json');
             expect(fs.existsSync(`${settingsPath}.bak`)).toBe(false);
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                'Warning: Could not read existing Claude settings.'
+                '警告：无法读取现有 Claude 设置。'
             );
         } finally {
             consoleErrorSpy.mockRestore();

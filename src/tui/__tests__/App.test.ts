@@ -151,11 +151,11 @@ describe('Pinned version mismatch guard', () => {
             method: 'pinned',
             packageManager: 'npm',
             installedVersion: '2.3.0'
-        }, '2.2.13', '/usr/local/bin/ccstatusline')).toEqual({
+        }, '2.2.13', '/usr/local/bin/ccstatusline-zh')).toEqual({
             packageManager: 'npm',
             installedVersion: '2.3.0',
             runningVersion: '2.2.13',
-            relaunchCommand: '/usr/local/bin/ccstatusline',
+            relaunchCommand: '/usr/local/bin/ccstatusline-zh',
             canUpdateToRunningVersion: false
         });
     });
@@ -165,13 +165,13 @@ describe('Pinned version mismatch guard', () => {
             method: 'pinned',
             packageManager: 'npm',
             installedVersion: '2.3.0'
-        }, '2.2.13', '/usr/local/bin/ccstatusline', '2.3.0')).toBeNull();
+        }, '2.2.13', '/usr/local/bin/ccstatusline-zh', '2.3.0')).toBeNull();
 
         expect(getPinnedVersionMismatch({
             method: 'pinned',
             packageManager: 'npm',
             installedVersion: '2.3.0'
-        }, '2.2.13', '/usr/local/bin/ccstatusline', '2.2.20')).not.toBeNull();
+        }, '2.2.13', '/usr/local/bin/ccstatusline-zh', '2.2.20')).not.toBeNull();
     });
 
     it('infers pinned package manager from the active PATH match', () => {
@@ -384,8 +384,8 @@ describe('App after a global update run from the TUI', () => {
         vi.spyOn(claudeSettings, 'isInstalled').mockResolvedValue(true);
         vi.spyOn(globalPackageManager, 'inspectActiveGlobalCommand').mockReturnValue({
             packageManager: 'npm',
-            resolvedPath: '/usr/local/bin/ccstatusline',
-            resolvedPaths: ['/usr/local/bin/ccstatusline'],
+            resolvedPath: '/usr/local/bin/ccstatusline-zh',
+            resolvedPaths: ['/usr/local/bin/ccstatusline-zh'],
             binDir: '/usr/local/bin',
             version: null,
             warning: null
@@ -398,7 +398,7 @@ describe('App after a global update run from the TUI', () => {
             actions: [{
                 id: 'npm-global',
                 packageManager: 'npm',
-                command: 'npm install -g ccstatusline@99.0.0',
+                command: 'npm install -g ccstatusline-zh@99.0.0',
                 version: '99.0.0',
                 available: true
             }]
@@ -408,31 +408,31 @@ describe('App after a global update run from the TUI', () => {
 
         try {
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('Main Menu');
+                expect(rendered.getFrame()).toContain('主菜单');
             });
 
             // An unsaved edit: Color Level 256 → Truecolor
-            await pressKey(rendered, KEYS.down, '▶  🎨 Edit Colors');
-            await pressKey(rendered, KEYS.down, '▶  ⚡ Powerline Setup');
-            await pressKey(rendered, KEYS.down, '▶  💻 Terminal Options');
-            await pressKey(rendered, KEYS.enter, '▶  ◱ Terminal Width');
-            await pressKey(rendered, KEYS.down, '▶  ▓ Color Level');
+            await pressKey(rendered, KEYS.down, '▶  🎨 编辑颜色');
+            await pressKey(rendered, KEYS.down, '▶  ⚡ Powerline 设置');
+            await pressKey(rendered, KEYS.down, '▶  💻 终端选项');
+            await pressKey(rendered, KEYS.enter, '▶  ◱ 终端宽度');
+            await pressKey(rendered, KEYS.down, '▶  ▓ 颜色级别');
             await pressKey(rendered, KEYS.enter, '(Truecolor)');
-            await pressKey(rendered, KEYS.escape, '💾 Save & Exit');
+            await pressKey(rendered, KEYS.escape, '💾 保存并退出');
 
-            await pressKey(rendered, KEYS.down, '▶  🌐 Global Overrides');
-            await pressKey(rendered, KEYS.down, '▶  🔧 Configure Status Line');
-            await pressKey(rendered, KEYS.down, '▶  📤 Export Config');
-            await pressKey(rendered, KEYS.down, '▶  📥 Import Config');
-            await pressKey(rendered, KEYS.down, '▶  🧰 Manage Installation');
-            await pressKey(rendered, KEYS.enter, '▶  🔄 Check for Updates');
-            await pressKey(rendered, KEYS.enter, 'An update is available.');
-            await pressKey(rendered, KEYS.enter, 'Run global update command?');
-            await pressKey(rendered, KEYS.enter, '✓ Global package updated');
+            await pressKey(rendered, KEYS.down, '▶  🌐 全局覆盖');
+            await pressKey(rendered, KEYS.down, '▶  🔧 配置状态行');
+            await pressKey(rendered, KEYS.down, '▶  📤 导出配置');
+            await pressKey(rendered, KEYS.down, '▶  📥 导入配置');
+            await pressKey(rendered, KEYS.down, '▶  🧰 管理安装');
+            await pressKey(rendered, KEYS.enter, '▶  🔄 检查更新');
+            await pressKey(rendered, KEYS.enter, '检测到可用更新。');
+            await pressKey(rendered, KEYS.enter, '是否执行全局更新命令？');
+            await pressKey(rendered, KEYS.enter, '✓ 全局包已更新');
             expect(runUpdate).toHaveBeenCalledOnce();
-            expect(rendered.getFrame()).not.toContain('Pinned Install Version Mismatch');
+            expect(rendered.getFrame()).not.toContain('固定安装版本不一致');
 
-            await pressKey(rendered, KEYS.ctrlS, '✓ Configuration saved');
+            await pressKey(rendered, KEYS.ctrlS, '✓ 配置已保存');
             const saved = JSON.parse(fs.readFileSync(sandbox.settingsPath, 'utf-8')) as {
                 colorLevel: number;
                 installation: InstallationMetadata;
@@ -466,16 +466,16 @@ describe('App save guard for an invalid settings.json', () => {
             await waitFor(() => {
                 expect(rendered.getFrame()).toContain('not in a valid format');
             });
-            await pressKey(rendered, KEYS.enter, 'Select Line to Edit Items');
-            await pressKey(rendered, KEYS.enter, 'Edit Line 1');
+            await pressKey(rendered, KEYS.enter, '选择要编辑组件的行');
+            await pressKey(rendered, KEYS.enter, '编辑行 1');
 
-            await pressKey(rendered, KEYS.ctrlS, 'is preserved on disk');
-            await pressKey(rendered, KEYS.escape, 'Edit Line 1');
+            await pressKey(rendered, KEYS.ctrlS, '原文件仍保留在磁盘上');
+            await pressKey(rendered, KEYS.escape, '编辑行 1');
             expect(fs.readFileSync(sandbox.settingsPath, 'utf-8')).toContain('not a list');
 
-            await pressKey(rendered, KEYS.ctrlS, 'is preserved on disk');
-            await pressKey(rendered, KEYS.enter, '✓ Configuration saved');
-            expect(rendered.getFrame()).toContain('Edit Line 1');
+            await pressKey(rendered, KEYS.ctrlS, '原文件仍保留在磁盘上');
+            await pressKey(rendered, KEYS.enter, '✓ 配置已保存');
+            expect(rendered.getFrame()).toContain('编辑行 1');
             const saved = JSON.parse(fs.readFileSync(sandbox.settingsPath, 'utf-8')) as { lines: unknown };
             expect(Array.isArray(saved.lines)).toBe(true);
         } finally {
@@ -523,14 +523,14 @@ describe('App while an install or update runs', () => {
 
         try {
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('Main Menu');
+                expect(rendered.getFrame()).toContain('主菜单');
             });
-            await pressKey(rendered, KEYS.up, '▶  ⭐ Like ccstatusline?');
-            await pressKey(rendered, KEYS.up, '▶  🚪 Exit');
-            await pressKey(rendered, KEYS.up, '▶  📦 Install to Claude Code');
-            await pressKey(rendered, KEYS.enter, 'Select update style');
-            await pressKey(rendered, KEYS.enter, 'Select package manager');
-            await pressKey(rendered, KEYS.enter, 'Continue?');
+            await pressKey(rendered, KEYS.up, '▶  ⭐ 喜欢 ccstatusline-zh？');
+            await pressKey(rendered, KEYS.up, '▶  🚪 退出');
+            await pressKey(rendered, KEYS.up, '▶  📦 安装到 Claude Code');
+            await pressKey(rendered, KEYS.enter, '选择安装方式');
+            await pressKey(rendered, KEYS.enter, '选择包管理器');
+            await pressKey(rendered, KEYS.enter, '是否继续？');
 
             // Yes: the global install starts and doesn't finish yet
             rendered.stdin.write(KEYS.enter);
@@ -543,12 +543,12 @@ describe('App while an install or update runs', () => {
             rendered.stdin.write(KEYS.escape);
             await letReactCatchUp();
             expect(globalInstall.run).toHaveBeenCalledOnce();
-            expect(rendered.getFrame()).toContain('Working...');
-            expect(rendered.getFrame()).not.toContain('Select update style');
+            expect(rendered.getFrame()).toContain('正在处理，请稍候...');
+            expect(rendered.getFrame()).not.toContain('选择安装方式');
 
             globalInstall.finish();
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('✓ Installed to Claude Code');
+                expect(rendered.getFrame()).toContain('✓ 已安装到 Claude Code');
             });
             expect(globalInstall.run).toHaveBeenCalledOnce();
             expect(writeClaudeSettings).toHaveBeenCalledOnce();
@@ -566,8 +566,8 @@ describe('App while an install or update runs', () => {
         vi.spyOn(claudeSettings, 'isInstalled').mockResolvedValue(true);
         vi.spyOn(globalPackageManager, 'inspectActiveGlobalCommand').mockReturnValue({
             packageManager: 'npm',
-            resolvedPath: '/usr/local/bin/ccstatusline',
-            resolvedPaths: ['/usr/local/bin/ccstatusline'],
+            resolvedPath: '/usr/local/bin/ccstatusline-zh',
+            resolvedPaths: ['/usr/local/bin/ccstatusline-zh'],
             binDir: '/usr/local/bin',
             version: null,
             warning: null
@@ -578,7 +578,7 @@ describe('App while an install or update runs', () => {
 
         try {
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('Pinned Install Version Mismatch');
+                expect(rendered.getFrame()).toContain('固定安装版本不一致');
             });
             rendered.stdin.write(KEYS.enter);
             await waitFor(() => {
@@ -590,14 +590,14 @@ describe('App while an install or update runs', () => {
             rendered.stdin.write(KEYS.escape);
             await letReactCatchUp();
             expect(globalInstall.run).toHaveBeenCalledOnce();
-            expect(rendered.getFrame()).toContain('Updating npm global install to v');
-            expect(rendered.getFrame()).not.toContain('Exit');
+            expect(rendered.getFrame()).toContain('正在将 npm 全局安装更新至 v');
+            expect(rendered.getFrame()).not.toMatch(/^\s*(?:▶\s+)?退出$/m);
 
             globalInstall.finish();
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('✓ Global package updated');
+                expect(rendered.getFrame()).toContain('✓ 全局包已更新');
             });
-            expect(rendered.getFrame()).toContain('Main Menu');
+            expect(rendered.getFrame()).toContain('主菜单');
             expect(globalInstall.run).toHaveBeenCalledOnce();
         } finally {
             rendered.cleanup();

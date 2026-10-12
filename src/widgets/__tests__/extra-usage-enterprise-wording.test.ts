@@ -25,8 +25,8 @@ describe('Extra Usage widgets on Enterprise accounts', () => {
 
     // Every widget that mentions the word ranks ahead of the loose fuzzy matches,
     // so the three are listed before anything unrelated
-    it.each(['enterprise', 'spend'])('finds the Extra Usage widgets among the widgets that mention "%s"', (query) => {
-        const results = filterWidgetCatalog(getWidgetCatalog(DEFAULT_SETTINGS), 'All', query);
+    it.each(['enterprise', '消费'])('finds the Extra Usage widgets among the widgets that mention "%s"', (query) => {
+        const results = filterWidgetCatalog(getWidgetCatalog(DEFAULT_SETTINGS), '全部', query);
         const firstLoose = results.findIndex(entry => !entry.searchText.includes(query));
         const mentioning = (firstLoose === -1 ? results : results.slice(0, firstLoose)).map(entry => entry.type);
 

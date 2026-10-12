@@ -17,7 +17,7 @@ import {
 } from './shared/metadata';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
-const LABEL = 'Rate: ';
+const LABEL = '费用速率: ';
 const CLOCK_TIME_KEY = 'clockTime';
 const TOGGLE_CLOCK_TIME_ACTION = 'toggle-clock-time';
 const HOUR_MS = 60 * 60 * 1000;
@@ -31,20 +31,20 @@ function isClockTime(item: WidgetItem): boolean {
 
 export class SessionCostRateWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return 'Shows the session cost per hour, over the time Claude spent working or the whole session'; }
-    getDisplayName(): string { return 'Session Cost Rate'; }
-    getCategory(): string { return 'Session'; }
+    getDescription(): string { return '按 Claude 的实际 API 工作时长或完整会话时长计算每小时费用'; }
+    getDisplayName(): string { return '会话费用速率'; }
+    getCategory(): string { return '会话'; }
     getLabelPrefix(): string { return LABEL; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return {
             displayText: this.getDisplayName(),
-            modifierText: isClockTime(item) ? '(clock time)' : '(active time)'
+            modifierText: isClockTime(item) ? '(完整会话时长)' : '(实际工作时长)'
         };
     }
 
     getCustomKeybinds(item?: WidgetItem): CustomKeybind[] {
-        const label = item && isClockTime(item) ? '(t)ime: use active time' : '(t)ime: use clock time';
+        const label = item && isClockTime(item) ? '(t)使用实际工作时长' : '(t)使用完整会话时长';
         return [{ key: 't', label, action: TOGGLE_CLOCK_TIME_ACTION }];
     }
 

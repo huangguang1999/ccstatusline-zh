@@ -346,7 +346,6 @@ ccstatusline-zh --config /path/to/custom-settings.json
 | `Enter` | 选择/确认 |
 | `a`     | 添加组件  |
 | `d`     | 删除组件  |
-| `e`     | 编辑组件  |
 | `e`     | 编辑文字前缀或自定义内容 |
 | `w`     | 组件选项  |
 | `/`     | 搜索      |

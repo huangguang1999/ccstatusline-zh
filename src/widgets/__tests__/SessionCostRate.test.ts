@@ -31,12 +31,12 @@ function render(widgetItem: WidgetItem, renderContext: RenderContext = {}): stri
 
 describe('SessionCostRateWidget', () => {
     it('divides the session cost by the time Claude spent working', () => {
-        expect(render(item, context)).toBe('Rate: $5.00/hr');
+        expect(render(item, context)).toBe('费用速率: $5.00/hr');
         expect(render({ ...item, rawValue: true }, context)).toBe('$5.00/hr');
     });
 
     it('divides by the whole session time when clock time is on', () => {
-        expect(render(clockItem, context)).toBe('Rate: $1.25/hr');
+        expect(render(clockItem, context)).toBe('费用速率: $1.25/hr');
     });
 
     it('waits for a full minute of the chosen time before showing a rate', () => {
@@ -45,7 +45,7 @@ describe('SessionCostRateWidget', () => {
 
         expect(render(item, early)).toBeNull();
         expect(render(clockItem, early)).toBeNull();
-        expect(render(item, oneMinute)).toBe('Rate: $6.00/hr');
+        expect(render(item, oneMinute)).toBe('费用速率: $6.00/hr');
     });
 
     it('renders nothing without a cost or a duration', () => {
@@ -56,25 +56,25 @@ describe('SessionCostRateWidget', () => {
     });
 
     it('applies the cost number format', () => {
-        expect(render({ ...item, numberFormat: { style: 'whole' } }, context)).toBe('Rate: $5/hr');
+        expect(render({ ...item, numberFormat: { style: 'whole' } }, context)).toBe('费用速率: $5/hr');
     });
 
     it('renders a sample rate in the preview', () => {
         // The Session Cost sample ($2.45) over 30 minutes.
-        expect(render(item, { isPreview: true })).toBe('Rate: $4.90/hr');
+        expect(render(item, { isPreview: true })).toBe('费用速率: $4.90/hr');
     });
 
     it('toggles clock time from the editor and names the time used on the editor row', () => {
         const widget = new SessionCostRateWidget();
 
         expect(widget.getCustomKeybinds(item)).toEqual([
-            { key: 't', label: '(t)ime: use clock time', action: 'toggle-clock-time' }
+            { key: 't', label: '(t)使用完整会话时长', action: 'toggle-clock-time' }
         ]);
         expect(widget.getCustomKeybinds(clockItem)).toEqual([
-            { key: 't', label: '(t)ime: use active time', action: 'toggle-clock-time' }
+            { key: 't', label: '(t)使用实际工作时长', action: 'toggle-clock-time' }
         ]);
-        expect(widget.getEditorDisplay(item).modifierText).toBe('(active time)');
-        expect(widget.getEditorDisplay(clockItem).modifierText).toBe('(clock time)');
+        expect(widget.getEditorDisplay(item).modifierText).toBe('(实际工作时长)');
+        expect(widget.getEditorDisplay(clockItem).modifierText).toBe('(完整会话时长)');
 
         expect(widget.handleEditorAction('toggle-clock-time', item)?.metadata?.clockTime).toBe('true');
         expect(widget.handleEditorAction('toggle-clock-time', clockItem)?.metadata?.clockTime).toBe('false');
@@ -82,6 +82,6 @@ describe('SessionCostRateWidget', () => {
     });
 
     it('sits with Session Cost in the Session category', () => {
-        expect(new SessionCostRateWidget().getCategory()).toBe('Session');
+        expect(new SessionCostRateWidget().getCategory()).toBe('会话');
     });
 });

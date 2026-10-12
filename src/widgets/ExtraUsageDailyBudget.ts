@@ -21,7 +21,7 @@ import {
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 import { USAGE_NO_DATA_HIDEABLE_STATE } from './shared/usage-display';
 
-const LABEL = 'Daily Budget: ';
+const LABEL = '每日预算: ';
 const WEEKDAYS_ONLY_KEY = 'weekdaysOnly';
 const TOGGLE_WEEKDAYS_ACTION = 'toggle-weekdays';
 
@@ -31,20 +31,20 @@ function isWeekdaysOnly(item: WidgetItem): boolean {
 
 export class ExtraUsageDailyBudgetWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return 'Shows what\'s left of your monthly extra usage limit per day left in the month, optionally counting weekdays only'; }
-    getDisplayName(): string { return 'Extra Usage Daily Budget'; }
-    getCategory(): string { return 'Usage'; }
+    getDescription(): string { return '将每月超额用量的剩余额度分摊到本月剩余天数，可选择只计算工作日'; }
+    getDisplayName(): string { return '超额每日预算'; }
+    getCategory(): string { return '用量'; }
     getLabelPrefix(): string { return LABEL; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return {
             displayText: this.getDisplayName(),
-            modifierText: isWeekdaysOnly(item) ? '(weekdays)' : undefined
+            modifierText: isWeekdaysOnly(item) ? '(仅工作日)' : undefined
         };
     }
 
     getCustomKeybinds(item?: WidgetItem): CustomKeybind[] {
-        const label = item && isWeekdaysOnly(item) ? '(w) count weekends' : '(w)eekdays only';
+        const label = item && isWeekdaysOnly(item) ? '(w)计入周末' : '(w)仅工作日';
         return [{ key: 'w', label, action: TOGGLE_WEEKDAYS_ACTION }];
     }
 

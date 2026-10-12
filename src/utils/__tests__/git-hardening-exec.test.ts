@@ -33,7 +33,7 @@ describe.skipIf(process.platform === 'win32')('git hardening against repository 
 
     // execGit's output, or null when it threw
     function execGit(args: string[], cwd: string): string | null {
-        const result = JSON.parse(execFileSync(process.execPath, [probePath, JSON.stringify([args, cwd])], { encoding: 'utf8' })) as { output: string | null };
+        const result = JSON.parse(execFileSync(process.execPath, [probePath, JSON.stringify([args, cwd])], { encoding: 'utf8', env: { ...process.env } })) as { output: string | null };
         return result.output;
     }
 
@@ -44,7 +44,7 @@ describe.skipIf(process.platform === 'win32')('git hardening against repository 
     }
 
     function plainGit(cwd: string, ...args: string[]): string {
-        return execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd, encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+        return execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd, encoding: 'utf8', env: { ...process.env }, stdio: ['pipe', 'pipe', 'ignore'] });
     }
 
     function makeRepo(name: string, attributes?: string): string {

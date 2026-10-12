@@ -80,14 +80,14 @@ describe('ExtraUsageUtilizationWidget', () => {
                 extraUsageLimit: 5000,
                 extraUsageUsed: 0
             }
-        })).toBe('Overage: 0.0%');
+        })).toBe('超额: 0.0%');
         expect(render(widget, item, {
             usageData: {
                 extraUsageEnabled: true,
                 extraUsageLimit: 5000,
                 extraUsageUsed: 1250
             }
-        })).toBe('Overage: 25.0%');
+        })).toBe('超额: 25.0%');
     });
 
     it('prefers the API-reported utilization over the derived one', () => {
@@ -100,7 +100,7 @@ describe('ExtraUsageUtilizationWidget', () => {
                 extraUsageUsed: 1250,
                 extraUsageUtilization: 40
             }
-        })).toBe('Overage: 40.0%');
+        })).toBe('超额: 40.0%');
     });
 
     it('renders nothing without a usable monthly limit to derive utilization from', () => {
@@ -164,8 +164,8 @@ describe('ExtraUsageUtilizationWidget', () => {
             metadata: { display: 'progress', cursor: 'true' }
         }).modifierText;
 
-        expect(modifierText).toContain('bar');
-        expect(modifierText).not.toContain('time cursor');
+        expect(modifierText).toContain('进度条');
+        expect(modifierText).not.toContain('时间游标');
     });
 
     it('shows usage errors only when required extra usage data is missing', () => {

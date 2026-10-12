@@ -237,7 +237,7 @@ export async function checkForUpdates({
     try {
         const latestVersion = await latestVersionFetcher(timeoutMs);
         if (!isReleaseVersion(latestVersion)) {
-            throw new Error('npm registry returned an invalid version');
+            throw new Error('npm 仓库返回了无效的版本号');
         }
 
         return buildUpdateCheckResult({
@@ -312,7 +312,7 @@ export function runGlobalPackageInstall(
     { platform = process.platform }: RunGlobalPackageInstallOptions = {}
 ): Promise<void> {
     if (!isReleaseVersion(version)) {
-        return Promise.reject(new Error('Not a release version of ccstatusline'));
+        return Promise.reject(new Error('不是有效的 ccstatusline-zh 发布版本'));
     }
 
     const executable = getPackageManagerExecutable(packageManager, platform);

@@ -265,7 +265,7 @@ const PinnedVersionMismatchScreen: React.FC<PinnedVersionMismatchScreenProps> = 
             {updating ? (
                 <Box marginTop={1}>
                     <Text color='yellow'>
-                        {`Updating ${mismatch.packageManager} global install to v${mismatch.runningVersion}... This may take a moment.`}
+                        {`正在将 ${mismatch.packageManager} 全局安装更新至 v${mismatch.runningVersion}，请稍候...`}
                     </Text>
                 </Box>
             ) : (

@@ -73,6 +73,6 @@ describe('getLabelModifierText', () => {
 // The key Custom Text, Custom Command, Custom Symbol and Link use to edit their own text
 describe('getLabelKeybind', () => {
     it('edits the label with (e)', () => {
-        expect(getLabelKeybind()).toEqual({ key: 'e', label: '(e)dit label…', action: 'edit-label' });
+        expect(getLabelKeybind()).toEqual({ key: 'e', label: '(e)文字前缀…', action: 'edit-label' });
     });
 });
