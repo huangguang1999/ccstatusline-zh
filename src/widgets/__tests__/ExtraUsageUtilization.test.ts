@@ -68,6 +68,60 @@ describe('ExtraUsageUtilizationWidget', () => {
         })).toBe('超额: 2.6%');
     });
 
+    // The usage API reports `utilization: null` until the first charge of the
+    // month, while still reporting the amount spent and the monthly limit.
+    it('derives utilization from spent and limit when the API reports none', () => {
+        const widget = new ExtraUsageUtilizationWidget();
+        const item: WidgetItem = { id: 'extra', type: 'extra-usage-utilization' };
+
+        expect(render(widget, item, {
+            usageData: {
+                extraUsageEnabled: true,
+                extraUsageLimit: 5000,
+                extraUsageUsed: 0
+            }
+        })).toBe('超额: 0.0%');
+        expect(render(widget, item, {
+            usageData: {
+                extraUsageEnabled: true,
+                extraUsageLimit: 5000,
+                extraUsageUsed: 1250
+            }
+        })).toBe('超额: 25.0%');
+    });
+
+    it('prefers the API-reported utilization over the derived one', () => {
+        const widget = new ExtraUsageUtilizationWidget();
+
+        expect(render(widget, { id: 'extra', type: 'extra-usage-utilization' }, {
+            usageData: {
+                extraUsageEnabled: true,
+                extraUsageLimit: 5000,
+                extraUsageUsed: 1250,
+                extraUsageUtilization: 40
+            }
+        })).toBe('超额: 40.0%');
+    });
+
+    it('renders nothing without a usable monthly limit to derive utilization from', () => {
+        const widget = new ExtraUsageUtilizationWidget();
+        const item: WidgetItem = { id: 'extra', type: 'extra-usage-utilization' };
+
+        expect(render(widget, item, {
+            usageData: {
+                extraUsageEnabled: true,
+                extraUsageUsed: 1250
+            }
+        })).toBeNull();
+        expect(render(widget, item, {
+            usageData: {
+                extraUsageEnabled: true,
+                extraUsageLimit: 0,
+                extraUsageUsed: 0
+            }
+        })).toBeNull();
+    });
+
     it('declares the disabled and no-data hideable states alongside display keybinds', () => {
         const widget = new ExtraUsageUtilizationWidget();
         const baseItem: WidgetItem = { id: 'extra', type: 'extra-usage-utilization' };
@@ -97,6 +151,21 @@ describe('ExtraUsageUtilizationWidget', () => {
         }).modifierText).toBe('(剩余)');
 
         expect(widget.getHideableStates().map(state => state.key)).toEqual(['disabled', 'no-data']);
+    });
+
+    it('does not show a time cursor carried over from a usage widget', () => {
+        // A usage bar's cursor metadata survives a type change in the picker,
+        // but this widget never draws a cursor
+        const widget = new ExtraUsageUtilizationWidget();
+
+        const modifierText = widget.getEditorDisplay({
+            id: 'extra',
+            type: 'extra-usage-utilization',
+            metadata: { display: 'progress', cursor: 'true' }
+        }).modifierText;
+
+        expect(modifierText).toContain('进度条');
+        expect(modifierText).not.toContain('时间游标');
     });
 
     it('shows usage errors only when required extra usage data is missing', () => {

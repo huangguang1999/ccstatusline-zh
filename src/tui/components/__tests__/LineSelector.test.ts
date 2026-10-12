@@ -457,7 +457,7 @@ describe('LineSelector', () => {
         }
     });
 
-    it('swaps the highlighted line with its neighbour in move mode, and with the far end past either edge', async () => {
+    it('swaps the highlighted line with its neighbour in move mode, and moves it to the other end past either edge', async () => {
         const view = renderLineSelector({ lines: [ONE_WIDGET, EMPTY, TWO_WIDGETS], allowEditing: true });
 
         try {
@@ -492,15 +492,25 @@ describe('LineSelector', () => {
             });
             expect(view.onLinesUpdate).toHaveBeenLastCalledWith([EMPTY, TWO_WIDGETS, ONE_WIDGET]);
 
+            // Past the bottom edge it goes to the top, and the other lines keep their order
             view.press(DOWN_ARROW);
             await waitFor(() => {
                 expect(view.rows()[0]).toBe('◆  ☰ 第 1 行 (1 个组件)');
             });
-            expect(view.onLinesUpdate).toHaveBeenLastCalledWith([ONE_WIDGET, TWO_WIDGETS, EMPTY]);
+            expect(view.rows()).toEqual([
+                '◆  ☰ 第 1 行 (1 个组件)',
+                '☰ 第 2 行 (空)',
+                '☰ 第 3 行 (2 个组件)'
+            ]);
+            expect(view.onLinesUpdate).toHaveBeenLastCalledWith([ONE_WIDGET, EMPTY, TWO_WIDGETS]);
 
             view.press(UP_ARROW);
             await waitFor(() => {
-                expect(view.rows()[2]).toBe('◆  ☰ 第 3 行 (1 个组件)');
+                expect(view.rows()).toEqual([
+                    '☰ 第 1 行 (空)',
+                    '☰ 第 2 行 (2 个组件)',
+                    '◆  ☰ 第 3 行 (1 个组件)'
+                ]);
             });
             expect(view.onLinesUpdate).toHaveBeenLastCalledWith([EMPTY, TWO_WIDGETS, ONE_WIDGET]);
 

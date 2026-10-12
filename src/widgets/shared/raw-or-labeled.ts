@@ -8,11 +8,11 @@ import { removeMetadataKeys } from './metadata';
 const LABEL_METADATA_KEY = 'label';
 export const EDIT_LABEL_ACTION = 'edit-label';
 
-// 'l' would be the natural mnemonic, but the reset timers already bind it to
-// (l)ocale
+// The key Custom Text, Custom Command, Custom Symbol and Link use to edit their
+// own text. None of them has a label, so it's free on every labeled widget.
 const LABEL_KEYBIND: CustomKeybind = {
-    key: 'b',
-    label: '(b)文字前缀…',
+    key: 'e',
+    label: '(e)文字前缀…',
     action: EDIT_LABEL_ACTION
 };
 
