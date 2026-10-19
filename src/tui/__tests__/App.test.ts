@@ -445,6 +445,67 @@ describe('App after a global update run from the TUI', () => {
     });
 });
 
+describe('App live label preview', () => {
+    let sandbox: AppSandbox;
+
+    beforeEach(() => {
+        sandbox = setUpAppSandbox();
+        vi.spyOn(claudeStatus, 'loadClaudeStatusLineState').mockResolvedValue({ existingStatusLine: null, refreshInterval: null });
+        vi.spyOn(claudeSettings, 'isInstalled').mockResolvedValue(false);
+    });
+
+    afterEach(() => {
+        sandbox.restore();
+    });
+
+    it.each([false, true])('previews label spacing, cancels drafts, and commits or resets labels (Powerline: %s)', async (powerline) => {
+        const initial = {
+            ...DEFAULT_SETTINGS,
+            powerline: { ...DEFAULT_SETTINGS.powerline, enabled: powerline },
+            lines: [
+                [{ id: 'anchor', type: 'custom-text', customText: 'Untouched line' }],
+                [{ id: 'model', type: 'model', metadata: { label: '7d' } }]
+            ]
+        };
+        fs.writeFileSync(sandbox.settingsPath, JSON.stringify(initial));
+        const rendered = renderApp();
+
+        try {
+            await waitFor(() => {
+                expect(rendered.getFrame()).toContain('主菜单');
+                expect(rendered.getFrame()).toContain('7dClaude');
+            });
+            await pressKey(rendered, KEYS.enter, '选择要编辑组件的行');
+            await pressKey(rendered, KEYS.down, '第 2 行');
+            await pressKey(rendered, KEYS.enter, '编辑行 2');
+            await pressKey(rendered, 'e', '(默认: "模型: ")');
+            await pressKey(rendered, ' ', '7d Claude');
+            await pressKey(rendered, '\x7f', '7dClaude');
+            await pressKey(rendered, 'XYZ', '7dXYZClaude');
+            expect(rendered.getFrame()).toContain('Untouched line');
+            expect(JSON.parse(fs.readFileSync(sandbox.settingsPath, 'utf-8'))).toEqual(initial);
+
+            await pressKey(rendered, KEYS.escape, '编辑行 2');
+            expect(rendered.getFrame()).toContain('7dClaude');
+            expect(rendered.getFrame()).not.toContain('7dXYZClaude');
+            await pressKey(rendered, 'e', '(默认: "模型: ")');
+            await pressKey(rendered, ' ', '7d Claude');
+            await pressKey(rendered, KEYS.enter, '编辑行 2');
+            expect(rendered.getFrame()).toContain('7d Claude');
+            await pressKey(rendered, KEYS.ctrlS, '✓ 配置已保存');
+            expect(JSON.parse(fs.readFileSync(sandbox.settingsPath, 'utf-8'))).toMatchObject({ lines: [initial.lines[0], [{ id: 'model', metadata: { label: '7d ' } }]] });
+
+            await pressKey(rendered, 'e', '(默认: "模型: ")');
+            await pressKey(rendered, '!', '7d !Claude');
+            await pressKey(rendered, '\t', '编辑行 2');
+            expect(rendered.getFrame()).toContain('模型: Claude');
+            expect(rendered.getFrame()).not.toContain('7d !Claude');
+        } finally {
+            rendered.cleanup();
+        }
+    });
+});
+
 describe('App save guard for an invalid settings.json', () => {
     let sandbox: AppSandbox;
 

@@ -8,6 +8,7 @@ import * as path from 'node:path';
 import React, { useState } from 'react';
 
 import { shouldInsertInput } from '../../utils/input-guards';
+import { BlinkingCursor } from '../../widgets/shared/BlinkingCursor';
 
 interface ExportConfigDialogProps {
     onExport: (filePath: string) => void;
@@ -38,7 +39,7 @@ export function ExportConfigDialog({ onExport, onCancel }: ExportConfigDialogPro
             <Box marginTop={1}>
                 <Text>路径： </Text>
                 <Text>{inputValue}</Text>
-                <Text inverse> </Text>
+                <BlinkingCursor inverse>{' '}</BlinkingCursor>
             </Box>
             <Box marginTop={1}>
                 <Text dimColor>按 Enter 确认，按 Esc 取消</Text>

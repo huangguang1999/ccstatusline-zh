@@ -1,4 +1,7 @@
-import { isSafeHyperlinkUrl } from './terminal-sanitize';
+import {
+    isSafeHyperlinkUrl,
+    sanitizeTerminalText
+} from './terminal-sanitize';
 
 export const IDE_LINK_MODES = [
     'vscode',
@@ -21,6 +24,12 @@ function stripControlChars(value: string): string {
     return result;
 }
 
+const SAFE_TERMINAL_SEQUENCE = /(?:\x1b\[[0-9;:]*m|\x9b[0-9;:]*m|(?:\x1b\]|\x9d)8;)/;
+
+function sanitizeLinkText(value: string): string {
+    return SAFE_TERMINAL_SEQUENCE.test(value) ? sanitizeTerminalText(value) : stripControlChars(value);
+}
+
 // A URL holding control characters (from a remote, a PR or settings) could end
 // the sequence early and start one of its own, so it gets no link
 export function renderOsc8Link(url: string, text: string): string {
@@ -28,7 +37,7 @@ export function renderOsc8Link(url: string, text: string): string {
         return stripControlChars(text);
     }
 
-    return `\x1b]8;;${url}\x1b\\${stripControlChars(text)}\x1b]8;;\x1b\\`;
+    return `\x1b]8;;${url}\x1b\\${sanitizeLinkText(text)}\x1b]8;;\x1b\\`;
 }
 
 export function encodeGitRefForUrlPath(ref: string): string {

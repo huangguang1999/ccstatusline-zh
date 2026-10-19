@@ -18,6 +18,7 @@ import type {
 import type { WidgetHookDef } from '../utils/hooks';
 import { shouldInsertInput } from '../utils/input-guards';
 
+import { BlinkingCursor } from './shared/BlinkingCursor';
 import { makeModifierText } from './shared/editor-display';
 import { isHidden } from './shared/hideable';
 import { removeMetadataKeys } from './shared/metadata';
@@ -191,7 +192,7 @@ const SkillsEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, onCance
                 <Box>
                     <Text>输入最多显示的技能数量（0 表示不限制）： </Text>
                     <Text>{limitInput}</Text>
-                    <Text backgroundColor='gray' color='black'>{' '}</Text>
+                    <BlinkingCursor>{' '}</BlinkingCursor>
                 </Box>
                 <Text dimColor>按 Enter 保存，ESC 取消</Text>
             </Box>
