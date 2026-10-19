@@ -35,6 +35,12 @@ const TRUECOLOR_FG = /\x1b\[38;2;\d+;\d+;\d+m/g;
 
 const baseItem: WidgetItem = { id: 'claude-status', type: 'claude-status' };
 const historyItem: WidgetItem = { ...baseItem, metadata: { history: 'true' } };
+const linkedItem: WidgetItem = { ...baseItem, metadata: { linkToStatusPage: 'true' } };
+
+// The text as a hyperlink to the status page
+function statusPageLink(text: string): string {
+    return `\x1b]8;;https://status.claude.com\x1b\\${text}\x1b]8;;\x1b\\`;
+}
 
 function render(
     widget: ClaudeStatusWidget,
@@ -162,7 +168,8 @@ describe('ClaudeStatusWidget', () => {
         expect(widget.getEditorDisplay(baseItem)).toEqual({ displayText: 'Claude 服务状态', modifierText: undefined });
         expect(widget.getEditorDisplay(historyItem)).toEqual({ displayText: 'Claude 服务状态', modifierText: '(故障历史)' });
         expect(widget.getCustomKeybinds()).toEqual([
-            { key: 'h', label: '(h)故障历史', action: 'toggle-history' }
+            { key: 'h', label: '(h)故障历史', action: 'toggle-history' },
+            { key: 'l', label: '(l)链接状态页', action: 'toggle-link' }
         ]);
 
         const enabled = widget.handleEditorAction('toggle-history', baseItem);
@@ -170,6 +177,36 @@ describe('ClaudeStatusWidget', () => {
         const disabled = widget.handleEditorAction('toggle-history', historyItem);
         expect(disabled?.metadata?.history).toBe('false');
         expect(widget.handleEditorAction('unknown-action', baseItem)).toBeNull();
+    });
+
+    it('links the status to the status page when the link is on', () => {
+        const widget = new ClaudeStatusWidget();
+
+        expect(render(widget, linkedItem, { claudeStatusData: { indicator: 'minor' } })).toBe(statusPageLink('Claude: 轻微故障'));
+        expect(render(widget, { ...linkedItem, rawValue: true }, { claudeStatusData: { indicator: 'none' } })).toBe(statusPageLink('ok'));
+        // An unknown status too, when the page is most worth a look
+        expect(render(widget, linkedItem, {})).toBe(statusPageLink('Claude: ?'));
+        expect(render(widget, linkedItem, { isPreview: true })).toBe(statusPageLink('Claude: 正常'));
+        expect(render(widget, baseItem, { claudeStatusData: { indicator: 'minor' } })).toBe('Claude: 轻微故障');
+    });
+
+    it('links the history strip along with the status', () => {
+        const widget = new ClaudeStatusWidget();
+        const item: WidgetItem = { ...baseItem, metadata: { history: 'true', linkToStatusPage: 'true' } };
+        const context: RenderContext = { claudeStatusData: { indicator: 'none', incidents: [] } };
+
+        expect(render(widget, item, context)).toBe(statusPageLink(`${GREEN}Claude: 正常${RESET_FG} ${`${GREEN}▮${RESET_FG}`.repeat(8)}`));
+    });
+
+    it('toggles the link with (l) and names it on the editor row', () => {
+        const widget = new ClaudeStatusWidget();
+        const enabled = widget.handleEditorAction('toggle-link', baseItem);
+        const disabled = widget.handleEditorAction('toggle-link', enabled ?? baseItem);
+
+        expect(enabled?.metadata?.linkToStatusPage).toBe('true');
+        expect(disabled?.metadata?.linkToStatusPage).toBe('false');
+        expect(widget.getEditorDisplay(linkedItem).modifierText).toBe('(状态链接)');
+        expect(widget.getEditorDisplay({ ...baseItem, metadata: { history: 'true', linkToStatusPage: 'true' } }).modifierText).toBe('(故障历史, 状态链接)');
     });
 
     it('preserves its own colors only in history mode', () => {
@@ -183,6 +220,14 @@ describe('ClaudeStatusWidget', () => {
 });
 
 describe('ClaudeStatus renderer integration', () => {
+    it('keeps the status page link on the status line', () => {
+        const line = renderLine(linkedItem, { claudeStatusData: { indicator: 'none' } });
+
+        expect(line).toContain('\x1b]8;;https://status.claude.com\x1b\\');
+        expect(line).toContain('Claude: 正常');
+        expect(line).toContain('\x1b]8;;\x1b\\');
+    });
+
     const context: RenderContext = { claudeStatusData: { indicator: 'none', incidents: [] } };
 
     it('applies global bold and background while preserving intrinsic history colors', () => {

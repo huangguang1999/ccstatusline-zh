@@ -55,41 +55,50 @@ describe('SessionUsageWidget', () => {
             id: 'session',
             type: 'session-usage',
             metadata: { cursor: 'true', display: 'slider' }
-        }, context)).toBe('会话: ▓▓░░░│░░░░ 20.0%');
+        }, context)).toBe('时段: ▓▓░░░│░░░░ 20.0%');
         expect(render(widget, {
             id: 'session',
             type: 'session-usage',
             metadata: { cursor: 'true', display: 'slider-only' }
-        }, context)).toBe('会话: ▓▓░░░│░░░░');
+        }, context)).toBe('时段: ▓▓░░░│░░░░');
     });
 
     it('applies the label override to every display mode', () => {
         const widget = new SessionUsageWidget();
         const context: RenderContext = { usageData: { sessionUsage: 20 } };
-        const metadata = { label: '5h ' };
+        const metadata = { label: '5 小时 ' };
 
-        expect(widget.getLabelPrefix()).toBe('会话: ');
-        expect(render(widget, { id: 'session', type: 'session-usage', metadata }, context)).toBe('5h 20.0%');
+        expect(widget.getLabelPrefix()).toBe('时段: ');
+        expect(render(widget, { id: 'session', type: 'session-usage', metadata }, context)).toBe('5 小时 20.0%');
         expect(render(widget, {
             id: 'session',
             type: 'session-usage',
             metadata: { ...metadata, display: 'slider-only' }
-        }, context)).toBe('5h ▓▓░░░░░░░░');
+        }, context)).toBe('5 小时 ▓▓░░░░░░░░');
+    });
+
+    it('是时段用量，默认标签为“时段: ”并支持自定义标签', () => {
+        const widget = new SessionUsageWidget();
+        const context: RenderContext = { usageData: { sessionUsage: 20 } };
+
+        expect(widget.getDisplayName()).toBe('时段用量');
+        expect(render(widget, { id: 'session', type: 'session-usage' }, context)).toBe('时段: 20.0%');
+        expect(render(widget, { id: 'session', type: 'session-usage', metadata: { label: '会话: ' } }, context)).toBe('会话: 20.0%');
     });
 
     runUsagePercentWidgetSuite({
         baseItem: { id: 'session', type: 'session-usage' },
         createWidget: () => new SessionUsageWidget(),
         errorMessageMock: usageErrorMessageMock,
-        expectedInvertedTime: '会话: 76.5%',
+        expectedInvertedTime: '时段: 76.5%',
         expectedModifierText: '(中进度条, 剩余)',
-        expectedPreviewInvertedTime: '会话: 80.0%',
-        expectedProgress: '会话: [████████████░░░░] 76.5%',
+        expectedPreviewInvertedTime: '时段: 80.0%',
+        expectedProgress: '时段: [████████████░░░░] 76.5%',
         expectedRawInvertedTime: '76.5%',
         expectedRawProgress: '[████████░░░░░░░░░░░░░░░░░░░░░░░░] 23.4%',
         expectedRawTime: '23.4%',
-        expectedTime: '会话: 23.4%',
-        expectedWholePercentTime: '会话: 23%',
+        expectedTime: '时段: 23.4%',
+        expectedWholePercentTime: '时段: 23%',
         modifierItem: {
             id: 'session',
             type: 'session-usage',

@@ -13,6 +13,7 @@ import type {
 import { getVisibleWidth } from '../../utils/ansi';
 import { shouldInsertInput } from '../../utils/input-guards';
 
+import { BlinkingCursor } from './BlinkingCursor';
 import { removeMetadataKeys } from './metadata';
 import { getGraphemes } from './text-cursor';
 
@@ -139,10 +140,10 @@ const SymbolSlotsEditor: React.FC<WidgetEditorProps & { slots: SymbolSlot[] }> =
                             <Text color={isSelected ? 'green' : undefined}>
                                 {`${labelPadding}${slot.label}: `}
                             </Text>
-                            {value ? (
-                                <Text inverse>{value}</Text>
+                            {isSelected ? (
+                                <BlinkingCursor inverse dimColor={!value}>{value || '（无）'}</BlinkingCursor>
                             ) : (
-                                <Text inverse dimColor>（无）</Text>
+                                <Text inverse dimColor={!value}>{value || '（无）'}</Text>
                             )}
                             <Text dimColor>{`（默认: ${slot.defaultSymbol})`}</Text>
                         </Box>

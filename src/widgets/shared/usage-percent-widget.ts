@@ -40,9 +40,9 @@ import {
     toggleUsageInverted
 } from './usage-display';
 
-export type UsagePercentWidgetKind = 'session' | 'weekly' | 'weekly-sonnet' | 'weekly-opus' | 'fable-weekly';
+export type UsagePercentWidgetKind = 'session' | 'weekly' | 'weekly-sonnet' | 'weekly-opus' | 'fable-weekly' | 'spend-limit';
 
-type UsagePercentField = 'sessionUsage' | 'weeklyUsage' | 'weeklySonnetUsage' | 'weeklyOpusUsage' | 'fableUsage';
+type UsagePercentField = 'sessionUsage' | 'weeklyUsage' | 'weeklySonnetUsage' | 'weeklyOpusUsage' | 'fableUsage' | 'spendLimitUsage';
 
 interface UsageCursorOptions { cursorPercent: number }
 
@@ -52,13 +52,15 @@ interface UsagePercentWidgetKindConfig {
     description: string;
     previewPercent: number;
     usageField: UsagePercentField;
+    // The value comes from the statusline payload, so usage API errors say nothing about it.
+    ignoreApiError?: boolean;
 }
 
 const USAGE_PERCENT_WIDGET_CONFIG: Record<UsagePercentWidgetKind, UsagePercentWidgetKindConfig> = {
     'session': {
-        label: '会话: ',
-        displayName: '会话用量',
-        description: '显示每日/会话 API 用量百分比',
+        label: '时段: ',
+        displayName: '时段用量',
+        description: '显示当前 5 小时时段的 API 用量百分比',
         previewPercent: 20,
         usageField: 'sessionUsage'
     },
@@ -89,6 +91,14 @@ const USAGE_PERCENT_WIDGET_CONFIG: Record<UsagePercentWidgetKind, UsagePercentWi
         description: '显示每周 Fable API 用量百分比',
         previewPercent: 4,
         usageField: 'fableUsage'
+    },
+    'spend-limit': {
+        label: '消费限额: ',
+        displayName: '消费限额用量',
+        description: '显示 Claude 应用网关消费限额的已用百分比',
+        previewPercent: 40,
+        usageField: 'spendLimitUsage',
+        ignoreApiError: true
     }
 };
 
@@ -106,6 +116,10 @@ function resolveUsageWindow(kind: UsagePercentWidgetKind, data: RenderUsageData,
     }
     if (kind === 'weekly-opus') {
         return resolveWeeklyOpusUsageWindow(data);
+    }
+    if (kind === 'spend-limit') {
+        // The payload does not say how long the limit's period is, so there is no window to place a cursor in.
+        return null;
     }
     return resolveFableUsageWindow(data);
 }
@@ -189,7 +203,7 @@ export function renderUsagePercentWidgetValue(
     const data: RenderUsageData = context.usageData ?? {};
     const usagePercent = data[config.usageField];
     if (usagePercent === undefined) {
-        if (data.error) {
+        if (data.error && !config.ignoreApiError) {
             return isHidden(item, USAGE_NO_DATA_HIDEABLE_STATE.key)
                 ? null
                 : getUsageErrorMessage(data.error);

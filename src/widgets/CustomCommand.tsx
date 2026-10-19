@@ -21,6 +21,7 @@ import {
 import { runCustomCommand } from '../utils/custom-command';
 import { shouldInsertInput } from '../utils/input-guards';
 
+import { BlinkingCursor } from './shared/BlinkingCursor';
 import { applyMaxWidth } from './shared/max-width';
 
 export class CustomCommandWidget implements Widget {
@@ -211,7 +212,7 @@ const CustomCommandEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, 
                     输入命令路径：
                     {' '}
                     {commandInput.slice(0, commandCursorPos)}
-                    <Text backgroundColor='gray' color='black'>{commandInput[commandCursorPos] ?? ' '}</Text>
+                    <BlinkingCursor>{commandInput[commandCursorPos] ?? ' '}</BlinkingCursor>
                     {commandInput.slice(commandCursorPos + 1)}
                 </Text>
                 <Text dimColor>←→ 移动光标，Enter 保存，ESC 取消</Text>
@@ -223,7 +224,7 @@ const CustomCommandEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, 
                 <Box>
                     <Text>输入最大宽度（留空表示不限制）： </Text>
                     <Text>{widthInput}</Text>
-                    <Text backgroundColor='gray' color='black'>{' '}</Text>
+                    <BlinkingCursor>{' '}</BlinkingCursor>
                 </Box>
                 <Text dimColor>按 Enter 保存，ESC 取消</Text>
             </Box>
@@ -234,7 +235,7 @@ const CustomCommandEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, 
                 <Box>
                     <Text>输入超时时长（毫秒，默认 1000）： </Text>
                     <Text>{timeoutInput}</Text>
-                    <Text backgroundColor='gray' color='black'>{' '}</Text>
+                    <BlinkingCursor>{' '}</BlinkingCursor>
                 </Box>
                 <Text dimColor>按 Enter 保存，ESC 取消</Text>
             </Box>

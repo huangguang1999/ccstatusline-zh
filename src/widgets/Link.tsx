@@ -18,6 +18,8 @@ import { renderOsc8Link } from '../utils/hyperlink';
 import { shouldInsertInput } from '../utils/input-guards';
 import { isSafeHyperlinkUrl } from '../utils/terminal-sanitize';
 
+import { BlinkingCursor } from './shared/BlinkingCursor';
+
 function isValidLinkUrl(url: string): boolean {
     try {
         const parsed = new URL(url);
@@ -194,7 +196,7 @@ const LinkEditor: React.FC<WidgetEditorProps> = ({ widget, onComplete, onCancel,
             <Text>
                 {prompt}
                 {activeValue.slice(0, activeCursor)}
-                <Text backgroundColor='gray' color='black'>{activeValue[activeCursor] ?? ' '}</Text>
+                <BlinkingCursor>{activeValue[activeCursor] ?? ' '}</BlinkingCursor>
                 {activeValue.slice(activeCursor + 1)}
             </Text>
             {isUrlMode ? (
