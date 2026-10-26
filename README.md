@@ -111,6 +111,8 @@ bun install -g ccstatusline-zh
 
 在 Claude Code 设置中添加状态栏配置。编辑 `~/.claude/settings.json`：
 
+> 若技能组件始终显示无数据，请确认包装脚本名称包含 `ccstatusline`，并通过 `ccstatusline-zh "$@"` 传递参数；保存配置时会提示未能安装的 Hook（事件触发命令）。
+
 > 如果状态栏只在某个目录为空，请检查 Claude Code 是否已信任该工作区。上游说明和排查方法见 [目录信任问题](docs/USAGE.md#status-line-empty-in-one-folder-but-fine-elsewhere)。
 
 ```json

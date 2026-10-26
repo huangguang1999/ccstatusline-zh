@@ -67,6 +67,7 @@ import {
     type GlobalPackageInstallation,
     type GlobalPackageManager
 } from '../utils/global-package-manager';
+import type { SkippedWidgetHooks } from '../utils/hooks';
 import { openExternalUrl } from '../utils/open-url';
 import {
     checkPowerlineFonts,
@@ -153,10 +154,13 @@ interface FlowNoticeState {
     title: string;
     message: string;
     color: 'green' | 'red' | 'yellow';
-    continueScreen: Exclude<AppScreen, 'confirm' | 'flowNotice'>;
+    // 'exit' closes the TUI, for a notice shown by Save & Exit
+    continueScreen: Exclude<AppScreen, 'confirm' | 'flowNotice'> | 'exit';
 }
 
-type FlowNoticeProps = FlowNoticeState & { onContinue: () => void };
+// Where Continue leads is App's to handle (onContinue), so the notice itself
+// takes only what it draws
+type FlowNoticeProps = Omit<FlowNoticeState, 'continueScreen'> & { onContinue: () => void };
 
 const NOTICE_ITEMS: ListEntry<string>[] = [
     {
@@ -316,6 +320,20 @@ function buildUninstallConfirmMessage(selection: UninstallSelection): string {
         .join('\n');
 
     return `将从 ${getClaudeSettingsPath()} 中移除 ccstatusline-zh 并运行：\n\n${commands}\n\n继续？`;
+}
+
+// A save left out hooks that widgets need, because the status line command may
+// be another tool: say which widgets, and how a wrapper script gets the hooks
+function buildSkippedHooksNotice(
+    skipped: SkippedWidgetHooks,
+    continueScreen: FlowNoticeState['continueScreen']
+): FlowNoticeState {
+    return {
+        title: '配置已保存',
+        message: `未添加 ${skipped.widgetNames.join('、')} 所需的 Claude Code Hook：状态行命令不包含 "ccstatusline"，可能属于其他工具。\n\n${skipped.statusCommand}\n\n如果这是运行 ccstatusline-zh 的包装脚本，请在脚本名称中加入 "ccstatusline"（例如 ~/.claude/ccstatusline-zh-wrapper.sh），通过 ccstatusline-zh "$@" 传递参数，然后重新保存。`,
+        color: 'yellow',
+        continueScreen
+    };
 }
 
 function clearInstallationMetadata(settings: Settings | null): Settings | null {
@@ -645,15 +663,21 @@ export const App: React.FC = () => {
             const performSave = () => {
                 void (async () => {
                     try {
-                        await saveSettings(settings);
+                        const skippedHooks = await saveSettings(settings);
                         setOriginalSettings(cloneSettings(settings));
                         setHasChanges(false);
                         // File is valid again after an explicit save → clear the banner + guard.
                         setConfigLoadError(null);
-                        setFlashMessage({
-                            text: '✓ 配置已保存',
-                            color: 'green'
-                        });
+                        if (skippedHooks) {
+                            setFlashMessage(null);
+                            setFlowNotice(buildSkippedHooksNotice(skippedHooks, screen === 'flowNotice' ? 'main' : screen));
+                            setScreen('flowNotice');
+                        } else {
+                            setFlashMessage({
+                                text: '✓ 配置已保存',
+                                color: 'green'
+                            });
+                        }
                     } catch {
                         setFlashMessage({
                             text: '✗ 无法保存配置',
@@ -1135,10 +1159,15 @@ export const App: React.FC = () => {
             case 'save': {
                 const saveAndExit = async () => {
                     try {
-                        await saveSettings(settings);
+                        const skippedHooks = await saveSettings(settings);
                         setOriginalSettings(cloneSettings(settings));
                         setHasChanges(false);
-                        exit();
+                        if (skippedHooks) {
+                            setFlowNotice(buildSkippedHooksNotice(skippedHooks, 'exit'));
+                            setScreen('flowNotice');
+                        } else {
+                            exit();
+                        }
                     } catch {
                         setFlashMessage({
                             text: '✗ 无法保存配置',
@@ -1407,6 +1436,10 @@ export const App: React.FC = () => {
                     <FlowNotice
                         {...flowNotice}
                         onContinue={() => {
+                            if (flowNotice.continueScreen === 'exit') {
+                                exit();
+                                return;
+                            }
                             setScreen(flowNotice.continueScreen);
                             setFlowNotice(null);
                         }}
