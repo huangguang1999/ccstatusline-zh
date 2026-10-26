@@ -20,6 +20,9 @@ export type UsageDisplayMode = 'time' | 'progress' | 'progress-short' | 'slider'
 // Shared by the usage percentage widgets and the reset timers.
 // Hour-format toggles use f so h remains available for the hide checklist.
 export const USAGE_NO_DATA_HIDEABLE_STATE: HideableState = { key: 'no-data', label: '用量数据不可用时' };
+// Block Reset Timer's: show the reset countdown only once the 5-hour limit is
+// hit. Here rather than in the widget so the usage prefetch can read it.
+export const SESSION_UNDER_LIMIT_HIDEABLE_STATE: HideableState = { key: 'under-limit', label: '5 小时时段用量未达 100% 时' };
 
 const SLIDER_WIDTH = 10;
 
