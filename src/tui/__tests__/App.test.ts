@@ -556,16 +556,20 @@ function createPendingRun() {
 
 describe('App while an install or update runs', () => {
     let sandbox: AppSandbox;
+    const savedEnv = { ...process.env };
 
     beforeEach(() => {
         sandbox = setUpAppSandbox();
+        process.env.CCSTATUSLINE_DEV_RELOAD = '1';
+        process.env.CCSTATUSLINE_DEV_RELOAD_STATE = `${sandbox.settingsPath}.reload`;
     });
 
     afterEach(() => {
         sandbox.restore();
+        process.env = { ...savedEnv };
     });
 
-    it('runs a confirmed install once, ignoring Enter and ESC until it finishes', async () => {
+    it('runs a confirmed install once, ignoring Enter, ESC and Ctrl+R until it finishes', async () => {
         vi.spyOn(claudeStatus, 'loadClaudeStatusLineState').mockResolvedValue({ existingStatusLine: null, refreshInterval: null });
         vi.spyOn(claudeSettings, 'isInstalled').mockResolvedValue(false);
         vi.spyOn(claudeSettings, 'getExistingStatusLine').mockResolvedValue(null);
@@ -603,6 +607,9 @@ describe('App while an install or update runs', () => {
             await letReactCatchUp();
             rendered.stdin.write(KEYS.escape);
             await letReactCatchUp();
+            rendered.stdin.write('\u0012');
+            await letReactCatchUp();
+            expect(fs.existsSync(`${sandbox.settingsPath}.reload`)).toBe(false);
             expect(globalInstall.run).toHaveBeenCalledOnce();
             expect(rendered.getFrame()).toContain('正在处理，请稍候...');
             expect(rendered.getFrame()).not.toContain('选择安装方式');
@@ -618,7 +625,7 @@ describe('App while an install or update runs', () => {
         }
     });
 
-    it('runs the pinned version update once, ignoring Enter and ESC until it finishes', async () => {
+    it('runs the pinned version update once, ignoring Enter, ESC and Ctrl+R until it finishes', async () => {
         fs.writeFileSync(sandbox.settingsPath, JSON.stringify({
             ...DEFAULT_SETTINGS,
             installation: { method: 'pinned', installedVersion: '2.0.0' }
@@ -650,6 +657,9 @@ describe('App while an install or update runs', () => {
             await letReactCatchUp();
             rendered.stdin.write(KEYS.escape);
             await letReactCatchUp();
+            rendered.stdin.write('\u0012');
+            await letReactCatchUp();
+            expect(fs.existsSync(`${sandbox.settingsPath}.reload`)).toBe(false);
             expect(globalInstall.run).toHaveBeenCalledOnce();
             expect(rendered.getFrame()).toContain('正在将 npm 全局安装更新至 v');
             expect(rendered.getFrame()).not.toMatch(/^\s*(?:▶\s+)?退出$/m);

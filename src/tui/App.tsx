@@ -47,6 +47,15 @@ import {
     type ImportValidationResult
 } from '../utils/config';
 import {
+    DEV_RELOAD_EXIT_CODE,
+    discardDevReloadSnapshot,
+    getDevReloadStateFile,
+    isDevReloadRequested,
+    readDevReloadSnapshot,
+    requestDevReload,
+    writeDevReloadSnapshot
+} from '../utils/dev-reload';
+import {
     inspectGlobalCommandResolution,
     isPathInsideDir
 } from '../utils/global-command-resolution';
@@ -477,14 +486,22 @@ export function buildInvalidConfigSaveConfirm(
 
 export const App: React.FC = () => {
     const { exit } = useApp();
+    // Only set when running under the CCSTATUSLINE_DEV_RELOAD supervisor; the
+    // snapshot (if any) is where ctrl+r left off before the restart
+    const [devReloadStateFile] = useState(() => getDevReloadStateFile(process.env));
+    const [restored] = useState(() => (devReloadStateFile ? readDevReloadSnapshot(devReloadStateFile) : null));
     const [settings, setSettings] = useState<Settings | null>(null);
     const [originalSettings, setOriginalSettings] = useState<Settings | null>(null);
     const [hasChanges, setHasChanges] = useState(false);
     const [configLoadError, setConfigLoadError] = useState<string | null>(null);
-    const [screen, setScreen] = useState<AppScreen>('main');
-    const [selectedLine, setSelectedLine] = useState(0);
+    const [screen, setScreen] = useState<AppScreen>(restored?.screen ?? 'main');
+    const [selectedLine, setSelectedLine] = useState(restored?.selectedLine ?? 0);
     const [previewWidgets, setPreviewWidgets] = useState<WidgetItem[] | null>(null);
-    const [menuSelections, setMenuSelections] = useState<Record<string, number>>({});
+    const [menuSelections, setMenuSelections] = useState<Record<string, number>>(restored?.menuSelections ?? {});
+    const handleLineSelectionChange = useCallback((index: number) => {
+        setMenuSelections(prev => ({ ...prev, lines: index }));
+    }, []);
+    const [itemsCursor, setItemsCursor] = useState(restored?.itemsCursor ?? 0);
     const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
     const [isClaudeInstalled, setIsClaudeInstalled] = useState(false);
     const [terminalWidth, setTerminalWidth] = useState(process.stdout.columns || 80);
@@ -523,10 +540,12 @@ export const App: React.FC = () => {
                 setHasLoadedClaudeStatus(true);
             });
         void loadSettings().then((loadedSettings) => {
+            // A dev reload resumes the unsaved settings instead of the file's
+            const initialSettings = restored?.settings ?? loadedSettings;
             // Set global chalk level based on settings (default to 256 colors for compatibility)
-            chalk.level = loadedSettings.colorLevel;
-            setSettings(loadedSettings);
-            setOriginalSettings(cloneSettings(loadedSettings));
+            chalk.level = initialSettings.colorLevel;
+            setSettings(initialSettings);
+            setOriginalSettings(cloneSettings(restored?.originalSettings ?? loadedSettings));
             // Capture why settings.json was rejected (if at all) so the TUI can warn and
             // guard saves. Read it here, in the load callback: the module-scoped signal is
             // reset by any later loadSettings/saveInstallationMetadata call.
@@ -556,7 +575,7 @@ export const App: React.FC = () => {
         return () => {
             process.stdout.off('resize', handleResize);
         };
-    }, []);
+    }, [restored]);
 
     // Check for changes whenever settings update
     useEffect(() => {
@@ -565,6 +584,23 @@ export const App: React.FC = () => {
             setHasChanges(hasAnyChanges);
         }
     }, [settings, originalSettings]);
+
+    // After the first load, originalSettings only changes once the settings
+    // file has been written: a save, or an install or update recording
+    // itself. The dev reload snapshot this TUI resumed from is then older
+    // than the file; a retry after a crash would restore it, and the next
+    // save would write it back over the file. Dropped, the retry loads the file.
+    const loadedOriginalSettings = useRef<Settings | null>(null);
+    useEffect(() => {
+        if (!devReloadStateFile || !originalSettings) {
+            return;
+        }
+        if (!loadedOriginalSettings.current) {
+            loadedOriginalSettings.current = originalSettings;
+        } else if (originalSettings !== loadedOriginalSettings.current) {
+            discardDevReloadSnapshot(devReloadStateFile);
+        }
+    }, [devReloadStateFile, originalSettings]);
 
     // Clear header message after 2 seconds
     useEffect(() => {
@@ -579,6 +615,15 @@ export const App: React.FC = () => {
     useInput((input, key) => {
         if (key.ctrl && input === 'c') {
             exit();
+        }
+        if (devReloadStateFile && key.ctrl && input === 'r' && settings && originalSettings) {
+            if (actionInFlightRef.current) {
+                return;
+            }
+            writeDevReloadSnapshot(devReloadStateFile, { settings, originalSettings, screen, selectedLine, menuSelections, itemsCursor });
+            requestDevReload();
+            exit();
+            return;
         }
         // Global save shortcut
         if (key.ctrl && input === 's' && settings && screen !== 'confirm') {
@@ -1166,6 +1211,7 @@ export const App: React.FC = () => {
 
     const handleLineSelect = (lineIndex: number) => {
         setSelectedLine(lineIndex);
+        setItemsCursor(0);
         setScreen('items');
     };
 
@@ -1186,6 +1232,7 @@ export const App: React.FC = () => {
                 <Text bold>
                     {` | ${runningVersion && `v${runningVersion}`}`}
                 </Text>
+                {devReloadStateFile && <Text dimColor>  dev reload: ctrl+r</Text>}
                 {flashMessage && (
                     <Text color={flashMessage.color} bold>
                         {`  ${flashMessage.text}`}
@@ -1220,6 +1267,7 @@ export const App: React.FC = () => {
                         isClaudeInstalled={isClaudeInstalled}
                         hasChanges={hasChanges}
                         initialSelection={menuSelections.main}
+                        onSelectionChange={(index) => { setMenuSelections(prev => ({ ...prev, main: index })); }}
                         powerlineFontStatus={powerlineFontStatus}
                         settings={settings}
                         installation={effectiveInstallation}
@@ -1241,6 +1289,7 @@ export const App: React.FC = () => {
                             setScreen('main');
                         }}
                         initialSelection={menuSelections.lines}
+                        onSelectionChange={handleLineSelectionChange}
                         title='选择要编辑组件的行'
                         allowEditing={true}
                     />
@@ -1250,6 +1299,8 @@ export const App: React.FC = () => {
                         widgets={settings.lines[selectedLine] ?? []}
                         onUpdate={(widgets) => { updateLine(selectedLine, widgets); }}
                         onPreviewChange={setPreviewWidgets}
+                        initialSelectedIndex={itemsCursor}
+                        onSelectedIndexChange={setItemsCursor}
                         onBack={() => {
                             // When going back to lines menu, preserve which line was selected
                             setMenuSelections(prev => ({ ...prev, lines: selectedLine }));
@@ -1274,6 +1325,7 @@ export const App: React.FC = () => {
                             setScreen('main');
                         }}
                         initialSelection={menuSelections.lines}
+                        onSelectionChange={handleLineSelectionChange}
                         title='选择要编辑颜色的行'
                         blockIfPowerlineActive={true}
                         settings={settings}
@@ -1539,5 +1591,12 @@ export const App: React.FC = () => {
 export function runTUI() {
     // Clear the terminal before starting the TUI
     process.stdout.write('\x1b[2J\x1b[H');
-    render(<App />);
+    const instance = render(<App />);
+    // ctrl+r under the dev reload supervisor: exit with the code that tells
+    // it to start a fresh process, once Ink has restored the terminal
+    void instance.waitUntilExit().finally(() => {
+        if (isDevReloadRequested()) {
+            process.exit(DEV_RELOAD_EXIT_CODE);
+        }
+    });
 }
