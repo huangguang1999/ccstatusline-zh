@@ -12,7 +12,7 @@ import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 const LABEL = '终端: ';
 
 export class TerminalWidthWidget implements Widget {
-    getDefaultColor(): string { return 'gray'; }
+    getDefaultColor(): string { return 'brightBlack'; }
     getDescription(): string { return '显示当前终端宽度（列数）'; }
     getDisplayName(): string { return '终端宽度'; }
     getCategory(): string { return '环境'; }
