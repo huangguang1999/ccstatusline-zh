@@ -110,6 +110,12 @@ const SymbolSlotsEditor: React.FC<WidgetEditorProps & { slots: SymbolSlot[] }> =
             setSelectedIndex(selectedIndex - 1 < 0 ? slots.length - 1 : selectedIndex - 1);
         } else if (key.downArrow && slots.length > 1) {
             setSelectedIndex(selectedIndex + 1 > slots.length - 1 ? 0 : selectedIndex + 1);
+        } else if (key.tab && key.shift) {
+            // Widgets with several glyphs are mostly blanked whole to save
+            // width on the status line, which is one Backspace per row
+            // otherwise. Blanked rows toggle back so the key is reversible.
+            const allBlank = values.every(value => value.length === 0);
+            setValues(values.map((_, index) => (allBlank ? slots[index]?.defaultSymbol ?? '' : '')));
         } else if (key.tab) {
             setValues(values.map((value, index) => (
                 index === selectedIndex ? slots[selectedIndex]?.defaultSymbol ?? '' : value
@@ -128,7 +134,7 @@ const SymbolSlotsEditor: React.FC<WidgetEditorProps & { slots: SymbolSlot[] }> =
             <Text bold>字符</Text>
             <Text dimColor>
                 {slots.length > 1
-                    ? '↑↓ 选行，输入字符，Tab 恢复默认，Backspace 清空，Enter 保存，ESC 取消'
+                    ? '↑↓ 选行，输入字符，Tab 恢复默认，Backspace 清空，Shift+Tab 切换全部清空/默认，Enter 保存，ESC 取消'
                     : '输入任意字符或 emoji，Tab 恢复默认，Backspace 清空，Enter 保存，ESC 取消'}
             </Text>
             <Box marginTop={1} flexDirection='column'>
