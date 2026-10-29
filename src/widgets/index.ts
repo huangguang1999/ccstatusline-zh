@@ -88,5 +88,6 @@ export { GitWorktreeBranchWidget } from './GitWorktreeBranch';
 export { GitWorktreeOriginalBranchWidget } from './GitWorktreeOriginalBranch';
 export { CompactionCounterWidget } from './CompactionCounter';
 export { SandboxStatusWidget } from './SandboxStatus';
+export { FastModeWidget } from './FastMode';
 export { RemoteControlStatusWidget } from './RemoteControlStatus';
 export { CacheTimerWidget } from './CacheTimer';
