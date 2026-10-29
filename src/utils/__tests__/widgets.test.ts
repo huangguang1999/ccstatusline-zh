@@ -40,6 +40,8 @@ describe('widget catalog', () => {
         const totalSpeed = catalog.find(entry => entry.type === 'total-speed');
         const resetTimer = catalog.find(entry => entry.type === 'reset-timer');
         const weeklyResetTimer = catalog.find(entry => entry.type === 'weekly-reset-timer');
+        const sessionForecast = catalog.find(entry => entry.type === 'block-forecast');
+        const sessionLimitTimer = catalog.find(entry => entry.type === 'block-limit-timer');
 
         expect(model?.displayName).toBe('模型');
         expect(model?.category).toBe('核心');
@@ -61,6 +63,10 @@ describe('widget catalog', () => {
         expect(resetTimer?.category).toBe('用量');
         expect(weeklyResetTimer?.displayName).toBe('周重置计时');
         expect(weeklyResetTimer?.category).toBe('用量');
+        expect(sessionForecast?.displayName).toBe('时段用量预测');
+        expect(sessionForecast?.category).toBe('用量');
+        expect(sessionLimitTimer?.displayName).toBe('时段额度耗尽计时');
+        expect(sessionLimitTimer?.category).toBe('用量');
     });
 
     it('hides manual separator when default separator is configured', () => {
