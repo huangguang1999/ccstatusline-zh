@@ -55,21 +55,21 @@ const SPEED_WIDGET_CONFIG: Record<SpeedWidgetKind, SpeedWidgetKindConfig> = {
     input: {
         label: '输入: ',
         displayName: '输入速度',
-        description: '显示会话平均输入 Token 速度（tokens/sec）。可选窗口：0-120 秒（0 = 全会话平均）。',
+        description: '显示会话平均输入 Token 速度（tokens/sec）。可选窗口：0-3600 秒（0 = 全会话平均）。',
         sessionPreview: 85.2,
         windowedPreview: 31.5
     },
     output: {
         label: '输出: ',
         displayName: '输出速度',
-        description: '显示会话平均输出 Token 速度（tokens/sec）。可选窗口：0-120 秒（0 = 全会话平均）。',
+        description: '显示会话平均输出 Token 速度（tokens/sec）。可选窗口：0-3600 秒（0 = 全会话平均）。',
         sessionPreview: 42.5,
         windowedPreview: 26.8
     },
     total: {
         label: '合计: ',
         displayName: '总速度',
-        description: '显示会话平均总 Token 速度（tokens/sec）。可选窗口：0-120 秒（0 = 全会话平均）。',
+        description: '显示会话平均总 Token 速度（tokens/sec）。可选窗口：0-3600 秒（0 = 全会话平均）。',
         sessionPreview: 127.7,
         windowedPreview: 58.3
     }
