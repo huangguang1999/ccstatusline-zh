@@ -418,8 +418,7 @@ describe('App after a global update run from the TUI', () => {
             await pressKey(rendered, KEYS.down, '▶  🎨 编辑颜色');
             await pressKey(rendered, KEYS.down, '▶  ⚡ Powerline 设置');
             await pressKey(rendered, KEYS.down, '▶  💻 终端选项');
-            await pressKey(rendered, KEYS.enter, '▶  ◱ 终端宽度');
-            await pressKey(rendered, KEYS.down, '▶  ▓ 颜色级别');
+            await pressKey(rendered, KEYS.enter, '▶  ▓ 颜色级别');
             await pressKey(rendered, KEYS.enter, '(Truecolor)');
             await pressKey(rendered, KEYS.escape, '💾 保存并退出');
 
@@ -738,12 +737,11 @@ describe('App save with a widget whose hooks the status line command can\'t run'
                 expect(rendered.getFrame()).toContain('主菜单');
             });
 
-            // An unsaved edit, so the menu offers 保存并退出: 颜色级别 256 → Truecolor
+            // An unsaved edit, so the menu offers Save & Exit: 颜色级别 256 → Truecolor
             await pressKey(rendered, KEYS.down, '▶  🎨 编辑颜色');
             await pressKey(rendered, KEYS.down, '▶  ⚡ Powerline 设置');
             await pressKey(rendered, KEYS.down, '▶  💻 终端选项');
-            await pressKey(rendered, KEYS.enter, '▶  ◱ 终端宽度');
-            await pressKey(rendered, KEYS.down, '▶  ▓ 颜色级别');
+            await pressKey(rendered, KEYS.enter, '▶  ▓ 颜色级别');
             await pressKey(rendered, KEYS.enter, '(Truecolor)');
             await pressKey(rendered, KEYS.escape, '💾 保存并退出');
 

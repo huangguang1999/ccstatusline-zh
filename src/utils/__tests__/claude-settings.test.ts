@@ -935,7 +935,7 @@ describe('backup and error handling behavior', () => {
     it.each([
         {
             name: 'fails validation',
-            content: JSON.stringify({ flexMode: 'not-a-mode', lines: [[{ id: 'skills-1', type: 'skills' }]] })
+            content: JSON.stringify({ colorLevel: 'not-a-level', lines: [[{ id: 'skills-1', type: 'skills' }]] })
         },
         {
             name: 'is not valid JSON',
