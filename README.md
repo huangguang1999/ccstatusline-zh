@@ -4,9 +4,9 @@
 
 _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标_
 
-> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前中文包版本为 **2.2.34**，同步至上游 **v2.2.32 / main@bed8501**（2026-10-19 核对，包含消费限额用量组件、状态页链接、8 位 ANSI 兼容和光标显示修复）。用户界面保持中文，组件标识符、配置字段和纯值输出与上游兼容。
+> 本项目是 [ccstatusline](https://github.com/sirmalloc/ccstatusline) 的**中文汉化 Fork**，当前中文包版本为 **2.2.35**，同步至上游 **v2.2.32 / main@30fcda3**（2026-10-30 核对，新增快速模式、超额用量限额、时段用量预测和额度耗尽计时，改善实时预览及用量统计）。用户界面保持中文，组件标识符、配置字段和纯值输出与上游兼容。
 >
-> 本次同步的完整上游提交：[`bed850187783904a9affcaba1dd80e967622e70b`](https://github.com/sirmalloc/ccstatusline/commit/bed850187783904a9affcaba1dd80e967622e70b)。后续同步以此提交为基线，中文包与上游版本号独立递增。
+> 本次同步的完整上游提交：[`30fcda3c85439eb7ed57d237ef50dd1e657bac13`](https://github.com/sirmalloc/ccstatusline/commit/30fcda3c85439eb7ed57d237ef50dd1e657bac13)。后续同步以此提交为基线，中文包与上游版本号独立递增。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/huangguang1999/ccstatusline-zh/blob/main/LICENSE)
 [![Node.js Version](https://img.shields.io/node/v/ccstatusline.svg)](https://nodejs.org)
@@ -35,7 +35,7 @@ _在终端中显示模型信息、Git 分支、Token 用量及其他实时指标
 
 ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支持 80+ 种可定制组件、Powerline 主题、交互式 TUI 配置界面等丰富功能。本项目在其基础上，将所有用户可见的英文文本直接替换为中文，包括：
 
-- **92 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余，v2.2.20 新增的 Remote Control Status，v2.2.22 新增的缓存命中率 / 缓存读取 / 缓存写入 / 超额已用，v2.2.24 新增的缓存计时器 / Git CI 状态 / 沙箱状态，v2.2.26 新增的周 Fable 用量）
+- **96 个组件**的名称、描述、分类标签（含 v2.2.13 新增的 Voice Status / 周 Sonnet 用量 / 周 Opus 用量，v2.2.17 新增的超额用量占比 / 超额用量剩余，v2.2.20 新增的 Remote Control Status，v2.2.22 新增的缓存命中率 / 缓存读取 / 缓存写入 / 超额已用，v2.2.24 新增的缓存计时器 / Git CI 状态 / 沙箱状态，v2.2.26 新增的周 Fable 用量）
 - **TUI 配置界面**的全部菜单项、帮助文本、提示信息、对话框
 - **布局组件**（分隔符、弹性分隔符）的名称和描述
 - **极简模式 / Minimalist Mode**、**模糊搜索组件选择器**、**Powerline 主题色延续**（v2.2.8）
@@ -54,6 +54,7 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 - **可编辑组件文字前缀**、**Git Fork 自定义字符**、**自定义命令按显示宽度截断**、**主目录缩写边界修复**、**共享组件逻辑和搜索编辑器重构**（上游 main@3b60234）
 - **会话费用速率 / 超额每日预算组件**、**按 `e` 编辑文字前缀**、**导入新增 Shell 命令时预览并确认**、**私有配置权限保留与损坏配置安装保护**、**Git 与终端输出安全加固**、**代理排除及请求总超时**、**缓存计时与中文宽度截断修复**（上游 v2.2.31–v2.2.32）
 - **消费限额用量 / 消费限额金额组件**、**Claude 服务状态链接**、**8 位 ANSI 颜色与安全终端序列兼容**、**编辑器实时预览与光标闪烁**、**Vitest 5 与依赖更新**（上游 main@bed8501）
+- **快速模式 / 超额用量限额 / 时段用量预测 / 时段额度耗尽计时组件**、**组件选择实时预览**、**当前目录链接与 Git 名称缩写**、**Powerline 保留手动分隔符**、**多配置用量缓存隔离**、**Token 去重与上下文计算修正**、**缓存真实到期时间与自动会话标题**（上游 main@30fcda3）
 - **确认对话框** "是 / 否"
 - **分类筛选** "全部" 等界面元素
 
@@ -66,13 +67,13 @@ ccstatusline 是一个优秀的 Claude Code CLI 状态栏格式化工具，支�
 | 界面语言   | 英文         | 中文                      |
 | 配置兼容性 | —            | ✅ 共用相同 settings.json |
 | 功能差异   | —            | 无，功能完全一致          |
-| 同步版本   | 最新         | v2.2.32 / [main@bed8501](https://github.com/sirmalloc/ccstatusline/commit/bed850187783904a9affcaba1dd80e967622e70b)（中文包 2.2.34） |
+| 同步版本   | 最新         | v2.2.32 / [main@30fcda3](https://github.com/sirmalloc/ccstatusline/commit/30fcda3c85439eb7ed57d237ef50dd1e657bac13)（中文包 2.2.35） |
 
 ---
 
 ## ✨ 功能特性
 
-- **92 种可定制组件** — 模型、Git（含 PR / CI / 冲突 / 暂存 / Origin / Upstream / 工作树等细分组件）、Token、上下文、会话、费用、速度等
+- **96 种可定制组件** — 模型、Git（含 PR / CI / 冲突 / 暂存 / Origin / Upstream / 工作树等细分组件）、Token、上下文、会话、费用、速度等
 - **交互式 TUI 配置** — 按 `ccstatusline-zh setup` 启动可视化配置界面
 - **Powerline 风格** — 内置多款 Powerline 主题，支持自定义分隔符，支持主题色跨行延续
 - **极简模式** — 一键让所有组件切换到"无标签"模式，状态栏更精简
@@ -110,6 +111,8 @@ bun install -g ccstatusline-zh
 ### 配置 Claude Code
 
 在 Claude Code 设置中添加状态栏配置。编辑 `~/.claude/settings.json`：
+
+> 若技能组件始终显示无数据，请确认包装脚本名称包含 `ccstatusline`，并通过 `ccstatusline-zh "$@"` 传递参数；保存配置时会提示未能安装的 Hook（事件触发命令）。
 
 > 如果状态栏只在某个目录为空，请检查 Claude Code 是否已信任该工作区。上游说明和排查方法见 [目录信任问题](docs/USAGE.md#status-line-empty-in-one-folder-but-fine-elsewhere)。
 
@@ -219,6 +222,7 @@ ccstatusline-zh --config /path/to/custom-settings.json
 | 思考力度 | 显示当前思考力度等级                                  |
 | Vim 模式 | 显示当前 Vim 模式                                     |
 | 语音状态 | 显示 Claude Code 语音输入是否启用（4 种格式 + Nerd 字体） |
+| 快速模式 | 显示 Claude Code 快速模式是否启用，可在关闭时隐藏 |
 | 沙箱状态 | 显示 Claude Code Bash 沙箱模式是否启用                |
 | Claude 服务状态 | 显示官方服务状态，可附带最近 48 小时的彩色故障历史条 |
 
@@ -287,11 +291,14 @@ ccstatusline-zh --config /path/to/custom-settings.json
 | 周 Fable 用量  | 显示本周 Fable 模型 API 用量  |
 | 超额用量占比   | 显示超额用量（按量付费）占比       |
 | 超额用量剩余   | 显示每月超额用量额度的剩余金额 |
+| 超额用量限额 | 显示每月超额用量限额，未设置时显示无限额 |
 | 超额每日预算   | 将月度剩余额度分摊到剩余 UTC 天数，可排除后续周末，当天始终计入 |
 | 消费限额用量   | 显示 Claude 应用网关消费限额的已用百分比             |
 | 消费限额金额   | 显示已消费金额与消费限额（美元）                     |
 | 时段计时器     | 显示当前 5 小时时段已用时间   |
 | 时段重置计时   | 显示时段重置窗口剩余时间      |
+| 时段用量预测 | 根据近期速度预测 5 小时时段重置时的用量 |
+| 时段额度耗尽计时 | 预计在重置前耗尽时，显示剩余可用时间 |
 | 周重置计时     | 显示周重置剩余时间            |
 | Claude 会话 ID | 显示当前 Claude 会话 ID       |
 | Claude 账户邮箱 | 显示当前登录的 Claude 账户邮箱 |
@@ -302,7 +309,7 @@ ccstatusline-zh --config /path/to/custom-settings.json
 
 | 组件     | 说明                 |
 | -------- | -------------------- |
-| 当前目录 | 显示当前工作目录     |
+| 当前目录 | 显示当前工作目录，可链接到文件管理器、VS Code 或 Cursor     |
 | 终端宽度 | 显示终端列数         |
 | 内存用量 | 显示系统内存使用情况 |
 
@@ -353,6 +360,10 @@ ccstatusline-zh --config /path/to/custom-settings.json
 | `w`     | 组件选项  |
 | `/`     | 搜索      |
 | `q`     | 退出      |
+
+组件选择器在移动高亮时实时预览，按 ESC 取消不会改动配置。Git 分支和工作树名称可按 `f` 使用 fish 风格缩写；当前目录按 `l` 切换链接。多字符槽编辑器按 `Shift+Tab` 切换全部清空或默认值。
+
+会话用量可在达到 100% 时隐藏，时段重置计时可在未达 100% 时隐藏，二者配合可自动切换。用量预测需要足够的近期数据，无法预测时隐藏。启用 Powerline 只隐藏手动分隔符，关闭后恢复显示。
 
 重置计时器可按 `h` 设置无数据时隐藏；日期模式下按 `f` 切换 12/24 小时格式，周重置计时器在时间模式下按 `o` 切换仅显示小时。
 
@@ -405,7 +416,7 @@ bun run lint
 ```
 src/
 ├── ccstatusline.ts          # 入口文件
-├── widgets/                 # 组件目录（92 个组件）
+├── widgets/                 # 组件目录（96 个组件）
 │   ├── Model.ts
 │   ├── GitBranch.ts
 │   ├── TokensInput.ts

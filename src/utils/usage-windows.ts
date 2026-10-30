@@ -101,19 +101,19 @@ export function resolveFableUsageWindow(usageData: UsageData, nowMs = Date.now()
     return getWeeklyUsageWindowFromResetAt(usageData.fableResetAt ?? usageData.weeklyResetAt, nowMs);
 }
 
-export function formatUsageDuration(durationMs: number, compact = false, useDays = true): string {
+export function formatUsageDuration(durationMs: number, compact = false, useDays = true, rawValue = false): string {
     const clampedMs = Math.max(0, durationMs);
     const totalHours = Math.floor(clampedMs / (1000 * 60 * 60));
     const m = Math.floor((clampedMs % (1000 * 60 * 60)) / (1000 * 60));
 
-    const hLabel = compact ? '时' : '时';
-    const mLabel = compact ? '分' : '分';
-    const dLabel = compact ? '天' : '天';
+    const hLabel = rawValue ? (compact ? 'h' : 'hr') : '时';
+    const mLabel = rawValue ? 'm' : '分';
+    const dLabel = rawValue ? 'd' : '天';
     const sep = compact ? '' : ' ';
     const d = useDays ? Math.floor(totalHours / 24) : 0;
     const h = useDays ? totalHours % 24 : totalHours;
     const parts = [d > 0 && `${d}${dLabel}`, h > 0 && `${h}${hLabel}`, m > 0 && `${m}${mLabel}`].filter(Boolean);
-    return parts.length > 0 ? parts.join(sep) : '0分';
+    return parts.length > 0 ? parts.join(sep) : `0${mLabel}`;
 }
 
 function pad(value: number): string {

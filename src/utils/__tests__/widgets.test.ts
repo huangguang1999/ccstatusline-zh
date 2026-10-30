@@ -40,6 +40,8 @@ describe('widget catalog', () => {
         const totalSpeed = catalog.find(entry => entry.type === 'total-speed');
         const resetTimer = catalog.find(entry => entry.type === 'reset-timer');
         const weeklyResetTimer = catalog.find(entry => entry.type === 'weekly-reset-timer');
+        const sessionForecast = catalog.find(entry => entry.type === 'block-forecast');
+        const sessionLimitTimer = catalog.find(entry => entry.type === 'block-limit-timer');
 
         expect(model?.displayName).toBe('模型');
         expect(model?.category).toBe('核心');
@@ -61,6 +63,10 @@ describe('widget catalog', () => {
         expect(resetTimer?.category).toBe('用量');
         expect(weeklyResetTimer?.displayName).toBe('周重置计时');
         expect(weeklyResetTimer?.category).toBe('用量');
+        expect(sessionForecast?.displayName).toBe('时段用量预测');
+        expect(sessionForecast?.category).toBe('用量');
+        expect(sessionLimitTimer?.displayName).toBe('时段额度耗尽计时');
+        expect(sessionLimitTimer?.category).toBe('用量');
     });
 
     it('hides manual separator when default separator is configured', () => {
@@ -276,14 +282,14 @@ describe('widget catalog filtering', () => {
                 type: 'exact-match',
                 displayName: 'Git Branch',
                 description: 'Exact substring match',
-                category: 'Core',
+                category: '核心',
                 searchText: 'git branch exact substring match exact-match'
             },
             {
                 type: 'fuzzy-match',
                 displayName: 'Global Input Timer',
                 description: 'Fuzzy-only match',
-                category: 'Core',
+                category: '核心',
                 searchText: 'global input timer fuzzy-only match fuzzy-match'
             }
         ];
@@ -303,21 +309,21 @@ describe('widget catalog filtering', () => {
                 type: 'alpha',
                 displayName: 'Git Branch',
                 description: 'Primary match',
-                category: 'Core',
+                category: '核心',
                 searchText: 'git branch primary match alpha'
             },
             {
                 type: 'git-type-only',
                 displayName: 'Branch',
                 description: 'Type fallback match',
-                category: 'Core',
+                category: '核心',
                 searchText: 'branch type fallback match git-type-only'
             },
             {
                 type: 'desc-only',
                 displayName: 'Branch',
                 description: 'Description contains git',
-                category: 'Core',
+                category: '核心',
                 searchText: 'branch description contains git desc-only'
             }
         ];
@@ -371,5 +377,44 @@ describe('getMatchSegments', () => {
     it('is case-insensitive but preserves original casing in output', () => {
         const segments = getMatchSegments('Git Branch', 'GIT');
         expect(segments[0]).toEqual({ text: 'Git', matched: true });
+    });
+});
+
+describe('label prefix', () => {
+    const LABEL_MODE_PROBES: Record<string, string>[] = [
+        {},
+        { absolute: 'true' },
+        { display: 'progress' },
+        { display: 'progress-short' },
+        { display: 'slider' },
+        { display: 'slider-only' },
+        { format: 'label-check' },
+        { format: 'label-mark' },
+        { inverse: 'true' }
+    ];
+
+    it('widgets render the label their prefix declares in every mode', () => {
+        const settings: Settings = {
+            ...DEFAULT_SETTINGS,
+            powerline: { ...DEFAULT_SETTINGS.powerline }
+        };
+
+        for (const type of getAllWidgetTypes(settings)) {
+            const widget = getWidget(type);
+            if (!widget?.getLabelPrefix) {
+                continue;
+            }
+
+            for (const metadata of LABEL_MODE_PROBES) {
+                const item = { id: '1', type, metadata };
+                const label = widget.getLabelPrefix(item);
+                if (label === undefined) {
+                    continue;
+                }
+                const rendered = widget.render(item, { isPreview: true }, settings) ?? '';
+                expect(`${type}/${JSON.stringify(metadata)}: ${rendered.includes(label) ? 'has' : 'lacks'} "${label}"`)
+                    .toBe(`${type}/${JSON.stringify(metadata)}: has "${label}"`);
+            }
+        }
     });
 });

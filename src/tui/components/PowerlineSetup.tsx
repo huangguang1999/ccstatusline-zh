@@ -197,7 +197,7 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                     if (hasManualSeparatorItems) {
                         setConfirmingEnable(true);
                     } else {
-                        onUpdate(buildEnabledPowerlineSettings(settings, false));
+                        onUpdate(buildEnabledPowerlineSettings(settings));
                     }
                 } else {
                     onUpdate({
@@ -355,10 +355,10 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                     {hasManualSeparatorItems && (
                         <>
                             <Box>
-                                <Text color='yellow'>⚠ 警告：启用 Powerline 模式将移除状态栏中所有现有的分隔符和弹性分隔符。</Text>
+                                <Text color='yellow'>⚠ Powerline 模式使用自己的分隔符系统。</Text>
                             </Box>
                             <Box marginBottom={1}>
-                                <Text dimColor>Powerline 模式使用自己的分隔符系统，与手动分隔符不兼容。</Text>
+                                <Text dimColor>现有手动分隔符会保留在配置中，但在启用 Powerline 时不显示。</Text>
                             </Box>
                         </>
                     )}
@@ -369,7 +369,7 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                         <ConfirmDialog
                             inline={true}
                             onConfirm={() => {
-                                onUpdate(buildEnabledPowerlineSettings(settings, true));
+                                onUpdate(buildEnabledPowerlineSettings(settings));
                                 setConfirmingEnable(false);
                             }}
                             onCancel={() => {

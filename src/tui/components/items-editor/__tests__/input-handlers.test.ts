@@ -106,10 +106,10 @@ describe('items-editor input handlers', () => {
 
     it('resets selection to best match when typing in category search', () => {
         const widgetCatalog = createCatalog([
-            { type: 'vim-mode', displayName: 'Vim Mode', category: 'Core' },
-            { type: 'git-branch', displayName: 'Git 分支', category: 'Core' }
+            { type: 'vim-mode', displayName: 'Vim Mode', category: '核心' },
+            { type: 'git-branch', displayName: 'Git 分支', category: '核心' }
         ]);
-        const widgetCategories = ['全部', 'Core'];
+        const widgetCategories = ['全部', '核心'];
         const pickerState = createStateSetter<WidgetPickerState | null>({
             action: 'change',
             level: 'category',
@@ -134,14 +134,14 @@ describe('items-editor input handlers', () => {
 
     it('resets selection to best match when typing in widget search', () => {
         const widgetCatalog = createCatalog([
-            { type: 'vim-mode', displayName: 'Vim Mode', category: 'Core' },
-            { type: 'git-branch', displayName: 'Git 分支', category: 'Core' }
+            { type: 'vim-mode', displayName: 'Vim Mode', category: '核心' },
+            { type: 'git-branch', displayName: 'Git 分支', category: '核心' }
         ]);
-        const widgetCategories = ['全部', 'Core'];
+        const widgetCategories = ['全部', '核心'];
         const pickerState = createStateSetter<WidgetPickerState | null>({
             action: 'change',
             level: 'widget',
-            selectedCategory: 'Core',
+            selectedCategory: '核心',
             categoryQuery: '',
             widgetQuery: '',
             selectedType: 'git-branch'
@@ -670,6 +670,36 @@ describe('items-editor input handlers', () => {
 
         const updated = onUpdate.mock.calls[0]?.[0] as WidgetItem[] | undefined;
         expect(updated?.[0]?.metadata?.hour12).toBe('true');
+    });
+
+    it('uses the CWD link key to persist the first link mode in settings metadata', () => {
+        const widgets: WidgetItem[] = [
+            { id: '1', type: 'current-working-dir', metadata: { abbreviateHome: 'true' } }
+        ];
+        const onUpdate = vi.fn();
+
+        handleNormalInputMode({
+            input: 'l',
+            key: {},
+            widgets,
+            selectedIndex: 0,
+            separatorChars: ['|', '-'],
+            onBack: vi.fn(),
+            onUpdate,
+            setSelectedIndex: vi.fn(),
+            setMoveMode: vi.fn(),
+            setShowClearConfirm: vi.fn(),
+            openWidgetPicker: vi.fn(),
+            getCustomKeybindsForWidget: (widgetImpl, widget) => widgetImpl.getCustomKeybinds ? widgetImpl.getCustomKeybinds(widget) : [],
+            setCustomEditorWidget: vi.fn()
+        });
+
+        const updated = onUpdate.mock.calls[0]?.[0] as WidgetItem[] | undefined;
+        expect(updated?.[0]).toEqual({
+            id: '1',
+            type: 'current-working-dir',
+            metadata: { abbreviateHome: 'true', linkTo: 'file' }
+        });
     });
 
     it('opens custom editor for reset timer timezone action', () => {

@@ -6,7 +6,10 @@ import {
 import React, { useState } from 'react';
 
 import type { FlexMode } from '../../types/FlexMode';
-import type { Settings } from '../../types/Settings';
+import {
+    DEFAULT_SETTINGS,
+    type Settings
+} from '../../types/Settings';
 import { shouldInsertInput } from '../../utils/input-guards';
 
 import {
@@ -40,17 +43,24 @@ export function buildTerminalWidthItems(
     selectedOption: FlexMode,
     compactThreshold: number
 ): ListEntry<FlexMode>[] {
+    const getSublabel = (option: FlexMode): string | undefined => {
+        if (option === selectedOption) {
+            return '（当前）';
+        }
+        return option === DEFAULT_SETTINGS.flexMode ? '（默认）' : undefined;
+    };
+
     return [
         {
             value: 'full',
             label: '始终全宽',
-            sublabel: selectedOption === 'full' ? '（当前）' : undefined,
-            description: '使用完整终端宽度减去 4 个字符的终端内边距。如果出现自动压缩消息，可能导致行换行。\n\n注意：如果启用了 /ide 集成，不建议使用此模式。'
+            sublabel: getSublabel('full'),
+            description: '使用完整终端宽度减去 6 个字符的终端内边距。如果出现自动压缩消息，可能导致行换行。\n\n注意：如果启用了 /ide 集成，不建议使用此模式。'
         },
         {
             value: 'full-minus-40',
             label: '全宽减 40',
-            sublabel: selectedOption === 'full-minus-40' ? '（当前）' : '（默认）',
+            sublabel: getSublabel('full-minus-40'),
             description: '在状态栏右侧留出空间以容纳自动压缩消息。这可以防止换行但可能留下未使用的空间。此限制存在是因为我们无法检测消息何时出现。'
         },
         {
