@@ -25,9 +25,9 @@ const PREVIEW_PROJECTED_PERCENT = 100;
 
 export class BlockForecastWidget implements Widget {
     getDefaultColor(): string { return 'brightBlue'; }
-    getDescription(): string { return 'Projected usage of the 5-hour block at its reset, from the recent pace; hidden until there\'s a forecast'; }
-    getDisplayName(): string { return 'Block Forecast'; }
-    getCategory(): string { return 'Usage'; }
+    getDescription(): string { return '根据近期速度预测 5 小时时段重置时的用量；无预测数据时隐藏'; }
+    getDisplayName(): string { return '时段用量预测'; }
+    getCategory(): string { return '用量'; }
     getLabelPrefix(): string { return LABEL; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {

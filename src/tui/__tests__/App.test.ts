@@ -123,13 +123,13 @@ describe('Pinned version mismatch guard', () => {
         expect(getPinnedVersionMismatch({
             method: 'auto-update',
             packageManager: 'bun'
-        }, '2.3.0', 'ccstatusline')).toBeNull();
+        }, '2.3.0', 'ccstatusline-zh')).toBeNull();
 
         expect(getPinnedVersionMismatch({
             method: 'pinned',
             packageManager: 'npm',
             installedVersion: '2.3.0'
-        }, '2.3.0', 'ccstatusline')).toBeNull();
+        }, '2.3.0', 'ccstatusline-zh')).toBeNull();
     });
 
     it('blocks when the running TUI is newer than the pinned global install', () => {
@@ -137,11 +137,11 @@ describe('Pinned version mismatch guard', () => {
             method: 'pinned',
             packageManager: 'bun',
             installedVersion: '2.2.13'
-        }, '2.3.0', '/home/alice/.bun/bin/ccstatusline')).toEqual({
+        }, '2.3.0', '/home/alice/.bun/bin/ccstatusline-zh')).toEqual({
             packageManager: 'bun',
             installedVersion: '2.2.13',
             runningVersion: '2.3.0',
-            relaunchCommand: '/home/alice/.bun/bin/ccstatusline',
+            relaunchCommand: '/home/alice/.bun/bin/ccstatusline-zh',
             canUpdateToRunningVersion: true
         });
     });
@@ -180,10 +180,10 @@ describe('Pinned version mismatch guard', () => {
             installedVersion: '2.2.13'
         }, {
             packageManager: 'bun',
-            resolvedPath: '/Users/alice/.bun/bin/ccstatusline',
+            resolvedPath: '/Users/alice/.bun/bin/ccstatusline-zh',
             resolvedPaths: [
-                '/Users/alice/.bun/bin/ccstatusline',
-                '/Users/alice/.nvm/versions/node/v24.9.0/bin/ccstatusline'
+                '/Users/alice/.bun/bin/ccstatusline-zh',
+                '/Users/alice/.nvm/versions/node/v24.9.0/bin/ccstatusline-zh'
             ],
             binDir: '/Users/alice/.bun/bin',
             version: null,
@@ -201,8 +201,8 @@ describe('Pinned version mismatch guard', () => {
             installedVersion: '2.2.13'
         }, {
             packageManager: 'bun',
-            resolvedPath: '/Users/alice/.bun/bin/ccstatusline',
-            resolvedPaths: ['/Users/alice/.bun/bin/ccstatusline'],
+            resolvedPath: '/Users/alice/.bun/bin/ccstatusline-zh',
+            resolvedPaths: ['/Users/alice/.bun/bin/ccstatusline-zh'],
             binDir: '/Users/alice/.bun/bin',
             version: '2.2.13',
             warning: null
@@ -411,7 +411,7 @@ describe('App after a global update run from the TUI', () => {
                 expect(rendered.getFrame()).toContain('主菜单');
             });
 
-            // An unsaved edit: Color Level 256 → Truecolor
+            // An unsaved edit: 颜色级别 256 → Truecolor
             await pressKey(rendered, KEYS.down, '▶  🎨 编辑颜色');
             await pressKey(rendered, KEYS.down, '▶  ⚡ Powerline 设置');
             await pressKey(rendered, KEYS.down, '▶  💻 终端选项');
@@ -465,7 +465,7 @@ describe('App launched through npx', () => {
         vi.spyOn(claudeSettings, 'isInstalled').mockResolvedValue(true);
         // While npx runs the TUI, its cache's bin dir comes first on PATH
         const responses: Record<string, string> = {
-            'which -a ccstatusline': '/home/alice/.npm/_npx/9f3c1e2a7b6d4c80/node_modules/.bin/ccstatusline\n/home/alice/.npm-global/bin/ccstatusline\n',
+            'which -a ccstatusline-zh': '/home/alice/.npm/_npx/9f3c1e2a7b6d4c80/node_modules/.bin/ccstatusline-zh\n/home/alice/.npm-global/bin/ccstatusline-zh\n',
             'npm prefix -g': '/home/alice/.npm-global\n'
         };
         vi.spyOn(childProcess, 'execFileSync').mockImplementation((command, args) => {
@@ -482,10 +482,10 @@ describe('App launched through npx', () => {
 
         try {
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('Pinned Install Version Mismatch');
+                expect(rendered.getFrame()).toContain('固定安装版本不一致');
             });
-            expect(rendered.getFrame()).toContain(`Claude Code is pinned to ccstatusline v2.0.0, but this TUI is v${getPackageVersion()}.`);
-            expect(rendered.getFrame()).toContain(`Update npm global install to v${getPackageVersion()}`);
+            expect(rendered.getFrame()).toContain(`Claude Code 固定使用 ccstatusline-zh v2.0.0，当前配置界面版本为 v${getPackageVersion()}。`);
+            expect(rendered.getFrame()).toContain(`更新 npm 全局安装至 v${getPackageVersion()}`);
         } finally {
             rendered.cleanup();
         }
@@ -558,7 +558,7 @@ describe('App lookup of the global ccstatusline command', () => {
 
     beforeEach(() => {
         sandbox = setUpAppSandbox();
-        vi.spyOn(claudeStatus, 'loadClaudeStatusLineState').mockResolvedValue({ existingStatusLine: 'ccstatusline', refreshInterval: null });
+        vi.spyOn(claudeStatus, 'loadClaudeStatusLineState').mockResolvedValue({ existingStatusLine: 'ccstatusline-zh', refreshInterval: null });
         vi.spyOn(claudeSettings, 'isInstalled').mockResolvedValue(true);
     });
 
@@ -576,15 +576,15 @@ describe('App lookup of the global ccstatusline command', () => {
         }));
         const inspectActiveCommand = vi.spyOn(globalPackageManager, 'inspectActiveGlobalCommand').mockReturnValue({
             packageManager: 'npm',
-            resolvedPath: '/usr/local/bin/ccstatusline',
-            resolvedPaths: ['/usr/local/bin/ccstatusline'],
+            resolvedPath: '/usr/local/bin/ccstatusline-zh',
+            resolvedPaths: ['/usr/local/bin/ccstatusline-zh'],
             binDir: '/usr/local/bin',
             version: runningVersion,
             warning: null
         });
         const inspectResolution = vi.spyOn(globalCommandResolution, 'inspectGlobalCommandResolution').mockReturnValue({
-            resolvedPaths: ['/usr/local/bin/ccstatusline'],
-            firstResolvedPath: '/usr/local/bin/ccstatusline',
+            resolvedPaths: ['/usr/local/bin/ccstatusline-zh'],
+            firstResolvedPath: '/usr/local/bin/ccstatusline-zh',
             expectedBinDir: '/usr/local/bin',
             warning: null
         });
@@ -592,18 +592,18 @@ describe('App lookup of the global ccstatusline command', () => {
 
         try {
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('🧰 Manage Installation');
+                expect(rendered.getFrame()).toContain('🧰 管理安装');
             });
-            await pressKey(rendered, KEYS.enter, 'Select Line to Edit Items');
-            await pressKey(rendered, KEYS.enter, 'Edit Line 1');
-            await pressKey(rendered, 'e', '(default: "Model: ")');
+            await pressKey(rendered, KEYS.enter, '选择要编辑组件的行');
+            await pressKey(rendered, KEYS.enter, '编辑行 1');
+            await pressKey(rendered, 'e', '(默认: "模型: ")');
             await pressKey(rendered, 'X', '7dXClaude');
             await pressKey(rendered, 'Y', '7dXYClaude');
             await pressKey(rendered, 'Z', '7dXYZClaude');
-            await pressKey(rendered, KEYS.enter, 'Edit Line 1');
-            await pressKey(rendered, 'r', '(raw value)');
-            await pressKey(rendered, KEYS.escape, 'Select Line to Edit Items');
-            await pressKey(rendered, KEYS.escape, '🧰 Manage Installation');
+            await pressKey(rendered, KEYS.enter, '编辑行 1');
+            await pressKey(rendered, 'r', '(纯值)');
+            await pressKey(rendered, KEYS.escape, '选择要编辑组件的行');
+            await pressKey(rendered, KEYS.escape, '🧰 管理安装');
 
             expect(inspectActiveCommand).toHaveBeenCalledOnce();
             // Pinned installs also look up the relaunch path for the version-mismatch screen
@@ -621,8 +621,8 @@ describe('App lookup of the global ccstatusline command', () => {
         let versionOnDisk = '2.0.0';
         const inspectActiveCommand = vi.spyOn(globalPackageManager, 'inspectActiveGlobalCommand').mockImplementation(() => ({
             packageManager: 'npm',
-            resolvedPath: '/usr/local/bin/ccstatusline',
-            resolvedPaths: ['/usr/local/bin/ccstatusline'],
+            resolvedPath: '/usr/local/bin/ccstatusline-zh',
+            resolvedPaths: ['/usr/local/bin/ccstatusline-zh'],
             binDir: '/usr/local/bin',
             version: versionOnDisk,
             warning: null
@@ -635,10 +635,10 @@ describe('App lookup of the global ccstatusline command', () => {
 
         try {
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('Pinned Install Version Mismatch');
+                expect(rendered.getFrame()).toContain('固定安装版本不一致');
             });
-            await pressKey(rendered, KEYS.enter, '✓ Global package updated');
-            expect(rendered.getFrame()).toContain('Main Menu');
+            await pressKey(rendered, KEYS.enter, '✓ 全局包已更新');
+            expect(rendered.getFrame()).toContain('主菜单');
             expect(inspectActiveCommand).toHaveBeenCalledTimes(2);
         } finally {
             rendered.cleanup();
@@ -706,51 +706,51 @@ describe('App save with a widget whose hooks the status line command can\'t run'
         sandbox.restore();
     });
 
-    it('explains after Ctrl+S that the hooks weren\'t added, then returns to the same screen', async () => {
+    it('explains after Ctrl+S that the hooks 未添加, then returns to the same screen', async () => {
         const rendered = renderApp();
 
         try {
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('Main Menu');
+                expect(rendered.getFrame()).toContain('主菜单');
             });
-            await pressKey(rendered, KEYS.enter, 'Select Line to Edit Items');
+            await pressKey(rendered, KEYS.enter, '选择要编辑组件的行');
 
-            await pressKey(rendered, KEYS.ctrlS, 'Claude Code hooks for Skills weren\'t added');
-            expect(rendered.getFrame()).toContain('Configuration Saved');
+            await pressKey(rendered, KEYS.ctrlS, '未添加 技能 所需的 Claude Code Hook');
+            expect(rendered.getFrame()).toContain('配置已保存');
             expect(rendered.getFrame()).toContain(statusCommand);
-            expect(rendered.getFrame()).toContain('ccstatusline "$@"');
+            expect(rendered.getFrame()).toContain('ccstatusline-zh "$@"');
 
-            await pressKey(rendered, KEYS.enter, 'Select Line to Edit Items');
-            expect(rendered.getFrame()).not.toContain('weren\'t added');
+            await pressKey(rendered, KEYS.enter, '选择要编辑组件的行');
+            expect(rendered.getFrame()).not.toContain('未添加');
         } finally {
             rendered.cleanup();
         }
     });
 
-    it('explains after Save & Exit that the hooks weren\'t added, then exits', async () => {
+    it('explains after 保存并退出 that the hooks 未添加, then exits', async () => {
         const rendered = renderApp();
 
         try {
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain('Main Menu');
+                expect(rendered.getFrame()).toContain('主菜单');
             });
 
-            // An unsaved edit, so the menu offers Save & Exit: Color Level 256 → Truecolor
-            await pressKey(rendered, KEYS.down, '▶  🎨 Edit Colors');
-            await pressKey(rendered, KEYS.down, '▶  ⚡ Powerline Setup');
-            await pressKey(rendered, KEYS.down, '▶  💻 Terminal Options');
-            await pressKey(rendered, KEYS.enter, '▶  ◱ Terminal Width');
-            await pressKey(rendered, KEYS.down, '▶  ▓ Color Level');
+            // An unsaved edit, so the menu offers 保存并退出: 颜色级别 256 → Truecolor
+            await pressKey(rendered, KEYS.down, '▶  🎨 编辑颜色');
+            await pressKey(rendered, KEYS.down, '▶  ⚡ Powerline 设置');
+            await pressKey(rendered, KEYS.down, '▶  💻 终端选项');
+            await pressKey(rendered, KEYS.enter, '▶  ◱ 终端宽度');
+            await pressKey(rendered, KEYS.down, '▶  ▓ 颜色级别');
             await pressKey(rendered, KEYS.enter, '(Truecolor)');
-            await pressKey(rendered, KEYS.escape, '💾 Save & Exit');
+            await pressKey(rendered, KEYS.escape, '💾 保存并退出');
 
-            await pressKey(rendered, KEYS.up, '▶  ⚡ Powerline Setup');
-            await pressKey(rendered, KEYS.up, '▶  🎨 Edit Colors');
-            await pressKey(rendered, KEYS.up, '▶  📝 Edit Lines');
-            await pressKey(rendered, KEYS.up, '▶  ⭐ Like ccstatusline?');
-            await pressKey(rendered, KEYS.up, '▶  ❌ Exit without saving');
-            await pressKey(rendered, KEYS.up, '▶  💾 Save & Exit');
-            await pressKey(rendered, KEYS.enter, 'Claude Code hooks for Skills weren\'t added');
+            await pressKey(rendered, KEYS.up, '▶  ⚡ Powerline 设置');
+            await pressKey(rendered, KEYS.up, '▶  🎨 编辑颜色');
+            await pressKey(rendered, KEYS.up, '▶  📝 编辑状态行');
+            await pressKey(rendered, KEYS.up, '▶  ⭐ 喜欢 ccstatusline-zh？');
+            await pressKey(rendered, KEYS.up, '▶  ❌ 不保存退出');
+            await pressKey(rendered, KEYS.up, '▶  💾 保存并退出');
+            await pressKey(rendered, KEYS.enter, '未添加 技能 所需的 Claude Code Hook');
             const saved = JSON.parse(fs.readFileSync(sandbox.settingsPath, 'utf-8')) as { colorLevel: number };
             expect(saved.colorLevel).toBe(3);
 

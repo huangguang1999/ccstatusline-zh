@@ -81,12 +81,12 @@ describe('SessionUsageWidget', () => {
             id: 'session',
             type: 'session-usage',
             metadata: { cursor: 'true', display: 'slider' }
-        }, context)).toBe('5h: ▓▓│░░░░░░░ 30.0%');
+        }, context)).toBe('时段: ▓▓│░░░░░░░ 30.0%');
         expect(render(widget, {
             id: 'session',
             type: 'session-usage',
             metadata: { cursor: 'true', display: 'slider', invert: 'true' }
-        }, context)).toBe('5h: ▓▓▓▓▓▓▓░│░ 70.0%');
+        }, context)).toBe('时段: ▓▓▓▓▓▓▓░│░ 70.0%');
     });
 
     it('applies the label override to every display mode', () => {
@@ -128,9 +128,9 @@ describe('SessionUsageWidget', () => {
         // The raw percent decides, so 99.7% that a whole-number percent shows as
         // "100%" still counts as under the limit
         it.each([
-            ['under 100%', { sessionUsage: 60 }, '5h: 60.0%'],
-            ['just under 100%', { sessionUsage: 99.7 }, '5h: 99.7%'],
-            ['the usage API under 100% after the payload reached it', { sessionUsage: 100, apiSessionUsage: 2 }, '5h: 100.0%']
+            ['under 100%', { sessionUsage: 60 }, '时段: 60.0%'],
+            ['just under 100%', { sessionUsage: 99.7 }, '时段: 99.7%'],
+            ['the usage API under 100% after the payload reached it', { sessionUsage: 100, apiSessionUsage: 2 }, '时段: 100.0%']
         ])('shows the percent when the block\'s usage is %s', (_label, usageData, expected) => {
             expect(render(new SessionUsageWidget(), item, withPayloadPercent(usageData))).toBe(expected);
         });
@@ -146,7 +146,7 @@ describe('SessionUsageWidget', () => {
         // Merged usage data keeps an API percent prefetch rejected, as stale or
         // from a block that has since reset, when the payload has none of its own
         it('shows the percent when only a rejected API percent is at 100%', () => {
-            expect(render(new SessionUsageWidget(), item, { usageData: { sessionUsage: 100 }, data: { rate_limits: { five_hour: { resets_at: 1 } } } })).toBe('5h: 100.0%');
+            expect(render(new SessionUsageWidget(), item, { usageData: { sessionUsage: 100 }, data: { rate_limits: { five_hour: { resets_at: 1 } } } })).toBe('时段: 100.0%');
         });
 
         it('keeps the no-data behavior when the usage is unknown', () => {
@@ -157,7 +157,7 @@ describe('SessionUsageWidget', () => {
         });
 
         it('keeps showing the percent at 100% when the state is off', () => {
-            expect(render(new SessionUsageWidget(), { id: 'session', type: 'session-usage' }, { usageData: { sessionUsage: 100 } })).toBe('5h: 100.0%');
+            expect(render(new SessionUsageWidget(), { id: 'session', type: 'session-usage' }, { usageData: { sessionUsage: 100 } })).toBe('时段: 100.0%');
         });
 
         it('keeps the preview sample', () => {

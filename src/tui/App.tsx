@@ -222,20 +222,20 @@ function getPinnedMismatchItems(
 
     if (mismatch.canUpdateToRunningVersion) {
         items.push({
-            label: `Update ${mismatch.packageManager} global install to v${mismatch.runningVersion}`,
+            label: `更新 ${mismatch.packageManager} 全局安装至 v${mismatch.runningVersion}`,
             value: 'update',
             disabled: !canRunPackageManager,
-            sublabel: canRunPackageManager ? undefined : `(${mismatch.packageManager} not installed)`,
-            description: `Runs ${mismatch.packageManager === 'npm'
+            sublabel: canRunPackageManager ? undefined : `（未检测到 ${mismatch.packageManager}）`,
+            description: `运行 ${mismatch.packageManager === 'npm'
                 ? `npm install -g ccstatusline-zh@${mismatch.runningVersion}`
                 : `bun add -g ccstatusline-zh@${mismatch.runningVersion}`}`
         });
     }
 
     items.push({
-        label: 'Exit',
+        label: '退出',
         value: 'exit',
-        description: `Relaunch manually with ${mismatch.relaunchCommand}`
+        description: `请使用 ${mismatch.relaunchCommand} 手动重新启动`
     });
 
     return items;
@@ -1229,7 +1229,7 @@ export const App: React.FC = () => {
                 <Box marginBottom={1}>
                     <Text bold>
                         <Gradient name='retro'>
-                            CCStatusline Configuration
+                            CCStatusline 配置
                         </Gradient>
                     </Text>
                     <Text bold>
@@ -1287,7 +1287,7 @@ export const App: React.FC = () => {
                 <Text bold>
                     {` | ${runningVersion && `v${runningVersion}`}`}
                 </Text>
-                {devReloadStateFile && <Text dimColor>  dev reload: ctrl+r</Text>}
+                {devReloadStateFile && <Text dimColor>  开发重载: Ctrl+R</Text>}
                 {flashMessage && (
                     <Text color={flashMessage.color} bold>
                         {`  ${flashMessage.text}`}

@@ -117,7 +117,7 @@ describe('SymbolSlotsEditor', () => {
         { name: 'supplementary Nerd Font icon', glyph: '\u{F05AA}', preview: '\u{F05AA} ' },
         { name: 'wide emoji', glyph: '📡', preview: '📡' },
         { name: 'combining character', glyph: 'e\u0301', preview: 'e\u0301 ' },
-        { name: 'empty glyph', glyph: '', preview: '(none)' }
+        { name: 'empty glyph', glyph: '', preview: '（无）' }
     ])('preserves the $name preview padding across blink frames without saving it', async ({ glyph, preview }) => {
         const slots: SymbolSlot[] = [
             { id: 'symbolOn', label: 'On', defaultSymbol: glyph },
@@ -129,8 +129,8 @@ describe('SymbolSlotsEditor', () => {
             for (let frame = 0; frame < 3; frame++) {
                 await waitFor(() => {
                     const output = getPlainOutput(rendered.stdout.getOutput());
-                    expect(output).toContain(`On: ${preview} (default:`);
-                    expect(output).toContain(`Off: ${preview} (default:`);
+                    expect(output).toContain(`On: ${preview}（默认:`);
+                    expect(output).toContain(`Off: ${preview}（默认:`);
                 });
                 rendered.stdout.clearOutput();
             }
@@ -197,13 +197,13 @@ describe('SymbolSlotsEditor', () => {
 
         try {
             await waitFor(() => {
-                expect(rendered.stdout.getOutput()).toContain('Conflicts:');
+                expect(rendered.stdout.getOutput()).toContain('冲突:');
             });
             // Any new frame after Shift+Tab means the toggle was handled
             rendered.stdout.clearOutput();
             rendered.stdin.write('\x1B[Z');
             await waitFor(() => {
-                expect(rendered.stdout.getOutput()).toContain('Conflicts:');
+                expect(rendered.stdout.getOutput()).toContain('冲突:');
             });
             rendered.stdin.write('\r');
             await waitFor(() => {
@@ -236,13 +236,13 @@ describe('SymbolSlotsEditor', () => {
 
         try {
             await waitFor(() => {
-                expect(rendered.stdout.getOutput()).toContain('Conflicts:');
+                expect(rendered.stdout.getOutput()).toContain('冲突:');
             });
             // Any new frame after Shift+Tab means the toggle was handled
             rendered.stdout.clearOutput();
             rendered.stdin.write('\x1B[Z');
             await waitFor(() => {
-                expect(rendered.stdout.getOutput()).toContain('Conflicts:');
+                expect(rendered.stdout.getOutput()).toContain('冲突:');
             });
             rendered.stdin.write('\r');
             await waitFor(() => {

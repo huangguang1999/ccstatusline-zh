@@ -29,7 +29,7 @@ type FastModeFormat = typeof FORMATS[number];
 
 const DEFAULT_FORMAT: FastModeFormat = 'icon-text';
 
-const OFF_HIDEABLE_STATE: HideableState = { key: 'off', label: 'when fast mode is off' };
+const OFF_HIDEABLE_STATE: HideableState = { key: 'off', label: '快速模式关闭时' };
 
 function canUseNerdFont(item: WidgetItem): boolean {
     const format = getFormat(item, FORMAT_OPTIONS);
@@ -50,7 +50,7 @@ function getIcon(enabled: boolean, nerdFont: boolean): string {
 }
 
 function formatStatus(enabled: boolean, format: FastModeFormat, nerdFont: boolean, rawValue: boolean): string {
-    const stateText = enabled ? 'on' : 'off';
+    const stateText = rawValue ? (enabled ? 'on' : 'off') : (enabled ? '启用' : '关闭');
     const stateDot = enabled ? STATE_DOT_ON : STATE_DOT_OFF;
     const icon = getIcon(enabled, nerdFont);
 
@@ -65,15 +65,15 @@ function formatStatus(enabled: boolean, format: FastModeFormat, nerdFont: boolea
         case 'text':
             return stateText;
         case 'word':
-            return rawValue ? stateText : `fast ${stateText}`;
+            return rawValue ? stateText : `快速 ${stateText}`;
     }
 }
 
 export class FastModeWidget implements Widget {
     getDefaultColor(): string { return 'yellow'; }
-    getDescription(): string { return 'Shows whether Claude Code fast mode is on'; }
-    getDisplayName(): string { return 'Fast Mode'; }
-    getCategory(): string { return 'Core'; }
+    getDescription(): string { return '显示 Claude Code 快速模式是否启用'; }
+    getDisplayName(): string { return '快速模式'; }
+    getCategory(): string { return '核心'; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return {

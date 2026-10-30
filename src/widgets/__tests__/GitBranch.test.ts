@@ -181,7 +181,7 @@ describe('GitBranchWidget', () => {
         // one the user checked out: Git Branch reads it as no branch, as before
         // it showed detached commits
         it.each([
-            [false, '⎇ no git'],
+            [false, '⎇ 无 Git'],
             [true, null]
         ])('should treat a colocated jj repo\'s detached HEAD as no branch (hide no git: %s)', (hideNoGit, expected) => {
             mockExecFileSync.mockReturnValueOnce('true\n');
@@ -370,10 +370,10 @@ describe('GitBranchWidget', () => {
             const widget = new GitBranchWidget();
 
             expect(widget.getEditorDisplay({ id: 'git-branch', type: 'git-branch', metadata: { fishStyle: 'true' } }).modifierText)
-                .toBe('(fish-style)');
+                .toBe('(fish 风格)');
             expect(widget.getCustomKeybinds()).toContainEqual({
                 key: 'f',
-                label: '(f)ish style',
+                label: '(f)fish 风格',
                 action: 'toggle-fish-style'
             });
         });

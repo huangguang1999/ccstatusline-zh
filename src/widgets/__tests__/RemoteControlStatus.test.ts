@@ -226,8 +226,8 @@ describe('RemoteControlStatusWidget', () => {
             const iconText: WidgetItem = { ...SLOT_ITEM, metadata: { ...SLOT_ITEM.metadata, format: 'icon-text' } };
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: false });
             const blankOff: WidgetItem = { ...iconText, metadata: { ...iconText.metadata, symbolOff: '' } };
-            expect(widget.render(iconText, makeContext(), DEFAULT_SETTINGS)).toBe(`${OFF_GLYPH} off`);
-            expect(widget.render(blankOff, makeContext(), DEFAULT_SETTINGS)).toBe('off');
+            expect(widget.render(iconText, makeContext(), DEFAULT_SETTINGS)).toBe(`${OFF_GLYPH} 关闭`);
+            expect(widget.render(blankOff, makeContext(), DEFAULT_SETTINGS)).toBe('关闭');
         });
 
         it('hides the widget when the glyph for the current state is blanked in icon format', () => {
@@ -244,7 +244,7 @@ describe('RemoteControlStatusWidget', () => {
 
         it('offers the glyph keybind only while the Nerd Font icons are visible', () => {
             const widget = new RemoteControlStatusWidget();
-            const glyphKeybind = { key: 'g', label: '(g)lyph', action: 'edit-symbol-override' };
+            const glyphKeybind = { key: 'g', label: '(g)字符', action: 'edit-symbol-override' };
 
             expect(widget.getCustomKeybinds(SLOT_ITEM)).toContainEqual(glyphKeybind);
             expect(widget.getCustomKeybinds(ITEM)).not.toContainEqual(glyphKeybind);
@@ -260,15 +260,15 @@ describe('RemoteControlStatusWidget', () => {
             const widget = new RemoteControlStatusWidget();
             const item: WidgetItem = { ...FORMAT_ITEM, metadata: { format: 'icon-text', nerdFont: 'true' } };
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: true });
-            expect(widget.render(item, makeContext(), DEFAULT_SETTINGS)).toBe('\uF1EB  on');
+            expect(widget.render(item, makeContext(), DEFAULT_SETTINGS)).toBe('\uF1EB  启用');
             vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled: false });
-            expect(widget.render(item, makeContext(), DEFAULT_SETTINGS)).toBe('\u{F05AA}  off');
+            expect(widget.render(item, makeContext(), DEFAULT_SETTINGS)).toBe('\u{F05AA}  关闭');
         });
 
         it.each([
-            { glyph: '+', expected: '+ on' },
-            { glyph: '📡', expected: '📡 on' },
-            { glyph: '', expected: 'on' }
+            { glyph: '+', expected: '+ 启用' },
+            { glyph: '📡', expected: '📡 启用' },
+            { glyph: '', expected: '启用' }
         ])('keeps custom glyph spacing for "$glyph"', ({ glyph, expected }) => {
             const item: WidgetItem = {
                 ...FORMAT_ITEM,
@@ -351,7 +351,7 @@ describe('RemoteControlStatusWidget', () => {
         ])('uses the shared label override in $format', ({ format, on, off }) => {
             const widget = new RemoteControlStatusWidget();
             const item: WidgetItem = { ...ITEM, metadata: { format, label: 'RC: ' } };
-            expect(widget.getLabelPrefix(item)).toBe('remote ');
+            expect(widget.getLabelPrefix(item)).toBe('远程 ');
             for (const enabled of [false, true]) {
                 vi.spyOn(claudeSettings, 'getRemoteControlStatus').mockReturnValue({ enabled });
                 const value = enabled ? on : off;

@@ -448,7 +448,7 @@ describe('CurrentWorkingDirWidget', () => {
                 abbreviateHome: 'true',
                 segments: '2',
                 linkTo: 'file'
-            })).modifierText).toBe('(~, segments: 2, link: file)');
+            })).modifierText).toBe('(~, 段数: 2, 链接: 文件)');
         });
     });
 
@@ -492,7 +492,7 @@ describe('CurrentWorkingDirWidget', () => {
             const keybinds = widget.getCustomKeybinds();
             const homeKeybind = keybinds.find(k => k.key === 'h');
             expect(homeKeybind).toBeDefined();
-            expect(homeKeybind?.label).toBe('(h)ome ~ 缩写');
+            expect(homeKeybind?.label).toBe('(h)主目录 ~ 缩写');
             expect(homeKeybind?.action).toBe('toggle-abbreviate-home');
         });
 
@@ -506,7 +506,7 @@ describe('CurrentWorkingDirWidget', () => {
         it('should expose the existing-style link cycle keybind without changing other controls', () => {
             expect(widget.getCustomKeybinds()).toContainEqual({
                 key: 'l',
-                label: '(l)ink mode',
+                label: '(l)链接模式',
                 action: 'cycle-link'
             });
             expect(widget.getCustomKeybinds().map(keybind => keybind.key)).toEqual(['h', 's', 'f', 'l', 'g']);

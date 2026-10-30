@@ -15,13 +15,13 @@ import { isHidden } from './shared/hideable';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 import { USAGE_NO_DATA_HIDEABLE_STATE } from './shared/usage-display';
 
-const LABEL = 'Overage Limit: ';
+const LABEL = '超额限额: ';
 
 export class ExtraUsageLimitWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return 'Shows your monthly extra usage limit (Pro/Max overage or Enterprise spend)'; }
-    getDisplayName(): string { return 'Extra Usage Limit'; }
-    getCategory(): string { return 'Usage'; }
+    getDescription(): string { return '显示每月超额用量限额（Pro/Max 超额用量或 Enterprise 消费）'; }
+    getDisplayName(): string { return '超额用量限额'; }
+    getCategory(): string { return '用量'; }
     getLabelPrefix(): string { return LABEL; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
@@ -57,7 +57,7 @@ export class ExtraUsageLimitWidget implements Widget {
         // Once extra usage is known to be on, a missing monthly limit means
         // none is set, not that the data is still loading (#413).
         if (data.extraUsageLimit === undefined) {
-            return formatRawOrLabeledValue(item, LABEL, 'none');
+            return formatRawOrLabeledValue(item, LABEL, item.rawValue ? 'none' : '无限额');
         }
 
         // extraUsageLimit is in cents

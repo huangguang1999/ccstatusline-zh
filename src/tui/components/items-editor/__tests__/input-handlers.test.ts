@@ -106,10 +106,10 @@ describe('items-editor input handlers', () => {
 
     it('resets selection to best match when typing in category search', () => {
         const widgetCatalog = createCatalog([
-            { type: 'vim-mode', displayName: 'Vim Mode', category: 'Core' },
-            { type: 'git-branch', displayName: 'Git 分支', category: 'Core' }
+            { type: 'vim-mode', displayName: 'Vim Mode', category: '核心' },
+            { type: 'git-branch', displayName: 'Git 分支', category: '核心' }
         ]);
-        const widgetCategories = ['全部', 'Core'];
+        const widgetCategories = ['全部', '核心'];
         const pickerState = createStateSetter<WidgetPickerState | null>({
             action: 'change',
             level: 'category',
@@ -134,14 +134,14 @@ describe('items-editor input handlers', () => {
 
     it('resets selection to best match when typing in widget search', () => {
         const widgetCatalog = createCatalog([
-            { type: 'vim-mode', displayName: 'Vim Mode', category: 'Core' },
-            { type: 'git-branch', displayName: 'Git 分支', category: 'Core' }
+            { type: 'vim-mode', displayName: 'Vim Mode', category: '核心' },
+            { type: 'git-branch', displayName: 'Git 分支', category: '核心' }
         ]);
-        const widgetCategories = ['全部', 'Core'];
+        const widgetCategories = ['全部', '核心'];
         const pickerState = createStateSetter<WidgetPickerState | null>({
             action: 'change',
             level: 'widget',
-            selectedCategory: 'Core',
+            selectedCategory: '核心',
             categoryQuery: '',
             widgetQuery: '',
             selectedType: 'git-branch'

@@ -211,6 +211,6 @@ describe('TerminalWidthMenu descriptions', () => {
 
         const fullItem = buildTerminalWidthItems('full', 60)[0];
 
-        expect(fullItem?.description).toContain(`minus ${reserved} characters`);
+        expect(fullItem?.description).toContain(`减去 ${reserved} 个字符`);
     });
 });

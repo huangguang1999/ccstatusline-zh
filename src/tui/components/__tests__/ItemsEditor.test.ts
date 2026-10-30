@@ -248,35 +248,35 @@ describe('ItemsEditor', () => {
 
         try {
             await waitFor(() => {
-                expect(output()).toContain('(icon-text, nerd font)');
+                expect(output()).toContain('(icon-text, Nerd 字体)');
             });
-            expect(output()).not.toContain('(e)dit label…');
-            expect(output()).not.toContain('(label:');
+            expect(output()).not.toContain('(e)文字前缀…');
+            expect(output()).not.toContain('(前缀:');
             for (const format of ['text', 'word']) {
                 await press('f', `(${format})`);
-                expect(output()).not.toContain('(e)dit label…');
-                expect(output()).not.toContain('(label:');
+                expect(output()).not.toContain('(e)文字前缀…');
+                expect(output()).not.toContain('(前缀:');
             }
 
             await press('f', '(label-check)');
-            expect(output()).toContain('(e)dit label…');
-            expect(output()).toContain('(label: "RC ")');
-            await press('e', '(default: "remote ")');
+            expect(output()).toContain('(e)文字前缀…');
+            expect(output()).toContain('(前缀: "RC ")');
+            await press('e', '(默认: "远程 ")');
             await press('X', 'RC X');
-            await press('\r', '(label: "RC X")');
+            await press('\r', '(前缀: "RC X")');
             await press('f', '(label-mark)');
-            expect(output()).toContain('(e)dit label…');
-            expect(output()).toContain('(label: "RC X")');
+            expect(output()).toContain('(e)文字前缀…');
+            expect(output()).toContain('(前缀: "RC X")');
 
-            await press('r', '(raw value)');
-            expect(output()).not.toContain('(e)dit label…');
-            expect(output()).not.toContain('(label:');
-            await press('r', '(label: "RC X")');
-            await press('e', '(default: "remote ")');
+            await press('r', '(纯值)');
+            expect(output()).not.toContain('(e)文字前缀…');
+            expect(output()).not.toContain('(前缀:');
+            await press('r', '(前缀: "RC X")');
+            await press('e', '(默认: "远程 ")');
             await press('\t', '(label-mark)');
-            expect(output()).not.toContain('(label:');
+            expect(output()).not.toContain('(前缀:');
             await press('f', '(icon)');
-            expect(output()).not.toContain('(e)dit label…');
+            expect(output()).not.toContain('(e)文字前缀…');
         } finally {
             instance.unmount();
             instance.cleanup();
@@ -562,7 +562,7 @@ describe('ItemsEditor', () => {
 
         try {
             await waitFor(() => {
-                expect(stripAnsi(stdout.getOutput())).toMatch(/▶\s+2\. Tokens Input/);
+                expect(stripAnsi(stdout.getOutput())).toMatch(/▶\s+2\. 输入 Token/);
             });
 
             stdin.write('\x1b[B');
@@ -584,7 +584,7 @@ describe('ItemsEditor', () => {
         const stderr = createMockStdout();
         const lastFrame = () => {
             const output = stripAnsi(stdout.getOutput());
-            return output.slice(output.lastIndexOf('Edit Line 1'));
+            return output.slice(output.lastIndexOf('编辑行 1'));
         };
         const instance = render(
             React.createElement(StatefulItemsEditor, {
@@ -599,29 +599,29 @@ describe('ItemsEditor', () => {
 
         try {
             await waitFor(() => {
-                expect(lastFrame()).toContain('Current Working Dir (~, segments: 2)');
+                expect(lastFrame()).toContain('当前目录 (~, 段数: 2)');
             });
-            expect(lastFrame()).toContain('(l)ink mode');
-            expect(lastFrame()).toContain('(h)ome ~');
-            expect(lastFrame()).toContain('(s)egments');
-            expect(lastFrame()).toContain('(f)ish style');
+            expect(lastFrame()).toContain('(l)链接模式');
+            expect(lastFrame()).toContain('(h)主目录 ~ 缩写');
+            expect(lastFrame()).toContain('(s)路径段数');
+            expect(lastFrame()).toContain('(f)fish 风格');
 
             stdin.write('l');
             await waitFor(() => {
-                expect(lastFrame()).toContain('Current Working Dir (~, segments: 2, link: file)');
+                expect(lastFrame()).toContain('当前目录 (~, 段数: 2, 链接: 文件)');
             });
             stdin.write('l');
             await waitFor(() => {
-                expect(lastFrame()).toContain('link: VS Code');
+                expect(lastFrame()).toContain('链接: VS Code');
             });
             stdin.write('l');
             await waitFor(() => {
-                expect(lastFrame()).toContain('link: Cursor');
+                expect(lastFrame()).toContain('链接: Cursor');
             });
             stdin.write('l');
             await waitFor(() => {
-                expect(lastFrame()).toContain('Current Working Dir (~, segments: 2)');
-                expect(lastFrame()).not.toContain('link:');
+                expect(lastFrame()).toContain('当前目录 (~, 段数: 2)');
+                expect(lastFrame()).not.toContain('链接:');
             });
         } finally {
             instance.unmount();
@@ -684,7 +684,7 @@ describe('ItemsEditor', () => {
                 // The last picker frame drawn since the last key press
                 latestPickerFrame: () => {
                     const output = screen();
-                    const start = output.lastIndexOf('ADD WIDGET');
+                    const start = output.lastIndexOf('添加组件');
                     return start === -1 ? '' : output.slice(start);
                 },
                 // The line editor is drawn and listening for keys
@@ -709,12 +709,12 @@ describe('ItemsEditor', () => {
                 await editor.ready();
                 editor.press('a');
                 await waitFor(() => {
-                    expect(editor.screen()).toContain('ADD WIDGET');
+                    expect(editor.screen()).toContain('添加组件');
                 });
                 // Browsing categories highlights no widget, so the line is untouched
                 expect(editor.latestPreview() ?? null).toBeNull();
 
-                editor.press('git branch');
+                editor.press('Git 分支');
                 await waitFor(() => {
                     expect(editor.latestPreview()?.map(widget => widget.type)).toEqual(['model', 'git-branch']);
                 });
@@ -726,8 +726,8 @@ describe('ItemsEditor', () => {
                 });
                 editor.press(ESC);
                 await waitFor(() => {
-                    expect(editor.screen()).toContain('Edit Line 1');
-                    expect(editor.screen()).not.toContain('ADD WIDGET');
+                    expect(editor.screen()).toContain('编辑行 1');
+                    expect(editor.screen()).not.toContain('添加组件');
                 });
                 expect(editor.onUpdate).not.toHaveBeenCalled();
             } finally {
@@ -742,9 +742,9 @@ describe('ItemsEditor', () => {
                 await editor.ready();
                 editor.press(RIGHT_ARROW);
                 await waitFor(() => {
-                    expect(editor.screen()).toContain('CHANGE WIDGET TYPE');
+                    expect(editor.screen()).toContain('更改组件类型');
                 });
-                editor.press('git branch');
+                editor.press('Git 分支');
                 await waitFor(() => {
                     expect(editor.latestPreview()).toEqual([
                         { id: '1', type: 'git-branch' },
@@ -767,9 +767,9 @@ describe('ItemsEditor', () => {
                 await editor.ready();
                 editor.press('a');
                 await waitFor(() => {
-                    expect(editor.screen()).toContain('ADD WIDGET');
+                    expect(editor.screen()).toContain('添加组件');
                 });
-                editor.press('git branch');
+                editor.press('Git 分支');
                 await waitFor(() => {
                     expect(editor.latestPreview()?.map(widget => widget.type)).toEqual(['model', 'git-branch']);
                 });
@@ -795,20 +795,20 @@ describe('ItemsEditor', () => {
                 await editor.ready();
                 editor.press('a');
                 await waitFor(() => {
-                    expect(editor.screen()).toContain('ADD WIDGET');
+                    expect(editor.screen()).toContain('添加组件');
                 });
                 editor.press(ENTER);
                 await waitFor(() => {
-                    expect(editor.latestPickerFrame()).toMatch(/↓ \d+ more/);
+                    expect(editor.latestPickerFrame()).toMatch(/↓ 另有 \d+ 项/);
                 });
                 const output = editor.latestPickerFrame();
 
                 const shown = getEntryRows(output).length;
-                const hiddenBelow = Number(/↓ (\d+) more/.exec(output)?.[1]);
+                const hiddenBelow = Number(/↓ 另有 (\d+) 项/.exec(output)?.[1]);
                 expect(shown).toBeGreaterThan(0);
                 expect(shown).toBeLessThan(allWidgetCount);
                 expect(shown + hiddenBelow).toBe(allWidgetCount);
-                expect(output).not.toMatch(/↑ \d+ more/);
+                expect(output).not.toMatch(/↑ 另有 \d+ 项/);
             } finally {
                 editor.cleanup();
             }
@@ -826,11 +826,11 @@ describe('ItemsEditor', () => {
                 await editor.ready();
                 editor.press('a');
                 await waitFor(() => {
-                    expect(editor.screen()).toContain('ADD WIDGET');
+                    expect(editor.screen()).toContain('添加组件');
                 });
                 editor.press(ENTER);
                 await waitFor(() => {
-                    expect(editor.latestPickerFrame()).toMatch(/↓ \d+ more/);
+                    expect(editor.latestPickerFrame()).toMatch(/↓ 另有 \d+ 项/);
                 });
 
                 expect(tallest).toBeGreaterThan(1);
@@ -847,11 +847,11 @@ describe('ItemsEditor', () => {
                 await editor.ready();
                 editor.press('a');
                 await waitFor(() => {
-                    expect(editor.screen()).toContain('ADD WIDGET');
+                    expect(editor.screen()).toContain('添加组件');
                 });
                 editor.press(ENTER);
                 await waitFor(() => {
-                    expect(editor.latestPickerFrame()).toMatch(/↓ \d+ more/);
+                    expect(editor.latestPickerFrame()).toMatch(/↓ 另有 \d+ 项/);
                 });
                 // Up from the first widget wraps to the last one
                 editor.press(UP_ARROW);
@@ -863,8 +863,8 @@ describe('ItemsEditor', () => {
                 const rows = getEntryRows(output);
 
                 expect(rows.some(row => /^\s*1\. /.test(row))).toBe(false);
-                expect(output).toMatch(/↑ \d+ more/);
-                expect(output).not.toMatch(/↓ \d+ more/);
+                expect(output).toMatch(/↑ 另有 \d+ 项/);
+                expect(output).not.toMatch(/↓ 另有 \d+ 项/);
             } finally {
                 editor.cleanup();
             }
@@ -877,9 +877,9 @@ describe('ItemsEditor', () => {
                 await editor.ready();
                 editor.press('a');
                 await waitFor(() => {
-                    expect(editor.screen()).toContain('ADD WIDGET');
+                    expect(editor.screen()).toContain('添加组件');
                 });
-                editor.press('git branch');
+                editor.press('Git 分支');
                 await waitFor(() => {
                     expect(editor.latestPreview()?.map(widget => widget.type)).toEqual(['model', 'git-branch']);
                 });

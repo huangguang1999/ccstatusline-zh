@@ -187,10 +187,10 @@ describe('GitWorktreeWidget', () => {
             const widget = new GitWorktreeWidget();
 
             expect(widget.getEditorDisplay({ id: 'git-worktree', type: 'git-worktree', metadata: { fishStyle: 'true' } }).modifierText)
-                .toBe('(fish-style)');
+                .toBe('(fish 风格)');
             expect(widget.getCustomKeybinds()).toContainEqual({
                 key: 'f',
-                label: '(f)ish style',
+                label: '(f)fish 风格',
                 action: 'toggle-fish-style'
             });
         });

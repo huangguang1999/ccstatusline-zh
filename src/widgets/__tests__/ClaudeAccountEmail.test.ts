@@ -151,7 +151,7 @@ describe('ClaudeAccountEmailWidget', () => {
             'utf-8'
         );
 
-        expect(render({ accountEmail: { status: 'available', email: 'current@example.com' } })).toBe('Account: current@example.com');
+        expect(render({ accountEmail: { status: 'available', email: 'current@example.com' } })).toBe('账户: current@example.com');
         expect(render({ accountEmail: { status: 'available', email: 'current@example.com' }, rawValue: true })).toBe('current@example.com');
     });
 
@@ -164,7 +164,7 @@ describe('ClaudeAccountEmailWidget', () => {
             'utf-8'
         );
 
-        expect(render({ accountEmail: { status: 'no-credentials' } })).toBe('Account: user@example.com');
+        expect(render({ accountEmail: { status: 'no-credentials' } })).toBe('账户: user@example.com');
     });
 
     it('hides an unverified previous account when the current login lookup fails', () => {
@@ -181,7 +181,7 @@ describe('ClaudeAccountEmailWidget', () => {
     it('shows the email of the live login when .claude.json has none', () => {
         process.env.CLAUDE_CONFIG_DIR = path.join(tempHomeDir, '.claude');
 
-        expect(render({ accountEmail: { status: 'available', email: 'current@example.com' } })).toBe('Account: current@example.com');
+        expect(render({ accountEmail: { status: 'available', email: 'current@example.com' } })).toBe('账户: current@example.com');
     });
 
     it('returns null when emailAddress is not a string', () => {

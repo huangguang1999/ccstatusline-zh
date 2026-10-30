@@ -291,7 +291,7 @@ describe('StatusLinePreview helpers', () => {
 
         try {
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('Limit in: 1hr 13m');
+                expect(stdout.getOutput()).toContain('额度耗尽: 1时 13分');
             });
 
             expect(stdout.getOutput()).toContain('→100.0%');

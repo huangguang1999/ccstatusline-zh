@@ -106,9 +106,9 @@ describe('App under dev reload', () => {
         const rendered = renderApp();
         try {
             await waitFor(() => {
-                expect(rendered.getFrame()).toContain(screen === 'main' ? 'Main Menu' : 'Select Line');
+                expect(rendered.getFrame()).toContain(screen === 'main' ? '主菜单' : '选择');
             });
-            const highlight = screen === 'main' ? '▶  🎨 Edit Colors' : '▶  ☰ Line 2';
+            const highlight = screen === 'main' ? '▶  🎨 编辑颜色' : '▶  ☰ 第 2 行';
             await pressKey(rendered, KEYS.down, highlight);
             fs.rmSync(stateFile);
             rendered.stdin.write(CTRL_R);
@@ -156,9 +156,9 @@ describe('App under dev reload', () => {
             // Line 2's editor, with the unsaved widget and the reload hint
             await waitFor(() => {
                 const output = stripAnsi(chunks.join(''));
-                expect(output).toContain('Edit Line 2');
+                expect(output).toContain('编辑行 2');
                 expect(output).toContain('unsaved edit');
-                expect(output).toContain('dev reload: ctrl+r');
+                expect(output).toContain('开发重载: Ctrl+R');
             });
 
             fs.rmSync(stateFile);
@@ -215,7 +215,7 @@ describe('App under dev reload', () => {
 
             stdin.write(CTRL_S);
             await waitFor(() => {
-                expect(stripAnsi(chunks.join(''))).toContain('Configuration saved');
+                expect(stripAnsi(chunks.join(''))).toContain('配置已保存');
             });
             await waitFor(() => {
                 expect(readDevReloadSnapshot(stateFile)).toBeNull();

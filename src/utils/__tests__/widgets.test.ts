@@ -282,14 +282,14 @@ describe('widget catalog filtering', () => {
                 type: 'exact-match',
                 displayName: 'Git Branch',
                 description: 'Exact substring match',
-                category: 'Core',
+                category: '核心',
                 searchText: 'git branch exact substring match exact-match'
             },
             {
                 type: 'fuzzy-match',
                 displayName: 'Global Input Timer',
                 description: 'Fuzzy-only match',
-                category: 'Core',
+                category: '核心',
                 searchText: 'global input timer fuzzy-only match fuzzy-match'
             }
         ];
@@ -309,21 +309,21 @@ describe('widget catalog filtering', () => {
                 type: 'alpha',
                 displayName: 'Git Branch',
                 description: 'Primary match',
-                category: 'Core',
+                category: '核心',
                 searchText: 'git branch primary match alpha'
             },
             {
                 type: 'git-type-only',
                 displayName: 'Branch',
                 description: 'Type fallback match',
-                category: 'Core',
+                category: '核心',
                 searchText: 'branch type fallback match git-type-only'
             },
             {
                 type: 'desc-only',
                 displayName: 'Branch',
                 description: 'Description contains git',
-                category: 'Core',
+                category: '核心',
                 searchText: 'branch description contains git desc-only'
             }
         ];

@@ -33,7 +33,7 @@ export class GitWorktreeWidget implements Widget {
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         const modifiers: string[] = [];
         if (item.metadata?.fishStyle === 'true')
-            modifiers.push('fish-style');
+            modifiers.push('fish 风格');
         return {
             displayText: this.getDisplayName(),
             modifierText: makeModifierText(modifiers)
@@ -116,7 +116,7 @@ export class GitWorktreeWidget implements Widget {
 
     getCustomKeybinds(): CustomKeybind[] {
         return [
-            { key: 'f', label: '(f)ish style', action: 'toggle-fish-style' },
+            { key: 'f', label: '(f)fish 风格', action: 'toggle-fish-style' },
             getSymbolKeybind()
         ];
     }

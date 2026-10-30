@@ -162,7 +162,7 @@ export interface DevReloadTerminal {
 }
 
 export function promptRetryOnTerminal(exitCode: number, terminal: DevReloadTerminal = process): Promise<boolean> {
-    terminal.stdout.write(`\nReload failed (exit ${exitCode}). Fix the code, then press Enter to retry, or q to quit.\n`);
+    terminal.stdout.write(`\n重载失败（退出码 ${exitCode}）。修复代码后按 Enter 重试，或按 q 退出。\n`);
 
     return new Promise((resolve) => {
         const stdin = terminal.stdin;

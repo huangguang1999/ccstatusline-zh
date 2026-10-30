@@ -105,7 +105,7 @@ describe('global package manager inspection', () => {
 
     it('warns about distinct POSIX bin directories that differ only in case', () => {
         mockExecFileSync({
-            'which -a ccstatusline': '/home/alice/Bin/ccstatusline\n/home/alice/bin/ccstatusline\n',
+            'which -a ccstatusline-zh': '/home/alice/Bin/ccstatusline-zh\n/home/alice/bin/ccstatusline-zh\n',
             'bun pm bin -g': '/home/alice/Bin\n'
         });
         vi.spyOn(fs, 'existsSync').mockReturnValue(false);
@@ -120,11 +120,11 @@ describe('global package manager inspection', () => {
 
         expect(activeCommand.packageManager).toBe('bun');
         expect(activeCommand.resolvedPaths).toEqual([
-            '/home/alice/Bin/ccstatusline',
-            '/home/alice/bin/ccstatusline'
+            '/home/alice/Bin/ccstatusline-zh',
+            '/home/alice/bin/ccstatusline-zh'
         ]);
         expect(activeCommand.warning).toBe(
-            '⚠ Multiple ccstatusline binaries are on PATH. Claude Code will run the first match: /home/alice/Bin/ccstatusline.\nOther matches: /home/alice/bin/ccstatusline'
+            '⚠ PATH 中存在多个 ccstatusline-zh 可执行文件，Claude Code 将使用第一个匹配：/home/alice/Bin/ccstatusline-zh。\n其他匹配：/home/alice/bin/ccstatusline-zh'
         );
     });
 
@@ -133,7 +133,7 @@ describe('global package manager inspection', () => {
         ['WSL', '/mnt/c/Users/Alice/Bin', '/mnt/c/users/alice/bin']
     ])('ignores case differences within the same %s bin directory', (_style, firstDir, secondDir) => {
         mockExecFileSync({
-            'which -a ccstatusline': `${firstDir}/ccstatusline\n${secondDir}/ccstatusline\n`,
+            'which -a ccstatusline-zh': `${firstDir}/ccstatusline-zh\n${secondDir}/ccstatusline-zh\n`,
             'bun pm bin -g': `${firstDir}\n`
         });
         vi.spyOn(fs, 'existsSync').mockReturnValue(false);
@@ -187,15 +187,15 @@ describe('global package manager inspection', () => {
 
     it('ignores transient npx status line shims when identifying the active global command', () => {
         mockExecFileSync({
-            'which -a ccstatusline': '/Users/alice/.npm/_npx/9f3c1e2a7b6d4c80/node_modules/.bin/ccstatusline\n/Users/alice/.nvm/versions/node/v24.9.0/bin/ccstatusline\n',
+            'which -a ccstatusline-zh': '/Users/alice/.npm/_npx/9f3c1e2a7b6d4c80/node_modules/.bin/ccstatusline-zh\n/Users/alice/.nvm/versions/node/v24.9.0/bin/ccstatusline-zh\n',
             'npm prefix -g': '/Users/alice/.nvm/versions/node/v24.9.0\n',
             'npm root -g': '/Users/alice/.nvm/versions/node/v24.9.0/lib/node_modules\n'
         });
         vi.spyOn(fs, 'existsSync').mockImplementation(filePath => (
-            filePath === '/Users/alice/.nvm/versions/node/v24.9.0/lib/node_modules/ccstatusline/package.json'
+            filePath === '/Users/alice/.nvm/versions/node/v24.9.0/lib/node_modules/ccstatusline-zh/package.json'
         ));
         vi.spyOn(fs, 'readFileSync').mockImplementation((filePath) => {
-            if (filePath === '/Users/alice/.nvm/versions/node/v24.9.0/lib/node_modules/ccstatusline/package.json') {
+            if (filePath === '/Users/alice/.nvm/versions/node/v24.9.0/lib/node_modules/ccstatusline-zh/package.json') {
                 return '{"version":"2.2.14"}';
             }
 
@@ -212,8 +212,8 @@ describe('global package manager inspection', () => {
 
         expect(activeCommand).toEqual({
             packageManager: 'npm',
-            resolvedPath: '/Users/alice/.nvm/versions/node/v24.9.0/bin/ccstatusline',
-            resolvedPaths: ['/Users/alice/.nvm/versions/node/v24.9.0/bin/ccstatusline'],
+            resolvedPath: '/Users/alice/.nvm/versions/node/v24.9.0/bin/ccstatusline-zh',
+            resolvedPaths: ['/Users/alice/.nvm/versions/node/v24.9.0/bin/ccstatusline-zh'],
             binDir: '/Users/alice/.nvm/versions/node/v24.9.0/bin',
             version: '2.2.14',
             warning: null
@@ -222,21 +222,21 @@ describe('global package manager inspection', () => {
 
     it('ignores transient npx shims in the Windows npm cache when identifying the active global command', () => {
         mockExecFileSync({
-            'where ccstatusline': [
-                'C:\\Users\\Alice\\AppData\\Local\\npm-cache\\_npx\\9f3c1e2a7b6d4c80\\node_modules\\.bin\\ccstatusline.cmd',
-                'C:\\Users\\Alice\\AppData\\Local\\npm-cache\\_npx\\9f3c1e2a7b6d4c80\\node_modules\\.bin\\ccstatusline.ps1',
-                'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline.cmd',
-                'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline.ps1',
+            'where ccstatusline-zh': [
+                'C:\\Users\\Alice\\AppData\\Local\\npm-cache\\_npx\\9f3c1e2a7b6d4c80\\node_modules\\.bin\\ccstatusline-zh.cmd',
+                'C:\\Users\\Alice\\AppData\\Local\\npm-cache\\_npx\\9f3c1e2a7b6d4c80\\node_modules\\.bin\\ccstatusline-zh.ps1',
+                'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline-zh.cmd',
+                'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline-zh.ps1',
                 ''
             ].join('\r\n'),
             'npm.cmd prefix -g': 'C:\\Users\\Alice\\AppData\\Roaming\\npm\r\n',
             'npm.cmd root -g': 'C:\\Users\\Alice\\AppData\\Roaming\\npm\\node_modules\r\n'
         });
         vi.spyOn(fs, 'existsSync').mockImplementation(filePath => (
-            filePath === 'C:\\Users\\Alice\\AppData\\Roaming\\npm\\node_modules\\ccstatusline\\package.json'
+            filePath === 'C:\\Users\\Alice\\AppData\\Roaming\\npm\\node_modules\\ccstatusline-zh\\package.json'
         ));
         vi.spyOn(fs, 'readFileSync').mockImplementation((filePath) => {
-            if (filePath === 'C:\\Users\\Alice\\AppData\\Roaming\\npm\\node_modules\\ccstatusline\\package.json') {
+            if (filePath === 'C:\\Users\\Alice\\AppData\\Roaming\\npm\\node_modules\\ccstatusline-zh\\package.json') {
                 return '{"version":"2.2.14"}';
             }
 
@@ -253,10 +253,10 @@ describe('global package manager inspection', () => {
 
         expect(activeCommand).toEqual({
             packageManager: 'npm',
-            resolvedPath: 'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline.cmd',
+            resolvedPath: 'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline-zh.cmd',
             resolvedPaths: [
-                'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline.cmd',
-                'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline.ps1'
+                'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline-zh.cmd',
+                'C:\\Users\\Alice\\AppData\\Roaming\\npm\\ccstatusline-zh.ps1'
             ],
             binDir: 'C:\\Users\\Alice\\AppData\\Roaming\\npm',
             version: '2.2.14',

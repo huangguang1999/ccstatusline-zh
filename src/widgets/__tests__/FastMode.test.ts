@@ -24,15 +24,15 @@ function render(item: WidgetItem, context: RenderContext): string | null {
 describe('FastModeWidget', () => {
     describe('metadata', () => {
         it('has correct display name', () => {
-            expect(new FastModeWidget().getDisplayName()).toBe('Fast Mode');
+            expect(new FastModeWidget().getDisplayName()).toBe('快速模式');
         });
 
         it('has correct description', () => {
-            expect(new FastModeWidget().getDescription()).toBe('Shows whether Claude Code fast mode is on');
+            expect(new FastModeWidget().getDescription()).toBe('显示 Claude Code 快速模式是否启用');
         });
 
         it('has correct category', () => {
-            expect(new FastModeWidget().getCategory()).toBe('Core');
+            expect(new FastModeWidget().getCategory()).toBe('核心');
         });
 
         it('has yellow default color', () => {
@@ -49,7 +49,7 @@ describe('FastModeWidget', () => {
 
         it('can hide while fast mode is off, not by default', () => {
             expect(new FastModeWidget().getHideableStates()).toEqual([
-                { key: 'off', label: 'when fast mode is off' }
+                { key: 'off', label: '快速模式关闭时' }
             ]);
         });
     });
@@ -57,14 +57,14 @@ describe('FastModeWidget', () => {
     describe('editor configuration', () => {
         it('exposes f and n keybinds', () => {
             expect(new FastModeWidget().getCustomKeybinds()).toEqual([
-                { key: 'f', label: '(f)ormat', action: 'cycle-format' },
-                { key: 'n', label: '(n)erd font', action: 'toggle-nerd-font' }
+                { key: 'f', label: '(f)显示格式', action: 'cycle-format' },
+                { key: 'n', label: '(n)Nerd 字体', action: 'toggle-nerd-font' }
             ]);
         });
 
         it('exposes the Nerd Font keybind only when its icon is visible', () => {
             const widget = new FastModeWidget();
-            const nerdFontKeybind = { key: 'n', label: '(n)erd font', action: 'toggle-nerd-font' };
+            const nerdFontKeybind = { key: 'n', label: '(n)Nerd 字体', action: 'toggle-nerd-font' };
 
             expect(widget.getCustomKeybinds(ITEM)).toContainEqual(nerdFontKeybind);
             expect(widget.getCustomKeybinds({ ...ITEM, rawValue: true })).not.toContainEqual(nerdFontKeybind);
@@ -79,7 +79,7 @@ describe('FastModeWidget', () => {
 
         it('defaults to icon-text in the editor display', () => {
             expect(new FastModeWidget().getEditorDisplay(ITEM)).toEqual({
-                displayText: 'Fast Mode',
+                displayText: '快速模式',
                 modifierText: '(icon-text)'
             });
         });
@@ -89,8 +89,8 @@ describe('FastModeWidget', () => {
                 ...ITEM,
                 metadata: { format: 'icon', nerdFont: 'true' }
             })).toEqual({
-                displayText: 'Fast Mode',
-                modifierText: '(icon, nerd font)'
+                displayText: '快速模式',
+                modifierText: '(icon, Nerd 字体)'
             });
         });
 
@@ -134,20 +134,20 @@ describe('FastModeWidget', () => {
     describe('render() - format icon-text (default)', () => {
         const NERD_ITEM: WidgetItem = { ...ITEM, metadata: { nerdFont: 'true' } };
 
-        it('renders ⚡ off when OFF', () => {
-            expect(render(ITEM, makeContext(false))).toBe('⚡ off');
+        it('renders ⚡ 关闭 when OFF', () => {
+            expect(render(ITEM, makeContext(false))).toBe('⚡ 关闭');
         });
 
-        it('renders ⚡ on when ON', () => {
-            expect(render(ITEM, makeContext(true))).toBe('⚡ on');
+        it('renders ⚡ 启用 when ON', () => {
+            expect(render(ITEM, makeContext(true))).toBe('⚡ 启用');
         });
 
         it('renders flash-off glyph (U+F0243) off when OFF (nerd font)', () => {
-            expect(render(NERD_ITEM, makeContext(false))).toBe('\u{F0243} off');
+            expect(render(NERD_ITEM, makeContext(false))).toBe('\u{F0243} 关闭');
         });
 
         it('renders flash glyph (U+F0241) on when ON (nerd font)', () => {
-            expect(render(NERD_ITEM, makeContext(true))).toBe('\u{F0241} on');
+            expect(render(NERD_ITEM, makeContext(true))).toBe('\u{F0241} 启用');
         });
     });
 
@@ -176,23 +176,23 @@ describe('FastModeWidget', () => {
         const FORMAT_ITEM: WidgetItem = { ...ITEM, metadata: { format: 'text' } };
 
         it('renders "off" when OFF', () => {
-            expect(render(FORMAT_ITEM, makeContext(false))).toBe('off');
+            expect(render(FORMAT_ITEM, makeContext(false))).toBe('关闭');
         });
 
         it('renders "on" when ON', () => {
-            expect(render(FORMAT_ITEM, makeContext(true))).toBe('on');
+            expect(render(FORMAT_ITEM, makeContext(true))).toBe('启用');
         });
     });
 
     describe('render() - format word', () => {
         const FORMAT_ITEM: WidgetItem = { ...ITEM, metadata: { format: 'word' } };
 
-        it('renders "fast off" when OFF', () => {
-            expect(render(FORMAT_ITEM, makeContext(false))).toBe('fast off');
+        it('renders "快速 关闭" when OFF', () => {
+            expect(render(FORMAT_ITEM, makeContext(false))).toBe('快速 关闭');
         });
 
-        it('renders "fast on" when ON', () => {
-            expect(render(FORMAT_ITEM, makeContext(true))).toBe('fast on');
+        it('renders "快速 启用" when ON', () => {
+            expect(render(FORMAT_ITEM, makeContext(true))).toBe('快速 启用');
         });
     });
 
@@ -204,25 +204,25 @@ describe('FastModeWidget', () => {
         });
 
         it('still renders while fast mode is on', () => {
-            expect(render(HIDE_ITEM, makeContext(true))).toBe('⚡ on');
+            expect(render(HIDE_ITEM, makeContext(true))).toBe('⚡ 启用');
         });
 
         it('shows the off state without the option', () => {
-            expect(render(ITEM, makeContext(false))).toBe('⚡ off');
+            expect(render(ITEM, makeContext(false))).toBe('⚡ 关闭');
         });
     });
 
     describe('render() - preview mode', () => {
         it('renders the ON state for the default format', () => {
-            expect(render(ITEM, makeContext(false, { isPreview: true }))).toBe('⚡ on');
+            expect(render(ITEM, makeContext(false, { isPreview: true }))).toBe('⚡ 启用');
         });
 
         it('renders the ON state even with hide-when-off set', () => {
-            expect(render({ ...ITEM, metadata: { hide: 'off' } }, makeContext(undefined, { isPreview: true }))).toBe('⚡ on');
+            expect(render({ ...ITEM, metadata: { hide: 'off' } }, makeContext(undefined, { isPreview: true }))).toBe('⚡ 启用');
         });
 
         it('renders the ON state for word format', () => {
-            expect(render({ ...ITEM, metadata: { format: 'word' } }, makeContext(undefined, { isPreview: true }))).toBe('fast on');
+            expect(render({ ...ITEM, metadata: { format: 'word' } }, makeContext(undefined, { isPreview: true }))).toBe('快速 启用');
         });
     });
 

@@ -71,11 +71,11 @@ describe('BlockForecastWidget', () => {
     it('describes itself for the line editor', () => {
         const widget = new BlockForecastWidget();
 
-        expect(widget.getDisplayName()).toBe('Block Forecast');
-        expect(widget.getCategory()).toBe('Usage');
+        expect(widget.getDisplayName()).toBe('时段用量预测');
+        expect(widget.getCategory()).toBe('用量');
         expect(widget.getDefaultColor()).toBe('brightBlue');
-        expect(widget.getEditorDisplay(ITEM).modifierText).toBe('(used)');
-        expect(widget.getEditorDisplay(REMAINING).modifierText).toBe('(remaining)');
+        expect(widget.getEditorDisplay(ITEM).modifierText).toBe('(已用)');
+        expect(widget.getEditorDisplay(REMAINING).modifierText).toBe('(剩余)');
     });
 
     // A type change in the widget picker keeps the old widget's metadata, but this
@@ -85,15 +85,15 @@ describe('BlockForecastWidget', () => {
         const fromBar: WidgetItem = { ...ITEM, metadata: { display: 'progress', invert: 'true' } };
 
         expect(render(fromBar, live(42, 83.2))).toBe('→16.8%');
-        expect(widget.getEditorDisplay(fromBar).modifierText).toBe('(remaining)');
-        expect(widget.getEditorDisplay({ ...ITEM, metadata: { display: 'slider-only' } }).modifierText).toBe('(used)');
+        expect(widget.getEditorDisplay(fromBar).modifierText).toBe('(剩余)');
+        expect(widget.getEditorDisplay({ ...ITEM, metadata: { display: 'slider-only' } }).modifierText).toBe('(已用)');
     });
 
     it('toggles remaining mode with u', () => {
         const widget = new BlockForecastWidget();
 
-        expect(widget.getCustomKeybinds(ITEM)).toEqual([{ key: 'u', label: '(u) show remaining', action: 'toggle-invert' }]);
-        expect(widget.getCustomKeybinds(REMAINING)).toEqual([{ key: 'u', label: '(u) show used', action: 'toggle-invert' }]);
+        expect(widget.getCustomKeybinds(ITEM)).toEqual([{ key: 'u', label: '(u)显示剩余', action: 'toggle-invert' }]);
+        expect(widget.getCustomKeybinds(REMAINING)).toEqual([{ key: 'u', label: '(u)显示已用', action: 'toggle-invert' }]);
         expect(widget.handleEditorAction('toggle-invert', ITEM)?.metadata?.invert).toBe('true');
         expect(widget.handleEditorAction('toggle-progress', ITEM)).toBeNull();
     });

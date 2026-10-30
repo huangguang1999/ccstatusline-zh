@@ -39,7 +39,7 @@ describe('ExtraUsageLimitWidget', () => {
             }
         };
 
-        expect(render(widget, { id: 'extra', type: 'extra-usage-limit' }, context)).toBe('Overage Limit: $500.00');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-limit' }, context)).toBe('超额限额: $500.00');
         expect(render(widget, {
             id: 'extra',
             rawValue: true,
@@ -56,7 +56,7 @@ describe('ExtraUsageLimitWidget', () => {
                 extraUsageEnabled: true,
                 extraUsageLimit: 5000
             }
-        })).toBe('Overage Limit: €50.00');
+        })).toBe('超额限额: €50.00');
     });
 
     it('applies the global cost style while preserving the reported currency', () => {
@@ -72,8 +72,8 @@ describe('ExtraUsageLimitWidget', () => {
                 extraUsageEnabled: true,
                 extraUsageLimit: 5000
             }
-        }, settings)).toBe('Overage Limit: €50');
-        expect(widget.render({ id: 'extra', type: 'extra-usage-limit' }, { isPreview: true }, settings)).toBe('Overage Limit: $4,000');
+        }, settings)).toBe('超额限额: €50');
+        expect(widget.render({ id: 'extra', type: 'extra-usage-limit' }, { isPreview: true }, settings)).toBe('超额限额: $4,000');
         expect(widget.supportsNumberFormat()).toBe(true);
     });
 
@@ -84,7 +84,7 @@ describe('ExtraUsageLimitWidget', () => {
         const widget = new ExtraUsageLimitWidget();
         const context: RenderContext = { usageData: { extraUsageEnabled: true, extraUsageUsed: 542 } };
 
-        expect(render(widget, { id: 'extra', type: 'extra-usage-limit' }, context)).toBe('Overage Limit: none');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-limit' }, context)).toBe('超额限额: 无限额');
         expect(render(widget, { id: 'extra', rawValue: true, type: 'extra-usage-limit' }, context)).toBe('none');
     });
 
@@ -92,7 +92,7 @@ describe('ExtraUsageLimitWidget', () => {
         const widget = new ExtraUsageLimitWidget();
         const context: RenderContext = { usageData: { extraUsageEnabled: false } };
 
-        expect(render(widget, { id: 'extra', type: 'extra-usage-limit' }, context)).toBe('Overage Limit: n/a');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-limit' }, context)).toBe('超额限额: n/a');
         expect(render(widget, {
             id: 'extra',
             metadata: { hide: 'disabled' },
@@ -118,20 +118,20 @@ describe('ExtraUsageLimitWidget', () => {
                 extraUsageEnabled: true,
                 extraUsageLimit: 50000
             }
-        })).toBe('Overage Limit: $500.00');
+        })).toBe('超额限额: $500.00');
     });
 
     it('renders a sample limit in the preview that matches the Used and Remaining samples', () => {
         const widget = new ExtraUsageLimitWidget();
 
         // Extra Usage Used previews $106.00 and Extra Usage Remaining $3,894.00.
-        expect(render(widget, { id: 'extra', type: 'extra-usage-limit' }, { isPreview: true })).toBe('Overage Limit: $4,000.00');
+        expect(render(widget, { id: 'extra', type: 'extra-usage-limit' }, { isPreview: true })).toBe('超额限额: $4,000.00');
     });
 
     it('declares the disabled and no-data hideable states', () => {
         const widget = new ExtraUsageLimitWidget();
 
         expect(widget.getHideableStates().map(state => state.key)).toEqual(['disabled', 'no-data']);
-        expect(widget.getCategory()).toBe('Usage');
+        expect(widget.getCategory()).toBe('用量');
     });
 });

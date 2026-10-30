@@ -2642,7 +2642,7 @@ describe('fetchAccountEmail', () => {
             });
             writeUsageCredentials(home.claudeConfig, { accessToken: 'previous-access', refreshToken: 'previous-refresh' });
             fs.writeFileSync(path.join(home.claudeConfig, '.claude.json'), JSON.stringify({ oauthAccount: { emailAddress: 'previous@example.com' } }));
-            expect(render('success').renderedEmail).toBe('Account: previous@example.com');
+            expect(render('success').renderedEmail).toBe('账户: previous@example.com');
 
             writeUsageCredentials(home.claudeConfig, { accessToken: 'current-access', refreshToken: 'current-refresh' });
             const failed = render(mode);
@@ -2657,7 +2657,7 @@ describe('fetchAccountEmail', () => {
             // The old email may remain cached, but only its own login may use it.
             writeUsageCredentials(home.claudeConfig, { accessToken: 'refreshed-previous-access', refreshToken: 'previous-refresh' });
             const previous = render('unexpected');
-            expect(previous.renderedEmail).toBe('Account: previous@example.com');
+            expect(previous.renderedEmail).toBe('账户: previous@example.com');
             expect(previous.requestCount).toBe(0);
         } finally {
             harness.cleanup();
@@ -2783,7 +2783,7 @@ describe('fetchAccountEmail', () => {
             expect(result.first).toEqual({ status: 'no-credentials' });
             expect(result.second).toEqual({ status: 'no-credentials' });
             expect(result.requestCount).toBe(0);
-            expect(result.renderedEmail).toBe('Account: snapshot@example.com');
+            expect(result.renderedEmail).toBe('账户: snapshot@example.com');
         } finally {
             harness.cleanup();
         }

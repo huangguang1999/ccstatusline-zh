@@ -421,7 +421,7 @@ describe('config utilities', () => {
 
         const skipped = await saveSettings({ ...DEFAULT_SETTINGS, lines: [[{ id: 'skills-1', type: 'skills' }]] });
 
-        expect(skipped).toEqual({ statusCommand: command, widgetNames: ['Skills'] });
+        expect(skipped).toEqual({ statusCommand: command, widgetNames: ['技能'] });
     });
 
     it('saves settings without leaving a temp file behind', async () => {

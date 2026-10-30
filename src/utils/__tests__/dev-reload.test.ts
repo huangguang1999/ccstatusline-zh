@@ -246,7 +246,7 @@ describe('promptRetryOnTerminal', () => {
         stdin.write('\r');
 
         expect(await answer).toBe(true);
-        expect(output()).toContain('Reload failed (exit 1)');
+        expect(output()).toContain('重载失败（退出码 1）');
         expect(stdin.setRawMode).toHaveBeenLastCalledWith(false);
     });
 

@@ -321,7 +321,7 @@ describe('usage prefetch', () => {
         expect(usageData).toEqual(partial);
         const context = { isPreview: false, usageData: usageData ?? undefined };
         expect(new WeeklyUsageWidget().render(weekly, context, DEFAULT_SETTINGS)).toBe('40.0%');
-        expect(new SessionUsageWidget().render(session, context, DEFAULT_SETTINGS)).toBe('[Rate limited]');
+        expect(new SessionUsageWidget().render(session, context, DEFAULT_SETTINGS)).toBe('[频率限制]');
     });
 
     it('keeps valid reset data when suppressing an error for another expired window', async () => {
@@ -480,7 +480,7 @@ describe('usage prefetch', () => {
             // must not decide visibility when the payload has no percentage.
             expect(usageData?.sessionUsage).toBe(percentage ?? 100);
             expect(usageData?.apiSessionUsage).toBeUndefined();
-            expect(widget.render(item, { data, usageData }, DEFAULT_SETTINGS)).toBe(percentage === 100 ? 'Reset: 4hr' : null);
+            expect(widget.render(item, { data, usageData }, DEFAULT_SETTINGS)).toBe(percentage === 100 ? '重置: 4时' : null);
         }
 
         const usageData = await prefetchUsageDataIfNeeded(makeLines([item]));

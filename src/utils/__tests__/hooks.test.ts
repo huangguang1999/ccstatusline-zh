@@ -237,7 +237,7 @@ describe('syncWidgetHooks', () => {
 
         const skipped = await syncWidgetHooks(settings);
 
-        expect(skipped).toEqual({ statusCommand: command, widgetNames: ['Skills'] });
+        expect(skipped).toEqual({ statusCommand: command, widgetNames: ['技能'] });
         const saved = JSON.parse(fs.readFileSync(settingsPath, 'utf-8')) as {
             statusLine?: { command?: string };
             hooks?: Record<string, unknown[]>;

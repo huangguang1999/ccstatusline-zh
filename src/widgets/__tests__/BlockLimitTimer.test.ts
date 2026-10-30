@@ -25,25 +25,26 @@ function limitIn(limitInMs: number | null): RenderContext {
 
 describe('BlockLimitTimerWidget', () => {
     it('shows the time until the limit, rounded down to the minute', () => {
-        expect(render(ITEM, limitIn(4_387_500))).toBe('Limit in: 1hr 13m');
+        expect(render(ITEM, limitIn(4_387_500))).toBe('额度耗尽: 1时 13分');
     });
 
     it('formats durations like the reset timers', () => {
-        expect(render(ITEM, limitIn(4_387_500))).toBe(`Limit in: ${formatUsageDuration(4_387_500)}`);
-        expect(render(COMPACT, limitIn(4_387_500))).toBe(`Limit in: ${formatUsageDuration(4_387_500, true)}`);
+        expect(render(ITEM, limitIn(4_387_500))).toBe(`额度耗尽: ${formatUsageDuration(4_387_500)}`);
+        expect(render(COMPACT, limitIn(4_387_500))).toBe(`额度耗尽: ${formatUsageDuration(4_387_500, true)}`);
     });
 
     it('shows the short form with s', () => {
-        expect(render(COMPACT, limitIn(4_387_500))).toBe('Limit in: 1h13m');
+        expect(render(COMPACT, limitIn(4_387_500))).toBe('额度耗尽: 1时13分');
     });
 
     it('drops the label in raw value mode', () => {
         expect(render({ ...ITEM, rawValue: true }, limitIn(4_387_500))).toBe('1hr 13m');
+        expect(render({ ...COMPACT, rawValue: true }, limitIn(4_387_500))).toBe('1h13m');
     });
 
     it('never shows 0m in the last minute', () => {
-        expect(render(ITEM, limitIn(30_000))).toBe('Limit in: 1m');
-        expect(render(COMPACT, limitIn(30_000))).toBe('Limit in: 1m');
+        expect(render(ITEM, limitIn(30_000))).toBe('额度耗尽: 1分');
+        expect(render(COMPACT, limitIn(30_000))).toBe('额度耗尽: 1分');
     });
 
     it.each([
@@ -54,18 +55,18 @@ describe('BlockLimitTimerWidget', () => {
     });
 
     it('shows a sample in the preview', () => {
-        expect(render(ITEM, { isPreview: true })).toBe('Limit in: 1hr 13m');
-        expect(render(COMPACT, { isPreview: true })).toBe('Limit in: 1h13m');
+        expect(render(ITEM, { isPreview: true })).toBe('额度耗尽: 1时 13分');
+        expect(render(COMPACT, { isPreview: true })).toBe('额度耗尽: 1时13分');
     });
 
     it('describes itself for the line editor', () => {
         const widget = new BlockLimitTimerWidget();
 
-        expect(widget.getDisplayName()).toBe('Block Limit Timer');
-        expect(widget.getCategory()).toBe('Usage');
+        expect(widget.getDisplayName()).toBe('时段额度耗尽计时');
+        expect(widget.getCategory()).toBe('用量');
         expect(widget.getDefaultColor()).toBe('red');
         expect(widget.getEditorDisplay(ITEM).modifierText).toBeUndefined();
-        expect(widget.getEditorDisplay(COMPACT).modifierText).toBe('(compact)');
+        expect(widget.getEditorDisplay(COMPACT).modifierText).toBe('(紧凑)');
     });
 
     // A type change in the widget picker keeps the old widget's metadata, but this
@@ -74,15 +75,15 @@ describe('BlockLimitTimerWidget', () => {
         const widget = new BlockLimitTimerWidget();
         const fromBar: WidgetItem = { ...ITEM, metadata: { display: 'progress', invert: 'true', compact: 'true' } };
 
-        expect(render(fromBar, limitIn(4_387_500))).toBe('Limit in: 1h13m');
-        expect(widget.getEditorDisplay(fromBar).modifierText).toBe('(compact)');
+        expect(render(fromBar, limitIn(4_387_500))).toBe('额度耗尽: 1时13分');
+        expect(widget.getEditorDisplay(fromBar).modifierText).toBe('(紧凑)');
         expect(widget.getEditorDisplay({ ...ITEM, metadata: { display: 'slider' } }).modifierText).toBeUndefined();
     });
 
     it('toggles the short form with s', () => {
         const widget = new BlockLimitTimerWidget();
 
-        expect(widget.getCustomKeybinds()).toEqual([{ key: 's', label: '(s)hort time', action: 'toggle-compact' }]);
+        expect(widget.getCustomKeybinds()).toEqual([{ key: 's', label: '(s)短时间', action: 'toggle-compact' }]);
         expect(widget.handleEditorAction('toggle-compact', ITEM)?.metadata?.compact).toBe('true');
         expect(widget.handleEditorAction('toggle-invert', ITEM)).toBeNull();
     });

@@ -92,7 +92,7 @@ const DESCRIPTION_INDENT = 2;
 
 const HiddenEntriesMarker: React.FC<{ arrow: string; count: number }> = ({ arrow, count }) => (
     <Box paddingLeft={3}>
-        <Text dimColor>{count > 0 ? `${arrow} ${count} more` : ' '}</Text>
+        <Text dimColor>{count > 0 ? `${arrow} 另有 ${count} 项` : ' '}</Text>
     </Box>
 );
 

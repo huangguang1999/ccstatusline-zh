@@ -108,7 +108,7 @@ describe('ContextPercentageWidget', () => {
             }
         };
 
-        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe('Ctx Used: 25.0%');
+        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe('已用: 25.0%');
     });
 
     describe('Sonnet 4.5 with 1M context window', () => {
