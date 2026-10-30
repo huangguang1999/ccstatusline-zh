@@ -356,7 +356,7 @@ export class CacheTimerWidget implements Widget {
         if (reportedRemaining !== null) {
             const ttlSeconds = getReportedTtlSeconds(context) ?? getTtlSeconds(item);
             const glyph = getStateSymbol(item, reportedRemaining, ttlSeconds);
-            return formatRawOrLabeledValue(item, this.getLabelPrefix(), withGlyph(glyph, formatCountdown(reportedRemaining)));
+            return formatRawOrLabeledValue(item, this.getLabelPrefix(), withGlyph(glyph, localizeStateValue(item, formatCountdown(reportedRemaining))));
         }
 
         const transcriptPath = context.data?.transcript_path;

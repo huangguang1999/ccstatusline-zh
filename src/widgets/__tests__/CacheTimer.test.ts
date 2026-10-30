@@ -134,7 +134,8 @@ describe('CacheTimer widget', () => {
         vi.spyOn(Date, 'now').mockReturnValue(1800000000000);
         const context: RenderContext = { data: { prompt_cache } };
 
-        expect(new CacheTimerWidget().render(item(hidden), context, DEFAULT_SETTINGS)).toBe('缓存: ❄️ COLD');
+        expect(new CacheTimerWidget().render(item(hidden), context, DEFAULT_SETTINGS)).toBe('缓存: ❄️ 已过期');
+        expect(new CacheTimerWidget().render(item({ rawValue: true }), context, DEFAULT_SETTINGS)).toBe('❄️ COLD');
     });
 
     it.each([
