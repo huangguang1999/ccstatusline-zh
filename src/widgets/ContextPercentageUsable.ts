@@ -6,6 +6,10 @@ import type {
     WidgetEditorDisplay,
     WidgetItem
 } from '../types/Widget';
+import {
+    getAutoCompactConfig,
+    resolveClaudeConfigCwd
+} from '../utils/claude-settings';
 import { getContextWindowMetrics } from '../utils/context-window';
 import {
     getContextConfig,
@@ -32,7 +36,7 @@ import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
 export class ContextPercentageUsableWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return '显示有效上下文窗口已用或剩余百分比（自动压缩前最大值的 80%）'; }
+    getDescription(): string { return '显示相对于估算压缩预算的上下文已用或剩余百分比。遵循 Claude Code 压缩设置和环境变量覆盖，默认估算为 80%。'; }
     getDisplayName(): string { return '上下文 %（有效）'; }
     getCategory(): string { return '上下文'; }
     getLabelPrefix(item: WidgetItem): string { return isContextInverse(item) ? '剩余: ' : '已用: '; }
@@ -57,9 +61,6 @@ export class ContextPercentageUsableWidget implements Widget {
     render(item: WidgetItem, context: RenderContext, settings: Settings): string | null {
         const isInverse = isContextInverse(item);
         const sliderMode = getContextSliderMode(item);
-        const modelIdentifier = getModelContextIdentifier(context.data?.model);
-        const contextWindowMetrics = getContextWindowMetrics(context.data);
-        const contextConfig = getContextConfig(modelIdentifier, contextWindowMetrics.windowSize);
         const format = resolveNumberFormat('percent', item, settings);
 
         const formatContextPercentage = (displayPercentage: number): string => {
@@ -70,6 +71,11 @@ export class ContextPercentageUsableWidget implements Widget {
         if (context.isPreview) {
             return formatContextPercentage(isInverse ? 88.4 : 11.6);
         }
+
+        const modelIdentifier = getModelContextIdentifier(context.data?.model);
+        const contextWindowMetrics = getContextWindowMetrics(context.data);
+        const autoCompact = getAutoCompactConfig(resolveClaudeConfigCwd(context));
+        const contextConfig = getContextConfig(modelIdentifier, contextWindowMetrics.windowSize, autoCompact);
 
         if (contextWindowMetrics.contextLengthTokens !== null) {
             const usedPercentage = Math.min(100, (contextWindowMetrics.contextLengthTokens / contextConfig.usableTokens) * 100);

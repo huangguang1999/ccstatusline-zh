@@ -140,7 +140,7 @@ describe('CacheTimer widget', () => {
         const timer = item({ rawValue: true, metadata: { symbolFresh: '', symbolUrgent: '' } });
 
         expect(widget.render(timer, context, DEFAULT_SETTINGS)).toBe(expected);
-        expect(widget.render({ ...timer, metadata: { ...timer.metadata, compact: 'true' } }, context, DEFAULT_SETTINGS)).toBe(紧凑);
+        expect(widget.render({ ...timer, metadata: { ...timer.metadata, compact: 'true' } }, context, DEFAULT_SETTINGS)).toBe(compact);
     });
 
     it.each([

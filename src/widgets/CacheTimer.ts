@@ -42,7 +42,7 @@ const TOGGLE_TTL_ACTION = 'toggle-ttl';
 
 // Same key, action and metadata flag as the reset timers, so short time works
 // the same way on every timer widget.
-const COMPACT_METADATA_KEY = '紧凑';
+const COMPACT_METADATA_KEY = 'compact';
 const TOGGLE_COMPACT_ACTION = 'toggle-compact';
 
 const SAFETY_MARGIN = 5; // display as COLD 5s before actual expiry
