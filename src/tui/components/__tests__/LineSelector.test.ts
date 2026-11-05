@@ -370,8 +370,9 @@ describe('LineSelector', () => {
             // Deleting the first line keeps the highlight on the first line
             view.press('d');
             await waitFor(() => {
-                expect(view.frame()).toContain('☰ 第 1 行 (1 个组件)');
+                expect(view.frame()).toContain('确定要删除此行吗？');
             });
+            expect(view.frame()).toContain('☰ 第 1 行 (1 个组件)');
 
             view.press(ENTER);
             await waitFor(() => {
