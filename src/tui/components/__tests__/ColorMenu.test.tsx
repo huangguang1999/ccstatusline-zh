@@ -97,12 +97,6 @@ function renderColorMenu(widgets: WidgetItem[]) {
     };
 }
 
-function flushInk() {
-    return new Promise((resolve) => {
-        setTimeout(resolve, 25);
-    });
-}
-
 describe('ColorMenu', () => {
     it('keeps bold and dim indicators on the current-style row', async () => {
         const stdin = createMockStdin();
@@ -146,13 +140,18 @@ describe('ColorMenu', () => {
             }
         );
 
-        try {
-            await flushInk();
-            stdin.write('\x1B[B');
-            await flushInk();
+        const latestFrame = () => stdout.getOutput().split('配置颜色').at(-1) ?? '';
 
-            const latestFrame = stdout.getOutput().split('配置颜色').at(-1) ?? '';
-            const currentStyleLine = latestFrame
+        try {
+            await waitFor(() => {
+                expect(stripAnsi(latestFrame())).toContain('▶  1: 缓存命中率');
+            });
+            stdin.write('\x1B[B');
+            await waitFor(() => {
+                expect(stripAnsi(latestFrame())).toContain('▶  2: 缓存读取');
+            });
+
+            const currentStyleLine = latestFrame()
                 .split('\n')
                 .find(line => line.includes('当前') && line.includes('前景色')) ?? '';
 
