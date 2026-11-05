@@ -620,6 +620,10 @@ describe('ItemsEditor', () => {
             });
             stdin.write('l');
             await waitFor(() => {
+                expect(lastFrame()).toContain('链接: Zed');
+            });
+            stdin.write('l');
+            await waitFor(() => {
                 expect(lastFrame()).toContain('当前目录 (~, 段数: 2)');
                 expect(lastFrame()).not.toContain('链接:');
             });
