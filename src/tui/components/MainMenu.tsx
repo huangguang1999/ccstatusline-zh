@@ -112,11 +112,10 @@ export function buildMainMenuItems(
                 '设置适用于所有组件的全局内边距、分隔符和颜色覆盖'
         },
         {
+            // Open before an install too: only its refresh interval needs one
             label: '🔧 配置状态行',
-            sublabel: isClaudeInstalled ? undefined : '（请先安装）',
-            disabled: !isClaudeInstalled,
             value: 'configureStatusLine',
-            description: '配置 Claude Code 状态行设置（如刷新间隔）'
+            description: '设置 ccstatusline-zh 缓存时长；安装后还可设置 Claude Code 刷新间隔'
         },
         '-',
         {

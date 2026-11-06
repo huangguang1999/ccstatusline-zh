@@ -19,9 +19,13 @@ function getRefreshInputValue(interval: number | null): string {
     return interval === null ? '' : String(interval);
 }
 
-function getRefreshIntervalSublabel(interval: number | null, supported: boolean): string {
+function getRefreshIntervalSublabel(interval: number | null, supported: boolean, installed: boolean): string {
     if (!supported) {
         return '（需要 Claude Code ≥ 2.1.97）';
+    }
+
+    if (!installed) {
+        return '（请先安装）';
     }
 
     if (interval === null) {
@@ -43,19 +47,22 @@ function getCacheTtlSublabel(ttlSeconds: number): string {
         : `（${ttlSeconds} 秒）`;
 }
 
+// The refresh interval is part of Claude Code's statusLine setting, so it waits
+// for an install; the cache TTLs are ccstatusline's own settings.
 export function buildConfigureStatusLineItems(
     refreshInterval: number | null,
     supportsRefreshInterval: boolean,
     gitCacheTtlSeconds: number,
     customCommandCacheTtlSeconds: number,
-    terminalWidthCacheTtlSeconds: number
+    terminalWidthCacheTtlSeconds: number,
+    isClaudeInstalled = true
 ): ListEntry<ConfigureStatusLineValue>[] {
     return [
         {
             label: '🔄 刷新间隔',
-            sublabel: getRefreshIntervalSublabel(refreshInterval, supportsRefreshInterval),
+            sublabel: getRefreshIntervalSublabel(refreshInterval, supportsRefreshInterval, isClaudeInstalled),
             value: 'refreshInterval',
-            disabled: !supportsRefreshInterval,
+            disabled: !supportsRefreshInterval || !isClaudeInstalled,
             description: supportsRefreshInterval
                 ? 'Claude Code 重新运行状态栏命令的频率。输入秒数 (1-60)，留空即移除。'
                 : '本设置需要 Claude Code 2.1.97 或更高版本。请升级 Claude Code 后再使用。'
@@ -146,6 +153,9 @@ interface TtlFieldConfig {
 export interface RefreshIntervalMenuProps {
     currentInterval: number | null;
     supportsRefreshInterval: boolean;
+    // Whether Claude Code's status line is ccstatusline's own install, which
+    // the refresh interval needs
+    isClaudeInstalled?: boolean;
     gitCacheTtlSeconds: number;
     customCommandCacheTtlSeconds: number;
     terminalWidthCacheTtlSeconds: number;
@@ -159,6 +169,7 @@ export interface RefreshIntervalMenuProps {
 export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
     currentInterval,
     supportsRefreshInterval,
+    isClaudeInstalled = true,
     gitCacheTtlSeconds,
     customCommandCacheTtlSeconds,
     terminalWidthCacheTtlSeconds,
@@ -331,7 +342,8 @@ export const RefreshIntervalMenu: React.FC<RefreshIntervalMenuProps> = ({
                         supportsRefreshInterval,
                         gitCacheTtlSeconds,
                         customCommandCacheTtlSeconds,
-                        terminalWidthCacheTtlSeconds
+                        terminalWidthCacheTtlSeconds,
+                        isClaudeInstalled
                     )}
                     onSelect={(value) => {
                         if (value === 'back') {
