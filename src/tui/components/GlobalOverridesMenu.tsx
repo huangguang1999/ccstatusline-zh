@@ -473,8 +473,12 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
 
                     <Box>
                         <Text>  默认内边距: </Text>
-                        <Text color='cyan'>{settings.defaultPadding ? `"${settings.defaultPadding}"` : '（无）'}</Text>
-                        <Text dimColor> - 按 (p) 编辑</Text>
+                        {/* One Text, because Ink measures a toned or joined emoji as
+                            several columns and a sibling Text would overwrite its end */}
+                        <Text>
+                            <Text color='cyan'>{settings.defaultPadding ? `"${settings.defaultPadding}"` : '（无）'}</Text>
+                            <Text dimColor> - 按 (p) 编辑</Text>
+                        </Text>
                     </Box>
 
                     <Box>
@@ -545,10 +549,11 @@ export const GlobalOverridesMenu: React.FC<GlobalOverridesMenuProps> = ({ settin
                         {isPowerlineEnabled ? (
                             <Text dimColor>[已禁用 - Powerline 激活中]</Text>
                         ) : (
-                            <>
+                            // One Text, as for Default Padding
+                            <Text>
                                 <Text color='cyan'>{settings.defaultSeparator ? `"${settings.defaultSeparator}"` : '（无）'}</Text>
                                 <Text dimColor> - 按 (s) 编辑</Text>
-                            </>
+                            </Text>
                         )}
                     </Box>
 
