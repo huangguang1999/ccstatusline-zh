@@ -261,7 +261,7 @@ describe('GitBranchWidget', () => {
         expect(render()).toBe('⎇ 无 Git');
     });
 
-    it('should keep plain text when origin remote cannot be parsed', () => {
+    it('should keep plain text when origin 远程 cannot be parsed', () => {
         mockExecFileSync.mockReturnValueOnce('true\n');
         mockExecFileSync.mockReturnValueOnce('refs/heads/feature/worktree\n');
         mockExecFileSync.mockReturnValueOnce('not-a-valid-remote-url');

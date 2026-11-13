@@ -301,7 +301,7 @@ describe('CacheTimer widget', () => {
         expect(widget.getCustomKeybinds()).toEqual([
             { key: 't', label: '(t)TTL', action: 'toggle-ttl' },
             { key: 's', label: '(s)短时间', action: 'toggle-compact' },
-            { key: 'g', label: '(g)lyph', action: 'edit-symbol-override' }
+            { key: 'g', label: '(g)字符', action: 'edit-symbol-override' }
         ]);
         expect(widget.getHideableStates().map(state => state.key)).toEqual(['empty']);
         expect(widget.handleEditorAction('unknown', item())).toBeNull();
@@ -316,9 +316,9 @@ describe('CacheTimer widget', () => {
 
     it('renders custom state glyphs from metadata overrides', () => {
         const widget = new CacheTimerWidget();
-        expect(widget.render(item({ metadata: { symbolCold: 'X' } }), transcriptContext([assistant(400)]), DEFAULT_SETTINGS)).toBe('缓存: X COLD');
+        expect(widget.render(item({ metadata: { symbolCold: 'X' } }), transcriptContext([assistant(400)]), DEFAULT_SETTINGS)).toBe('缓存: X 已过期');
         expect(widget.render(item({ metadata: { symbolFresh: '*' } }), transcriptContext([assistant(10)]), DEFAULT_SETTINGS)).toMatch(/^缓存: \* (\d+m )?\d+s$/);
-        expect(widget.render(item({ metadata: { symbolHot: '>' } }), transcriptContext([assistant(60), pendingUser]), DEFAULT_SETTINGS)).toBe('缓存: > HOT');
+        expect(widget.render(item({ metadata: { symbolHot: '>' } }), transcriptContext([assistant(60), pendingUser]), DEFAULT_SETTINGS)).toBe('缓存: > 工作中');
     });
 
     it('drops the glyph and its space when an override is blanked', () => {

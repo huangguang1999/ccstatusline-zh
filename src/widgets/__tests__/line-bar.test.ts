@@ -11,6 +11,7 @@ import type { RenderContext } from '../../types/RenderContext';
 import { DEFAULT_SETTINGS } from '../../types/Settings';
 import type { WidgetItem } from '../../types/Widget';
 import * as claudeSettings from '../../utils/claude-settings';
+import * as jsonl from '../../utils/jsonl';
 import { BlockResetTimerWidget } from '../BlockResetTimer';
 import { BlockTimerWidget } from '../BlockTimer';
 import { ContextBarWidget } from '../ContextBar';
@@ -53,19 +54,19 @@ const context: RenderContext = {
 };
 
 const cases = [
-    { widget: new SessionUsageWidget(), type: 'session-usage', label: '5h: ', preview: '━━━───────────── 20.0%', cursor: true },
-    { widget: new WeeklyUsageWidget(), type: 'weekly-usage', label: 'Weekly: ', preview: '━━────────────── 12.0%', cursor: true },
-    { widget: new WeeklySonnetUsageWidget(), type: 'weekly-sonnet-usage', label: 'Weekly Sonnet: ', preview: '━─────────────── 8.0%', cursor: true },
-    { widget: new WeeklyOpusUsageWidget(), type: 'weekly-opus-usage', label: 'Weekly Opus: ', preview: '━─────────────── 4.0%', cursor: true },
-    { widget: new FableWeeklyUsageWidget(), type: 'fable-weekly-usage', label: 'Weekly Fable: ', preview: '━─────────────── 4.0%', cursor: true },
-    { widget: new SpendLimitUsageWidget(), type: 'spend-limit-usage', label: 'Spend Limit: ', preview: '━━━━━━────────── 40.0%', cursor: false },
-    { widget: new ExtraUsageUtilizationWidget(), type: 'extra-usage-utilization', label: 'Overage: ', preview: '──────────────── 2.6%', cursor: false },
-    { widget: new BlockTimerWidget(), type: 'block-timer', label: 'Block ', preview: '━━━━━━━━━━━━──── 73.9%', cursor: false },
-    { widget: new BlockResetTimerWidget(), type: 'reset-timer', label: 'Reset ', preview: '━━────────────── 10.0%', cursor: false },
-    { widget: new WeeklyResetTimerWidget(), type: 'weekly-reset-timer', label: 'Weekly Reset ', preview: '━━────────────── 10.0%', cursor: false }
+    { widget: new SessionUsageWidget(), type: 'session-usage', label: '时段: ', preview: '━━━───────────── 20.0%', cursor: true },
+    { widget: new WeeklyUsageWidget(), type: 'weekly-usage', label: '周用量: ', preview: '━━────────────── 12.0%', cursor: true },
+    { widget: new WeeklySonnetUsageWidget(), type: 'weekly-sonnet-usage', label: '周 Sonnet: ', preview: '━─────────────── 8.0%', cursor: true },
+    { widget: new WeeklyOpusUsageWidget(), type: 'weekly-opus-usage', label: '周 Opus: ', preview: '━─────────────── 4.0%', cursor: true },
+    { widget: new FableWeeklyUsageWidget(), type: 'fable-weekly-usage', label: '周 Fable: ', preview: '━─────────────── 4.0%', cursor: true },
+    { widget: new SpendLimitUsageWidget(), type: 'spend-limit-usage', label: '消费限额: ', preview: '━━━━━━────────── 40.0%', cursor: false },
+    { widget: new ExtraUsageUtilizationWidget(), type: 'extra-usage-utilization', label: '超额: ', preview: '──────────────── 2.6%', cursor: false },
+    { widget: new BlockTimerWidget(), type: 'block-timer', label: '时段 ', preview: '━━━━━━━━━━━━──── 73.9%', cursor: false },
+    { widget: new BlockResetTimerWidget(), type: 'reset-timer', label: '重置 ', preview: '━━────────────── 10.0%', cursor: false },
+    { widget: new WeeklyResetTimerWidget(), type: 'weekly-reset-timer', label: '周重置 ', preview: '━━────────────── 10.0%', cursor: false }
 ];
 
-describe('line bars across usage and timer widgets', () => {
+describe('细线进度条s across usage and timer widgets', () => {
     beforeEach(() => {
         vi.spyOn(Date, 'now').mockReturnValue(NOW);
     });
@@ -78,7 +79,7 @@ describe('line bars across usage and timer widgets', () => {
             it('renders live usage and its preview as an unbracketed 16-cell line', () => {
                 expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe(`${label}━━━━──────────── 25.0%`);
                 expect(widget.render(item, { isPreview: true }, DEFAULT_SETTINGS)).toBe(label + preview);
-                expect(widget.getEditorDisplay(item).modifierText).toContain('line bar');
+                expect(widget.getEditorDisplay(item).modifierText).toContain('细线进度条');
             });
 
             it('preserves fill inversion, label overrides, raw values, and number formatting', () => {
@@ -87,7 +88,7 @@ describe('line bars across usage and timer widgets', () => {
                 expect(widget.render({ ...inverted, rawValue: true }, context, DEFAULT_SETTINGS)).toBe('━━━━━━━━━━━━──── 75.00%');
             });
 
-            it('offers the same controls as medium bars and retains cursor behavior', () => {
+            it('offers the same controls as 中进度条s and retains cursor behavior', () => {
                 const medium: WidgetItem = { ...item, metadata: { display: 'progress-short' } };
                 expect(widget.getCustomKeybinds(item)).toEqual(widget.getCustomKeybinds(medium));
                 const withCursor: WidgetItem = { ...item, metadata: { display: 'line', cursor: 'true' } };
@@ -116,38 +117,39 @@ describe('line bars across usage and timer widgets', () => {
     }
 
     it('renders an empty line for an inactive block and retains no-data hiding', () => {
+        vi.spyOn(jsonl, 'getCachedBlockMetrics').mockReturnValue(null);
         const widget = new BlockTimerWidget();
         const item: WidgetItem = { id: 'block', type: 'block-timer', metadata: { display: 'line' } };
-        expect(widget.render(item, {}, DEFAULT_SETTINGS)).toBe('Block ──────────────── 0.0%');
+        expect(widget.render(item, {}, DEFAULT_SETTINGS)).toBe('时段 ──────────────── 0.0%');
         expect(widget.render({ ...item, metadata: { display: 'line', hide: 'no-data' } }, {}, DEFAULT_SETTINGS)).toBeNull();
     });
 });
 
-describe('context line bars', () => {
+describe('context 细线进度条s', () => {
     beforeEach(() => {
         vi.spyOn(claudeSettings, 'getAutoCompactConfig').mockReturnValue({});
     });
     afterEach(() => vi.restoreAllMocks());
 
     it.each([
-        { widget: new ContextPercentageWidget(), type: 'context-percentage', live: 'Ctx Used: ━━━───────────── 20.0%', remaining: '━━━━━━━━━━━━━─── 80.0%', preview: 'Ctx Used: ━─────────────── 9.3%' },
-        { widget: new ContextPercentageUsableWidget(), type: 'context-percentage-usable', live: 'Ctx(u) Used: ━━━━──────────── 25.0%', remaining: '━━━━━━━━━━━━──── 75.0%', preview: 'Ctx(u) Used: ━━────────────── 11.6%' }
+        { widget: new ContextPercentageWidget(), type: 'context-percentage', live: '已用: ━━━───────────── 20.0%', remaining: '━━━━━━━━━━━━━─── 80.0%', preview: '已用: ━─────────────── 9.3%' },
+        { widget: new ContextPercentageUsableWidget(), type: 'context-percentage-usable', live: '已用: ━━━━──────────── 25.0%', remaining: '━━━━━━━━━━━━──── 75.0%', preview: '已用: ━━────────────── 11.6%' }
     ])('renders $type live and preview values, with remaining mode and cycle support', ({ widget, type, live, remaining, preview }) => {
         const item: WidgetItem = { id: type, type, metadata: { display: 'line' } };
         expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe(live);
         expect(widget.render(item, { isPreview: true }, DEFAULT_SETTINGS)).toBe(preview);
         expect(widget.render({ ...item, rawValue: true, metadata: { display: 'line', inverse: 'true' } }, context, DEFAULT_SETTINGS)).toBe(remaining);
-        expect(widget.getEditorDisplay(item).modifierText).toBe('(line bar)');
+        expect(widget.getEditorDisplay(item).modifierText).toBe('(细线进度条)');
         const line = widget.handleEditorAction('toggle-slider', { ...item, metadata: { display: 'slider-only', inverse: 'true' } });
         expect(line).not.toBeNull();
         expect(line?.metadata).toEqual({ display: 'line', inverse: 'true' });
         expect(widget.handleEditorAction('toggle-slider', line ?? item)?.metadata).toEqual({ inverse: 'true' });
     });
 
-    it('retains the original Context Bar line appearance in live and preview output', () => {
+    it('retains the original 上下文进度条 line appearance in live and preview output', () => {
         const widget = new ContextBarWidget();
         const item: WidgetItem = { id: 'context-bar', type: 'context-bar', metadata: { display: 'line' } };
-        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe('Context: ━━━───────────── 40k/200k (20%)');
-        expect(widget.render(item, { isPreview: true }, DEFAULT_SETTINGS)).toBe('Context: ━━━━──────────── 50k/200k (25%)');
+        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe('上下文: ━━━───────────── 40k/200k (20%)');
+        expect(widget.render(item, { isPreview: true }, DEFAULT_SETTINGS)).toBe('上下文: ━━━━──────────── 50k/200k (25%)');
     });
 });

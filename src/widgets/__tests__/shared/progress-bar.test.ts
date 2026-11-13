@@ -99,7 +99,7 @@ describe('makeLineProgressBar', () => {
         [75, '━━━━━━━━────│───'],
         [100, '━━━━━━━━───────│'],
         [150, '━━━━━━━━───────│']
-    ])('positions and clamps the time cursor at %s percent', (cursorPercent, expected) => {
+    ])('positions and clamps the 时间游标 at %s percent', (cursorPercent, expected) => {
         expect(makeLineProgressBar(50, 16, { cursorPercent })).toBe(expected);
     });
 });

@@ -67,10 +67,10 @@ describe('Prompt cache widgets', () => {
     it('describes each widget in the Cache category', () => {
         const widgets = [new CacheMissesWidget(), new LastCacheMissWidget(), new CacheMissTokensWidget(), new CacheIfColdWidget()];
 
-        expect(widgets.map(widget => widget.getDisplayName())).toEqual(['Cache Misses', 'Last Cache Miss', 'Cache Miss Tokens', 'Cache If Cold']);
-        expect(widgets.map(widget => widget.getLabelPrefix())).toEqual(['Misses: ', 'Last miss: ', 'Miss recache: ', 'If cold: ']);
+        expect(widgets.map(widget => widget.getDisplayName())).toEqual(['缓存未命中次数', '最近缓存未命中', '缓存未命中 Token', '缓存过期重建量']);
+        expect(widgets.map(widget => widget.getLabelPrefix())).toEqual(['未命中: ', '最近未命中: ', '未命中重建: ', '过期重建: ']);
         for (const widget of widgets) {
-            expect(widget.getCategory()).toBe('Cache');
+            expect(widget.getCategory()).toBe('缓存');
             expect(widget.supportsRawValue()).toBe(true);
         }
     });
@@ -82,23 +82,23 @@ describe('Prompt cache widgets', () => {
         expect(getWidget('cache-if-cold')).toBeInstanceOf(CacheIfColdWidget);
     });
 
-    describe('Cache Misses', () => {
+    describe('缓存未命中次数', () => {
         const widget = new CacheMissesWidget();
         const render = (widgetItem: WidgetItem, context: RenderContext) => widget.render(widgetItem, context, DEFAULT_SETTINGS);
 
         it('shows the misses out of the session\'s requests', () => {
-            expect(render(item('cache-misses'), withCache(DOCS_EXAMPLE))).toBe('Misses: 2/14');
+            expect(render(item('cache-misses'), withCache(DOCS_EXAMPLE))).toBe('未命中: 2/14');
             expect(render(item('cache-misses', { rawValue: true }), withCache(DOCS_EXAMPLE))).toBe('2/14');
         });
 
         it('shows zero misses unless hidden', () => {
-            expect(render(item('cache-misses'), withCache(NO_MISSES))).toBe('Misses: 0/6');
+            expect(render(item('cache-misses'), withCache(NO_MISSES))).toBe('未命中: 0/6');
             expect(render(hideZero('cache-misses'), withCache(NO_MISSES))).toBeNull();
-            expect(render(hideZero('cache-misses'), withCache(DOCS_EXAMPLE))).toBe('Misses: 2/14');
+            expect(render(hideZero('cache-misses'), withCache(DOCS_EXAMPLE))).toBe('未命中: 2/14');
         });
 
         it('shows the count alone when the request count is missing', () => {
-            expect(render(item('cache-misses'), withCache({ misses: 2 }))).toBe('Misses: 2');
+            expect(render(item('cache-misses'), withCache({ misses: 2 }))).toBe('未命中: 2');
         });
 
         it('renders nothing without a miss count', () => {
@@ -107,31 +107,31 @@ describe('Prompt cache widgets', () => {
         });
 
         it('previews the docs\' example', () => {
-            expect(render(item('cache-misses'), PREVIEW)).toBe('Misses: 2/14');
+            expect(render(item('cache-misses'), PREVIEW)).toBe('未命中: 2/14');
         });
 
         it('can hide while the session has no misses', () => {
-            expect(widget.getHideableStates()).toEqual([{ key: 'zero', label: 'when there are no misses' }]);
+            expect(widget.getHideableStates()).toEqual([{ key: 'zero', label: '没有缓存未命中时' }]);
         });
     });
 
-    describe('Last Cache Miss', () => {
+    describe('最近缓存未命中', () => {
         const widget = new LastCacheMissWidget();
         const render = (widgetItem: WidgetItem, context: RenderContext) => widget.render(widgetItem, context, DEFAULT_SETTINGS);
 
         it('shows how long ago the last miss was and its likely cause', () => {
-            expect(render(item('last-cache-miss'), withCache(DOCS_EXAMPLE))).toBe('Last miss: 3m ago, tools changed (+2)');
+            expect(render(item('last-cache-miss'), withCache(DOCS_EXAMPLE))).toBe('最近未命中: 3分前, 工具变更 (+2)');
             expect(render(item('last-cache-miss', { rawValue: true }), withCache(DOCS_EXAMPLE))).toBe('3m ago, tools changed (+2)');
         });
 
         it('lists several causes', () => {
             const cache = { ...DOCS_EXAMPLE, last_miss_cause: { causes: ['system_prompt_changed', 'ttl_expired_5m'], system_char_delta: 120 } };
 
-            expect(render(item('last-cache-miss'), withCache(cache))).toBe('Last miss: 3m ago, system prompt changed (+120 chars), 5m TTL expired');
+            expect(render(item('last-cache-miss'), withCache(cache))).toBe('最近未命中: 3分前, 系统提示词变更 (+120 字符), 5分 TTL 已过期');
         });
 
         it('says the cause is unknown when Claude Code identified none', () => {
-            expect(render(item('last-cache-miss'), withCache({ ...DOCS_EXAMPLE, last_miss_cause: null }))).toBe('Last miss: 3m ago, cause unknown');
+            expect(render(item('last-cache-miss'), withCache({ ...DOCS_EXAMPLE, last_miss_cause: null }))).toBe('最近未命中: 3分前, 原因未知');
         });
 
         it('renders nothing before the first miss', () => {
@@ -140,27 +140,27 @@ describe('Prompt cache widgets', () => {
         });
 
         it('previews the docs\' example', () => {
-            expect(render(item('last-cache-miss'), PREVIEW)).toBe('Last miss: 3m ago, tools changed (+2)');
+            expect(render(item('last-cache-miss'), PREVIEW)).toBe('最近未命中: 3分前, 工具变更 (+2)');
         });
     });
 
-    describe('Cache Miss Tokens', () => {
+    describe('缓存未命中 Token', () => {
         const widget = new CacheMissTokensWidget();
         const render = (widgetItem: WidgetItem, context: RenderContext) => widget.render(widgetItem, context, DEFAULT_SETTINGS);
 
         it('shows the tokens the misses wrote back to the cache', () => {
-            expect(render(item('cache-miss-tokens'), withCache(DOCS_EXAMPLE))).toBe('Miss recache: 310.2k');
+            expect(render(item('cache-miss-tokens'), withCache(DOCS_EXAMPLE))).toBe('未命中重建: 310.2k');
             expect(render(item('cache-miss-tokens', { rawValue: true }), withCache(DOCS_EXAMPLE))).toBe('310.2k');
         });
 
         it('applies the token number format', () => {
-            expect(render(item('cache-miss-tokens', { numberFormat: { style: 'whole' } }), withCache(DOCS_EXAMPLE))).toBe('Miss recache: 310k');
+            expect(render(item('cache-miss-tokens', { numberFormat: { style: 'whole' } }), withCache(DOCS_EXAMPLE))).toBe('未命中重建: 310k');
         });
 
         it('shows zero unless hidden while the session has no misses', () => {
-            expect(render(item('cache-miss-tokens'), withCache(NO_MISSES))).toBe('Miss recache: 0');
+            expect(render(item('cache-miss-tokens'), withCache(NO_MISSES))).toBe('未命中重建: 0');
             expect(render(hideZero('cache-miss-tokens'), withCache(NO_MISSES))).toBeNull();
-            expect(widget.getHideableStates()).toEqual([{ key: 'zero', label: 'when there are no misses' }]);
+            expect(widget.getHideableStates()).toEqual([{ key: 'zero', label: '没有缓存未命中时' }]);
         });
 
         it('renders nothing without the token count', () => {
@@ -169,18 +169,18 @@ describe('Prompt cache widgets', () => {
         });
 
         it('previews the docs\' example', () => {
-            expect(render(item('cache-miss-tokens'), PREVIEW)).toBe('Miss recache: 310.2k');
+            expect(render(item('cache-miss-tokens'), PREVIEW)).toBe('未命中重建: 310.2k');
         });
     });
 
-    describe('Cache If Cold', () => {
+    describe('缓存过期重建量', () => {
         const widget = new CacheIfColdWidget();
         const render = (widgetItem: WidgetItem, context: RenderContext) => widget.render(widgetItem, context, DEFAULT_SETTINGS);
 
         it('shows what the next request re-caches if the cache has gone cold', () => {
-            expect(render(item('cache-if-cold'), withCache(DOCS_EXAMPLE))).toBe('If cold: 45.0k');
+            expect(render(item('cache-if-cold'), withCache(DOCS_EXAMPLE))).toBe('过期重建: 45.0k');
             expect(render(item('cache-if-cold', { rawValue: true }), withCache(DOCS_EXAMPLE))).toBe('45.0k');
-            expect(render(item('cache-if-cold', { numberFormat: { style: 'whole' } }), withCache(DOCS_EXAMPLE))).toBe('If cold: 45k');
+            expect(render(item('cache-if-cold', { numberFormat: { style: 'whole' } }), withCache(DOCS_EXAMPLE))).toBe('过期重建: 45k');
         });
 
         // Null right after a compaction, until the next request
@@ -190,7 +190,7 @@ describe('Prompt cache widgets', () => {
         });
 
         it('previews the docs\' example', () => {
-            expect(render(item('cache-if-cold'), PREVIEW)).toBe('If cold: 45.0k');
+            expect(render(item('cache-if-cold'), PREVIEW)).toBe('过期重建: 45.0k');
         });
     });
 });

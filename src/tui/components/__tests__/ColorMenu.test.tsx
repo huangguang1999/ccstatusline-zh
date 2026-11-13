@@ -254,9 +254,9 @@ describe('ColorMenu', () => {
 
             try {
                 await waitFor(() => {
-                    expect(stripAnsi(stdout.getOutput())).toContain('▶  1: Thinking Effort');
+                    expect(stripAnsi(stdout.getOutput())).toContain('▶  1: 思考力度');
                 });
-                return stripAnsi(stdout.getOutput().split('Configure Colors').at(-1) ?? '');
+                return stripAnsi(stdout.getOutput().split('配置颜色').at(-1) ?? '');
             } finally {
                 instance.unmount();
                 instance.cleanup();
@@ -269,7 +269,7 @@ describe('ColorMenu', () => {
         const levelColored = await renderMenu({ id: '1', type: 'thinking-effort', metadata: { levelColors: 'true' } });
         const singleColored = await renderMenu({ id: '1', type: 'thinking-effort' });
 
-        expect(levelColored).toContain('sets some of its own colors');
-        expect(singleColored).not.toContain('sets some of its own colors');
+        expect(levelColored).toContain('自行设置部分颜色');
+        expect(singleColored).not.toContain('自行设置部分颜色');
     });
 });

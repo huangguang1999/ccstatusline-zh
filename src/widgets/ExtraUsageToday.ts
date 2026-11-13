@@ -15,13 +15,13 @@ import { isHidden } from './shared/hideable';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 import { USAGE_NO_DATA_HIDEABLE_STATE } from './shared/usage-display';
 
-const LABEL = 'Overage Today: ';
+const LABEL = '今日超额: ';
 
 export class ExtraUsageTodayWidget implements Widget {
     getDefaultColor(): string { return 'green'; }
-    getDescription(): string { return 'Shows the extra usage spent today (since 00:00 UTC), including claude.ai and other machines'; }
-    getDisplayName(): string { return 'Extra Usage Today'; }
-    getCategory(): string { return 'Usage'; }
+    getDescription(): string { return '显示今日自 UTC 00:00 起的超额消费，包含 claude.ai 和其他设备'; }
+    getDisplayName(): string { return '今日超额用量'; }
+    getCategory(): string { return '用量'; }
     getLabelPrefix(): string { return LABEL; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {

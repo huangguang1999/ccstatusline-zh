@@ -62,8 +62,8 @@ describe('ContextPercentageUsableWidget', () => {
 
     it('shows 96k of a configured 120k usable budget as 80%, or 20% remaining', () => {
         process.env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE = '60';
-        expect(render(undefined, 96000)).toBe('Ctx(u) Used: 80.0%');
-        expect(render(undefined, 96000, false, true)).toBe('Ctx(u) Left: 20.0%');
+        expect(render(undefined, 96000)).toBe('已用: 80.0%');
+        expect(render(undefined, 96000, false, true)).toBe('剩余: 20.0%');
     });
 
     it('uses the project root from the payload for compaction settings', () => {
@@ -76,20 +76,20 @@ describe('ContextPercentageUsableWidget', () => {
             }
         };
         expect(new ContextPercentageUsableWidget().render({ id: 'usable', type: 'context-percentage-usable' }, context, DEFAULT_SETTINGS))
-            .toBe('Ctx(u) Used: 50.0%');
+            .toBe('已用: 50.0%');
         expect(readConfig).toHaveBeenCalledWith('/project');
     });
 
     it('uses the full window when auto-compaction is disabled', () => {
         process.env.DISABLE_AUTO_COMPACT = '1';
-        expect(render(undefined, 100000)).toBe('Ctx(u) Used: 50.0%');
+        expect(render(undefined, 100000)).toBe('已用: 50.0%');
     });
 
     it('keeps preview samples independent of compaction settings', () => {
         const context: RenderContext = { isPreview: true };
         process.env.DISABLE_AUTO_COMPACT = '1';
         expect(new ContextPercentageUsableWidget().render({ id: 'usable', type: 'context-percentage-usable' }, context, DEFAULT_SETTINGS))
-            .toBe('Ctx(u) Used: 11.6%');
+            .toBe('已用: 11.6%');
         expect(claudeSettings.getAutoCompactConfig).not.toHaveBeenCalled();
     });
 
@@ -171,7 +171,7 @@ describe('ContextPercentageUsableWidget', () => {
             expect(result).toBe('已用: 5.3%');
         });
 
-        it('should calculate percentage using 800k denominator for Sonnet 4.5 (raw value) with [1m] suffix', () => {
+        it('should calculate percentage using 800k denominator for Sonnet 4.5 (纯值) with [1m] suffix', () => {
             const result = render('claude-sonnet-4-5-20250929[1m]', 42000, true);
             expect(result).toBe('5.3%');
         });

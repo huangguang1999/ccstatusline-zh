@@ -13,14 +13,14 @@ import {
 } from './shared/prompt-cache';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
-const LABEL = 'Last miss: ';
+const LABEL = '最近未命中: ';
 
 // Renders nothing until the session's first miss, so it needs no hide option
 export class LastCacheMissWidget implements Widget {
     getDefaultColor(): string { return 'yellow'; }
-    getDescription(): string { return 'Shows when the last prompt cache miss happened and its likely cause, as Claude Code reports them'; }
-    getDisplayName(): string { return 'Last Cache Miss'; }
-    getCategory(): string { return 'Cache'; }
+    getDescription(): string { return '显示 Claude Code 报告的最近提示缓存未命中时间及可能原因'; }
+    getDisplayName(): string { return '最近缓存未命中'; }
+    getCategory(): string { return '缓存'; }
     getLabelPrefix(): string { return LABEL; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName() };
@@ -32,7 +32,18 @@ export class LastCacheMissWidget implements Widget {
             return null;
         }
 
-        const value = `${formatMissAge(cache.last_miss_at)}, ${formatMissCause(cache.last_miss_cause)}`;
+        const raw = `${formatMissAge(cache.last_miss_at)}, ${formatMissCause(cache.last_miss_cause)}`;
+        const value = item.rawValue ? raw : raw
+            .replace('just now', '刚刚')
+            .replace(' ago', '前')
+            .replace(/(\d+)h/g, '$1时')
+            .replace(/(\d+)m/g, '$1分')
+            .replace('tools changed', '工具变更')
+            .replace('system prompt changed', '系统提示词变更')
+            .replace(' chars', ' 字符')
+            .replace('TTL expired', 'TTL 已过期')
+            .replace('cause unknown', '原因未知')
+            .replace('likely server side', '可能由服务端引起');
         return formatRawOrLabeledValue(item, LABEL, value);
     }
 

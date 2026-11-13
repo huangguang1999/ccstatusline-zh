@@ -97,7 +97,7 @@ describe('getColorAnsiCode gradient first-stop fallback (powerline / ansi16 path
     });
 });
 
-describe('getColorAnsiCode custom colors at ansi16 (Basic / No Color)', () => {
+describe('getColorAnsiCode custom colors at ansi16 (Basic / 无颜色)', () => {
     it('returns empty for hex and ansi256 colors, as for gradients', () => {
         expect(getColorAnsiCode('hex:FF0000', 'ansi16', false)).toBe('');
         expect(getColorAnsiCode('hex:0000FF', 'ansi16', true)).toBe('');

@@ -69,10 +69,10 @@ describe('widget catalog', () => {
         expect(sessionForecast?.category).toBe('用量');
         expect(sessionLimitTimer?.displayName).toBe('时段额度耗尽计时');
         expect(sessionLimitTimer?.category).toBe('用量');
-        expect(weeklyLimitTimer?.displayName).toBe('Weekly Limit Timer');
-        expect(weeklyLimitTimer?.category).toBe('Usage');
-        expect(fableWeeklyLimitTimer?.displayName).toBe('Weekly Fable Limit Timer');
-        expect(fableWeeklyLimitTimer?.category).toBe('Usage');
+        expect(weeklyLimitTimer?.displayName).toBe('周额度耗尽计时');
+        expect(weeklyLimitTimer?.category).toBe('用量');
+        expect(fableWeeklyLimitTimer?.displayName).toBe('周 Fable 额度耗尽计时');
+        expect(fableWeeklyLimitTimer?.category).toBe('用量');
     });
 
     it('hides manual separator when default separator is configured', () => {

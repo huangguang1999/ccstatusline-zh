@@ -143,7 +143,7 @@ describe('validateCustomCommandCacheTtlInput', () => {
 });
 
 describe('buildConfigureStatusLineItems', () => {
-    it('should show (not set) when interval is null and supported', () => {
+    it('should show （未设置） when interval is null and supported', () => {
         const items = buildConfigureStatusLineItems(null, true, 5, 5, 5);
         expect(items[0]?.sublabel).toBe('（未设置）');
     });
@@ -171,21 +171,21 @@ describe('buildConfigureStatusLineItems', () => {
 
     it('should ask for an install before the refresh interval, keeping the cache TTLs editable', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 5, 5, false);
-        expect(items[0]?.sublabel).toBe('(install first)');
+        expect(items[0]?.sublabel).toBe('（请先安装）');
         expect(items[0]?.disabled).toBe(true);
         expect(items.slice(1).map(item => item.disabled)).toEqual([undefined, undefined, undefined]);
 
         // An install wouldn't help an older Claude Code
-        expect(buildConfigureStatusLineItems(null, false, 5, 5, 5, false)[0]?.sublabel).toContain('requires Claude Code');
+        expect(buildConfigureStatusLineItems(null, false, 5, 5, 5, false)[0]?.sublabel).toContain('需要 Claude Code');
     });
 
-    it('should show the configured Git cache TTL', () => {
+    it('should show the configured Git 缓存 TTL', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 5, 5);
         expect(items[1]?.label).toContain('Git 缓存 TTL');
         expect(items[1]?.sublabel).toBe('（5 秒）');
     });
 
-    it('should describe zero Git cache TTL as mtime-only', () => {
+    it('should describe zero Git 缓存 TTL as mtime-only', () => {
         const items = buildConfigureStatusLineItems(10, true, 0, 5, 5);
         expect(items[1]?.sublabel).toBe('（仅 mtime）');
     });
@@ -201,13 +201,13 @@ describe('buildConfigureStatusLineItems', () => {
         expect(items[2]?.sublabel).toBe('（已关闭）');
     });
 
-    it('should show the configured Terminal Width cache TTL', () => {
+    it('should show the configured 终端宽度缓存时长', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 5, 30);
         expect(items[3]?.label).toContain('终端宽度缓存时长');
         expect(items[3]?.sublabel).toBe('（30 秒）');
     });
 
-    it('should describe zero Terminal Width cache TTL as disabled', () => {
+    it('should describe zero 终端宽度缓存时长 as disabled', () => {
         const items = buildConfigureStatusLineItems(10, true, 5, 5, 0);
         expect(items[3]?.sublabel).toBe('（已关闭）');
     });
@@ -232,7 +232,7 @@ describe('validateTerminalWidthCacheTtlInput', () => {
 });
 
 describe('RefreshIntervalMenu', () => {
-    it('saves a three-digit Terminal Width cache TTL without changing the other settings', async () => {
+    it('saves a three-digit 终端宽度缓存时长 without changing the other settings', async () => {
         const stdin = createMockStdin();
         const stdout = createMockStdout();
         const stderr = createMockStdout();
@@ -340,7 +340,7 @@ describe('RefreshIntervalMenu', () => {
         }
     });
 
-    it('shows helper text while editing Git cache TTL and saves updates', async () => {
+    it('shows helper text while editing Git 缓存 TTL and saves updates', async () => {
         const stdin = createMockStdin();
         const stdout = createMockStdout();
         const stderr = createMockStdout();
@@ -392,7 +392,7 @@ describe('RefreshIntervalMenu', () => {
         }
     });
 
-    it('edits the 自定义命令缓存时长 without touching the Git cache TTL', async () => {
+    it('edits the 自定义命令缓存时长 without touching the Git 缓存 TTL', async () => {
         const stdin = createMockStdin();
         const stdout = createMockStdout();
         const stderr = createMockStdout();
@@ -477,16 +477,16 @@ describe('RefreshIntervalMenu', () => {
 
         try {
             await waitFor(() => {
-                expect(stdout.getOutput()).toMatch(selected('Refresh Interval'));
+                expect(stdout.getOutput()).toMatch(selected('刷新间隔'));
             });
-            await press(stdin, stdout, '\u001B[B', selected('Git Cache TTL'));
-            await press(stdin, stdout, '\u001B[B', selected('Custom Command Cache TTL'));
-            await press(stdin, stdout, '\r', 'Enter custom command cache TTL in seconds (0-60):');
+            await press(stdin, stdout, '\u001B[B', selected('Git 缓存 TTL'));
+            await press(stdin, stdout, '\u001B[B', selected('自定义命令缓存时长'));
+            await press(stdin, stdout, '\r', '输入自定义命令缓存时长（秒，0-60）:');
 
-            await press(stdin, stdout, '\u001B', selected('Custom Command Cache TTL'));
-            expect(stdout.getOutput()).not.toMatch(selected('Refresh Interval'));
+            await press(stdin, stdout, '\u001B', selected('自定义命令缓存时长'));
+            expect(stdout.getOutput()).not.toMatch(selected('刷新间隔'));
 
-            await press(stdin, stdout, '\r', 'Enter custom command cache TTL in seconds (0-60):');
+            await press(stdin, stdout, '\r', '输入自定义命令缓存时长（秒，0-60）:');
             expect(onUpdate).not.toHaveBeenCalled();
             expect(onCustomCommandCacheTtlUpdate).not.toHaveBeenCalled();
             expect(onBack).not.toHaveBeenCalled();

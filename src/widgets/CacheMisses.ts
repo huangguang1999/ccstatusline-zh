@@ -15,13 +15,13 @@ import {
 } from './shared/prompt-cache';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
-const LABEL = 'Misses: ';
+const LABEL = '未命中: ';
 
 export class CacheMissesWidget implements Widget {
     getDefaultColor(): string { return 'yellow'; }
-    getDescription(): string { return 'Shows prompt cache misses out of the session\'s requests, as Claude Code reports them'; }
-    getDisplayName(): string { return 'Cache Misses'; }
-    getCategory(): string { return 'Cache'; }
+    getDescription(): string { return '显示 Claude Code 报告的本会话提示缓存未命中次数与请求总数'; }
+    getDisplayName(): string { return '缓存未命中次数'; }
+    getCategory(): string { return '缓存'; }
     getLabelPrefix(): string { return LABEL; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName() };

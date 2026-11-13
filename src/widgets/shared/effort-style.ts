@@ -14,7 +14,7 @@ const BRACKET_COLOR_KEY = 'bracketColor';
 const LEVEL_COLOR_KEY_PREFIX = 'levelColor.';
 
 export const THINKING_EFFORT_DEFAULT_COLOR = 'magenta';
-export const THINKING_EFFORT_LABEL = 'Thinking: ';
+export const THINKING_EFFORT_LABEL = '思考: ';
 
 export const BRACKET_STYLES = ['()', '[]', '{}', '<>'] as const;
 export type BracketStyle = typeof BRACKET_STYLES[number];

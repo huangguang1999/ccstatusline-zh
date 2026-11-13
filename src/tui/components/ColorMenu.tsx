@@ -52,9 +52,9 @@ export interface ColorMenuProps {
 // 256 colors up
 function getColorEntryKeys(colorLevel: number): string {
     if (colorLevel === 3) {
-        return ' (h)ex, (a)nsi256,';
+        return ' (h)十六进制，(a)256 色，';
     }
-    return colorLevel === 2 ? ' (a)nsi256,' : '';
+    return colorLevel === 2 ? ' (a)256 色，' : '';
 }
 
 // The color the menu shows for a widget: its own setting, else the widget's default
@@ -642,7 +642,7 @@ export const ColorMenu: React.FC<ColorMenuProps> = ({ widgets, lineIndex, settin
                             {/* Widgets that fully own their colors are filtered out
                                 above; this one colors only some runs itself */}
                             {!editingBackground && widgetColorsOnlyItsRuns(selectedWidget) && (
-                                <Text dimColor>  This widget sets some of its own colors (see its options in Edit Lines); this foreground colors the rest.</Text>
+                                <Text dimColor>  此组件自行设置部分颜色（见编辑状态行中的选项）；此前景色用于其余内容。</Text>
                             )}
                         </Box>
                     ) : (

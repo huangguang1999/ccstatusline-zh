@@ -235,7 +235,7 @@ function getResolutionWarning(
 
     const installPaths = getOnePathPerDirectory(resolvedPaths);
     if (installPaths.length > 1) {
-        return `⚠ PATH 中存在多个 ccstatusline-zh 可执行文件，Claude Code 将使用第一个匹配： ${firstResolvedPath}。\n其他匹配： ${formatPathList(installPaths.slice(1))}`;
+        return `⚠ PATH 中存在多个 ccstatusline-zh 可执行文件，Claude Code 将使用第一个匹配：${firstResolvedPath}。\n其他匹配：${formatPathList(installPaths.slice(1))}`;
     }
 
     if (expectedBinDir && !isPathInsideDir(firstResolvedPath, expectedBinDir)) {

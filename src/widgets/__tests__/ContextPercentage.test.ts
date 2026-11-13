@@ -117,7 +117,7 @@ describe('ContextPercentageWidget', () => {
             expect(result).toBe('已用: 4.2%');
         });
 
-        it('should calculate percentage using 1M denominator for Sonnet 4.5 (raw value) with [1m] suffix', () => {
+        it('should calculate percentage using 1M denominator for Sonnet 4.5 (纯值) with [1m] suffix', () => {
             const result = render('claude-sonnet-4-5-20250929[1m]', 42000, true);
             expect(result).toBe('4.2%');
         });

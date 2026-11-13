@@ -55,7 +55,7 @@ export function resolveConfigPath(filePath?: string): string {
 
 // Why the settings in use, though the user's own, differ from what the file holds
 export function getConfigLoadNotice(): string | null {
-    return unsavedMigration ? 'settings.json could not be backed up before migrating' : null;
+    return unsavedMigration ? '迁移前无法备份 settings.json' : null;
 }
 
 export function initConfigPath(filePath?: string): void {
@@ -461,13 +461,13 @@ export async function saveInstallationMetadata(metadata: InstallationMetadata | 
     // record installation metadata — that would discard the user's (recoverable)
     // file. Metadata is non-critical and is persisted on the next clean save.
     if (getConfigLoadError() !== null) {
-        console.error('Skipping installation-metadata write: settings.json is unreadable (left unchanged).');
+        console.error('跳过安装信息写入：无法读取 settings.json（原文件未修改）。');
         return;
     }
     // Nor when the load just failed to back it up before migrating: writing would put
     // the migration over it with no copy of the original
     if (getConfigLoadNotice() !== null) {
-        console.error('Skipping installation-metadata write: settings.json could not be backed up before migrating (left unchanged).');
+        console.error('跳过安装信息写入：迁移前无法备份 settings.json（原文件未修改）。');
         return;
     }
 

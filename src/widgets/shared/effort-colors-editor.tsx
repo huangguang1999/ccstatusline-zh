@@ -62,7 +62,7 @@ function cycleNamedColor(current: string, direction: 1 | -1): string {
 // except the default xhigh orange, which has no name among the 16 named colors
 function getColorLabel(color: string): string {
     if (color === 'ansi256:208') {
-        return 'Orange';
+        return '橙色';
     }
     if (color.startsWith('ansi256:')) {
         return `ANSI ${color.substring(8)}`;
@@ -83,7 +83,7 @@ interface EditorColors {
 // What a row shows: the brackets' color mode, or the level's color drawn in it
 function getRowValue(widget: WidgetItem, row: Row, colors: EditorColors): string {
     if (row === 'brackets') {
-        return getBracketColorMode(widget) === 'effort' ? 'Match effort' : 'Widget color';
+        return getBracketColorMode(widget) === 'effort' ? '跟随力度' : '组件颜色';
     }
     const color = getLevelColor(widget, row, colors.colorLevel);
     const label = getColorLabel(color);
@@ -192,24 +192,24 @@ export const EffortColorsEditor: React.FC<WidgetEditorProps> = ({ widget, onComp
 
     return (
         <Box flexDirection='column'>
-            <Text bold>Thinking Effort: level colors</Text>
-            <Text dimColor>↑↓ select, ←→ change color, Space on/off, (x) custom color, (d)efaults, Enter save, ESC cancel</Text>
+            <Text bold>思考力度：分级颜色</Text>
+            <Text dimColor>↑↓ 选择，←→ 更改颜色，空格启用/关闭，(x)自定义颜色，(d)恢复默认，Enter 保存，ESC 取消</Text>
             <Box marginTop={1}>
-                <Text>Sample: </Text>
+                <Text>示例: </Text>
                 <Text>{sample}</Text>
             </Box>
             <Box marginTop={1}>
-                <Text>Level colors: </Text>
-                <Text color={enabled ? 'green' : 'red'}>{enabled ? 'On' : 'Off'}</Text>
-                {!enabled && <Text dimColor>  (Space to turn on; the widget uses its single color until then)</Text>}
+                <Text>分级颜色: </Text>
+                <Text color={enabled ? 'green' : 'red'}>{enabled ? '启用' : '关闭'}</Text>
+                {!enabled && <Text dimColor>  （按空格启用；关闭时组件使用统一颜色）</Text>}
             </Box>
             {customInput !== null && (
                 <Box marginTop={1} flexDirection='column'>
                     <Box>
-                        <Text>{`Custom color for ${selectedRow} (#RRGGBB or 0-255): `}</Text>
+                        <Text>{`${selectedRow} 的自定义颜色（#RRGGBB 或 0-255）: `}</Text>
                         <Text color='cyan'>{customInput}</Text>
                     </Box>
-                    {customError && <Text color='red'>Not a color. Use #RRGGBB, or a number from 0 to 255.</Text>}
+                    {customError && <Text color='red'>颜色无效。请输入 #RRGGBB 或 0 到 255 的数字。</Text>}
                 </Box>
             )}
             <Box marginTop={1} flexDirection='column'>
@@ -222,7 +222,7 @@ export const EffortColorsEditor: React.FC<WidgetEditorProps> = ({ widget, onComp
                                 <Text color={isSelected ? 'green' : undefined}>{isSelected ? '▶ ' : '  '}</Text>
                             </Box>
                             <Box width={11}>
-                                <Text color={isSelected ? 'green' : undefined} dimColor={!enabled && !isSelected}>{row}</Text>
+                                <Text color={isSelected ? 'green' : undefined} dimColor={!enabled && !isSelected}>{row === 'brackets' ? '括号' : row}</Text>
                             </Box>
                             <Text dimColor={!enabled}>{value}</Text>
                         </Box>

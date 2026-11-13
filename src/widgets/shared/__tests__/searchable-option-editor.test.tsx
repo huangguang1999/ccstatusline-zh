@@ -301,7 +301,7 @@ for (const editor of EDITORS) {
 
             try {
                 await waitFor(() => {
-                    expect(getPlainOutput(rendered)).toContain(`${editor.title} Current: ${editor.unlisted}`);
+                    expect(getPlainOutput(rendered)).toContain(`${editor.title} 当前: ${editor.unlisted}`);
                     expect(getSelectedRow(rendered)).toBe(describeOption(options.find(option => option.value === editor.unlisted)));
                 });
 

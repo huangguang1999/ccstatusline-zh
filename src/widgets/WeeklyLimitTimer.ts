@@ -24,17 +24,17 @@ const HOUR_MS = 60 * 60 * 1000;
 
 const WEEKLY_LIMIT_WINDOWS: Record<WeeklyLimitWindow, WeeklyLimitWindowConfig> = {
     'weekly': {
-        label: 'Weekly limit in: ',
-        displayName: 'Weekly Limit Timer',
-        description: 'Time until the 7-day limit at this week\'s average pace; shown only when that comes before the reset',
+        label: '周额度耗尽: ',
+        displayName: '周额度耗尽计时',
+        description: '按本周平均速度估算周额度耗尽的剩余时间；仅在重置前会耗尽时显示',
         previewLimitInMs: 37 * HOUR_MS,
         usageField: 'weeklyUsage',
         resetFields: ['weeklyResetAt']
     },
     'fable-weekly': {
-        label: 'Fable limit in: ',
-        displayName: 'Weekly Fable Limit Timer',
-        description: 'Time until the Fable-only 7-day limit at this week\'s average pace; shown only when that comes before the reset',
+        label: 'Fable 额度耗尽: ',
+        displayName: '周 Fable 额度耗尽计时',
+        description: '按本周平均速度估算 Fable 周额度耗尽的剩余时间；仅在重置前会耗尽时显示',
         previewLimitInMs: 52 * HOUR_MS,
         usageField: 'fableUsage',
         resetFields: ['fableResetAt', 'weeklyResetAt']

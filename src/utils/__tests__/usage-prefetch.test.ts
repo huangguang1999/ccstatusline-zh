@@ -390,7 +390,7 @@ describe('usage prefetch', () => {
         ]);
     });
 
-    it('reads Weekly Limit Timer\'s data from rate_limits without fetching', async () => {
+    it('reads 周额度耗尽计时\'s data from rate_limits without fetching', async () => {
         const lines = makeLines([{ id: '1', type: 'weekly-limit-timer' }]);
 
         const usageData = await prefetchUsageDataIfNeeded(lines, { rate_limits: { seven_day: { used_percentage: 72, resets_at: 1776211200 } } });
@@ -399,7 +399,7 @@ describe('usage prefetch', () => {
         expect(mockFetchUsageData.mock.calls.length).toBe(0);
     });
 
-    it('fetches the weekly reset time Weekly Limit Timer needs and keeps quiet when that fails', async () => {
+    it('fetches the weekly reset time 周额度耗尽计时 needs and keeps quiet when that fails', async () => {
         mockFetchUsageData.mockResolvedValue({ error: 'rate-limited' });
 
         const lines = makeLines([{ id: '1', type: 'weekly-limit-timer' }]);
@@ -412,7 +412,7 @@ describe('usage prefetch', () => {
         ]);
     });
 
-    it('fetches Fable\'s percent for Weekly Fable Limit Timer, using the all-models reset when Fable has none', async () => {
+    it('fetches Fable\'s percent for 周 Fable 额度耗尽计时, using the all-models reset when Fable has none', async () => {
         mockFetchUsageData.mockResolvedValue({ fableUsage: 8 });
 
         const lines = makeLines([{ id: '1', type: 'fable-weekly-limit-timer' }]);
@@ -425,7 +425,7 @@ describe('usage prefetch', () => {
         ]);
     });
 
-    it('keeps quiet when the fetch made only for Weekly Fable Limit Timer fails', async () => {
+    it('keeps quiet when the fetch made only for 周 Fable 额度耗尽计时 fails', async () => {
         mockFetchUsageData.mockResolvedValue({ error: 'rate-limited' });
 
         const lines = makeLines([{ id: '1', type: 'fable-weekly-limit-timer' }]);
@@ -583,7 +583,7 @@ describe('usage prefetch', () => {
         expect(usageData).toEqual({ sessionUsage: 100, sessionResetAt: epochToIso(1774020000) });
     });
 
-    it('fetches the 5-hour block\'s percent for a Block Usage that hides at the limit, even when rate_limits has one', async () => {
+    it('fetches the 5-hour block\'s percent for a 时段用量 that hides at the limit, even when rate_limits has one', async () => {
         mockFetchUsageData.mockResolvedValue({ sessionUsage: 100 });
 
         const lines = makeLines(
@@ -599,7 +599,7 @@ describe('usage prefetch', () => {
         ]);
     });
 
-    it('fetches the block\'s percent once for Block Usage and Block Reset Timer that swap at the limit', async () => {
+    it('fetches the block\'s percent once for 时段用量 and 时段重置计时 that swap at the limit', async () => {
         mockFetchUsageData.mockResolvedValue({ sessionUsage: 100 });
 
         const lines = makeLines(
@@ -615,7 +615,7 @@ describe('usage prefetch', () => {
         ]);
     });
 
-    it('doesn\'t fetch for a Block Usage without the at-limit state when rate_limits has its percent', async () => {
+    it('doesn\'t fetch for a 时段用量 without the at-limit state when rate_limits has its percent', async () => {
         const lines = makeLines(
             [{ id: '1', type: 'session-usage', metadata: { hide: 'no-data' } }]
         );
@@ -751,7 +751,7 @@ describe('usage prefetch', () => {
         ]);
     });
 
-    it('fetches the extra usage state and monthly limit for the Extra Usage Limit widget', async () => {
+    it('fetches the extra usage state and monthly limit for the 超额用量限额 widget', async () => {
         mockFetchUsageData.mockResolvedValue({
             extraUsageEnabled: true,
             extraUsageLimit: 50000
@@ -1143,7 +1143,7 @@ describe('today\'s extra usage spend', () => {
         vi.restoreAllMocks();
     });
 
-    it('works out today\'s spend for the Extra Usage Today widget', async () => {
+    it('works out today\'s spend for the 今日超额用量 widget', async () => {
         vi.spyOn(usage, 'getUsageAccountKey').mockReturnValue('work-login');
         vi.spyOn(usage, 'getUsageFetchedAtMs').mockReturnValue(FETCHED_AT);
 

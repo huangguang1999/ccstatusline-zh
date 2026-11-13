@@ -40,18 +40,18 @@ const TIMERS: TimerCase[] = [
         name: 'WeeklyLimitTimerWidget',
         type: 'weekly-limit-timer',
         create: () => new WeeklyLimitTimerWidget(),
-        displayName: 'Weekly Limit Timer',
-        label: 'Weekly limit in: ',
-        preview: ['1d 13hr', '1d13h'],
+        displayName: '周额度耗尽计时',
+        label: '周额度耗尽: ',
+        preview: ['1天 13时', '1天13时'],
         usage: (weeklyUsage, weeklyResetAt) => ({ weeklyUsage, weeklyResetAt })
     },
     {
         name: 'FableWeeklyLimitTimerWidget',
         type: 'fable-weekly-limit-timer',
         create: () => new FableWeeklyLimitTimerWidget(),
-        displayName: 'Weekly Fable Limit Timer',
-        label: 'Fable limit in: ',
-        preview: ['2d 4hr', '2d4h'],
+        displayName: '周 Fable 额度耗尽计时',
+        label: 'Fable 额度耗尽: ',
+        preview: ['2天 4时', '2天4时'],
         usage: (fableUsage, fableResetAt) => ({ fableUsage, fableResetAt })
     }
 ];
@@ -79,7 +79,7 @@ describe.each(TIMERS)('$name', (timer) => {
 
     it('shows the time until the weekly limit at this week\'s average pace', () => {
         // 72% in 5 days: the other 28% take 46h 40m
-        expect(render(ITEM, usage(72))).toBe(`${timer.label}1d 22hr 40m`);
+        expect(render(ITEM, usage(72))).toBe(`${timer.label}1天 22时 40分`);
     });
 
     it('formats durations like the reset timers', () => {
@@ -90,7 +90,7 @@ describe.each(TIMERS)('$name', (timer) => {
     });
 
     it('shows the short form with s', () => {
-        expect(render(COMPACT, usage(72))).toBe(`${timer.label}1d22h40m`);
+        expect(render(COMPACT, usage(72))).toBe(`${timer.label}1天22时40分`);
     });
 
     it('drops the label in raw value mode', () => {
@@ -101,7 +101,7 @@ describe.each(TIMERS)('$name', (timer) => {
         // 30 seconds of the remaining pace at 5 days in
         const percent = 100 * 432_000_000 / (432_000_000 + 30_000);
 
-        expect(render(ITEM, usage(percent))).toBe(`${timer.label}1m`);
+        expect(render(ITEM, usage(percent))).toBe(`${timer.label}1分`);
     });
 
     it.each([
@@ -134,17 +134,17 @@ describe.each(TIMERS)('$name', (timer) => {
         const widget = timer.create();
 
         expect(widget.getDisplayName()).toBe(timer.displayName);
-        expect(widget.getCategory()).toBe('Usage');
+        expect(widget.getCategory()).toBe('用量');
         expect(widget.getDefaultColor()).toBe('red');
         expect(widget.getLabelPrefix()).toBe(timer.label);
         expect(widget.getEditorDisplay(ITEM).modifierText).toBeUndefined();
-        expect(widget.getEditorDisplay(COMPACT).modifierText).toBe('(compact)');
+        expect(widget.getEditorDisplay(COMPACT).modifierText).toBe('(紧凑)');
     });
 
     it('toggles the short form with s', () => {
         const widget = timer.create();
 
-        expect(widget.getCustomKeybinds()).toEqual([{ key: 's', label: '(s)hort time', action: 'toggle-compact' }]);
+        expect(widget.getCustomKeybinds()).toEqual([{ key: 's', label: '(s)短时间', action: 'toggle-compact' }]);
         expect(widget.handleEditorAction('toggle-compact', ITEM)?.metadata?.compact).toBe('true');
         expect(widget.handleEditorAction('toggle-invert', ITEM)).toBeNull();
     });
@@ -153,17 +153,17 @@ describe.each(TIMERS)('$name', (timer) => {
 describe('the weekly limit timers\' windows', () => {
     const render = (widget: WeeklyLimitTimerWidget, usageData: RenderUsageData): string | null => widget.render({ id: 'limit', type: 'weekly-limit-timer' }, { usageData }, DEFAULT_SETTINGS);
 
-    it('reads only the all-models window for Weekly Limit Timer', () => {
-        expect(render(new WeeklyLimitTimerWidget(), { weeklyUsage: 72, weeklyResetAt: RESET_AT, fableUsage: 50, fableResetAt: RESET_AT })).toBe('Weekly limit in: 1d 22hr 40m');
+    it('reads only the all-models window for 周额度耗尽计时', () => {
+        expect(render(new WeeklyLimitTimerWidget(), { weeklyUsage: 72, weeklyResetAt: RESET_AT, fableUsage: 50, fableResetAt: RESET_AT })).toBe('周额度耗尽: 1天 22时 40分');
         expect(render(new WeeklyLimitTimerWidget(), { fableUsage: 72, fableResetAt: RESET_AT })).toBeNull();
     });
 
-    it('reads only Fable\'s percent for Weekly Fable Limit Timer', () => {
+    it('reads only Fable\'s percent for 周 Fable 额度耗尽计时', () => {
         expect(render(new FableWeeklyLimitTimerWidget(), { weeklyUsage: 72, weeklyResetAt: RESET_AT })).toBeNull();
     });
 
     // As Weekly Fable Usage's time cursor does when the API sends no Fable reset
     it('falls back to the all-models reset for Fable\'s window', () => {
-        expect(render(new FableWeeklyLimitTimerWidget(), { fableUsage: 72, weeklyResetAt: RESET_AT })).toBe('Fable limit in: 1d 22hr 40m');
+        expect(render(new FableWeeklyLimitTimerWidget(), { fableUsage: 72, weeklyResetAt: RESET_AT })).toBe('Fable 额度耗尽: 1天 22时 40分');
     });
 });

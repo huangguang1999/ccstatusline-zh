@@ -40,14 +40,14 @@ describe('loadClaudeStatusLineState', () => {
         await saveClaudeSettings({
             statusLine: {
                 type: 'command',
-                command: 'npx -y ccstatusline@latest',
+                command: 'npx -y ccstatusline-zh@latest',
                 padding: 0,
                 refreshInterval: 10
             }
         });
 
         await expect(loadClaudeStatusLineState()).resolves.toEqual({
-            existingStatusLine: 'npx -y ccstatusline@latest',
+            existingStatusLine: 'npx -y ccstatusline-zh@latest',
             refreshInterval: 10
         });
     });
@@ -56,13 +56,13 @@ describe('loadClaudeStatusLineState', () => {
         await saveClaudeSettings({
             statusLine: {
                 type: 'command',
-                command: 'npx -y ccstatusline@latest',
+                command: 'npx -y ccstatusline-zh@latest',
                 padding: 0
             }
         });
 
         await expect(loadClaudeStatusLineState()).resolves.toEqual({
-            existingStatusLine: 'npx -y ccstatusline@latest',
+            existingStatusLine: 'npx -y ccstatusline-zh@latest',
             refreshInterval: null
         });
     });

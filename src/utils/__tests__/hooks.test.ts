@@ -304,7 +304,7 @@ describe('syncWidgetHooks', () => {
 
     it('leaves the hooks alone when saving a config the status line command doesn\'t load', async () => {
         const settingsPath = getClaudeSettingsPath();
-        const command = 'npx -y ccstatusline@latest';
+        const command = 'npx -y ccstatusline-zh@latest';
         const claudeSettings = JSON.stringify({
             statusLine: { type: 'command', command },
             hooks: {

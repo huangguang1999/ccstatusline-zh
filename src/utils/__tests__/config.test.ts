@@ -616,7 +616,7 @@ describe('config utilities', () => {
         // Not a load error, as the file is valid, and nothing on stderr, which every
         // status line render would repeat
         expect(getConfigLoadError()).toBeNull();
-        expect(getConfigLoadNotice()).toBe('settings.json could not be backed up before migrating');
+        expect(getConfigLoadNotice()).toBe('迁移前无法备份 settings.json');
         expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
 
@@ -712,7 +712,7 @@ describe('config utilities', () => {
 
         expect(fs.readFileSync(settingsPath, 'utf-8')).toBe(original);
         expect(fs.readdirSync(configDir).filter(name => name.endsWith('.tmp'))).toEqual([]);
-        expect(getConfigLoadNotice()).toBe('settings.json could not be backed up before migrating');
+        expect(getConfigLoadNotice()).toBe('迁移前无法备份 settings.json');
     });
 
     it('does not record installation metadata over a migration it cannot back up', async () => {

@@ -9,7 +9,7 @@ import { formatUsageDuration } from '../../utils/usage-windows';
 export type PromptCache = NonNullable<StatusJSON['prompt_cache']>;
 type LastMissCause = NonNullable<PromptCache['last_miss_cause']>;
 
-export const NO_MISSES_HIDEABLE_STATE: HideableState = { key: 'zero', label: 'when there are no misses' };
+export const NO_MISSES_HIDEABLE_STATE: HideableState = { key: 'zero', label: '没有缓存未命中时' };
 
 // The documentation's example session, for the TUI preview: 2 misses in 14
 // requests, the last 3 minutes ago because 2 tools were added
@@ -77,5 +77,5 @@ export function formatMissCause(cause: LastMissCause | null | undefined): string
 
 export function formatMissAge(lastMissAtSeconds: number, nowMs = Date.now()): string {
     const ageMs = nowMs - lastMissAtSeconds * 1000;
-    return ageMs < 60 * 1000 ? 'just now' : `${formatUsageDuration(ageMs, true)} ago`;
+    return ageMs < 60 * 1000 ? 'just now' : `${formatUsageDuration(ageMs, true, true, true)} ago`;
 }

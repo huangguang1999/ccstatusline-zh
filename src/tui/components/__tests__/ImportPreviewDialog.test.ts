@@ -322,7 +322,7 @@ describe('ImportPreviewDialog helpers', () => {
 
         try {
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Replace All');
+                expect(stdout.getOutput()).toContain('▶  全部替换');
             });
             stdin.write('\u001B');
             await waitFor(() => {
@@ -364,23 +364,23 @@ describe('ImportPreviewDialog helpers', () => {
             });
             stdin.write('\u001B[B');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Merge');
+                expect(stdout.getOutput()).toContain('▶  合并');
                 expect(lastGlobalBoldRow(stdout.getOutput())).toBe('globalBold: true');
             });
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Cancel');
-                expect(stdout.getOutput()).toContain('Apply and run these commands');
+                expect(stdout.getOutput()).toContain('▶  取消');
+                expect(stdout.getOutput()).toContain('应用并运行这些命令');
             });
 
             stdout.clearOutput();
             stdin.write('\u001B');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('Changes that will be applied:');
-                expect(stdout.getOutput()).toContain('▶  Merge');
+                expect(stdout.getOutput()).toContain('即将应用的更改：');
+                expect(stdout.getOutput()).toContain('▶  合并');
                 expect(lastGlobalBoldRow(stdout.getOutput())).toBe('globalBold: true');
             });
-            expect(stdout.getOutput()).not.toContain('▶  Replace All');
+            expect(stdout.getOutput()).not.toContain('▶  全部替换');
             expect(onCancel).not.toHaveBeenCalled();
 
             stdin.write('\u001B');
@@ -418,34 +418,34 @@ describe('ImportPreviewDialog helpers', () => {
 
         try {
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Replace All');
+                expect(stdout.getOutput()).toContain('▶  全部替换');
             });
             stdin.write('\u001B[B');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Merge');
+                expect(stdout.getOutput()).toContain('▶  合并');
             });
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Cancel');
-                expect(stdout.getOutput()).toContain('Apply and run these commands');
+                expect(stdout.getOutput()).toContain('▶  取消');
+                expect(stdout.getOutput()).toContain('应用并运行这些命令');
             });
 
             stdout.clearOutput();
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Merge');
+                expect(stdout.getOutput()).toContain('▶  合并');
                 expect(lastGlobalBoldRow(stdout.getOutput())).toBe('globalBold: true');
             });
-            expect(stdout.getOutput()).not.toContain('▶  Replace All');
+            expect(stdout.getOutput()).not.toContain('▶  全部替换');
 
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Cancel');
-                expect(stdout.getOutput()).toContain('Apply and run these commands');
+                expect(stdout.getOutput()).toContain('▶  取消');
+                expect(stdout.getOutput()).toContain('应用并运行这些命令');
             });
             stdin.write('\u001B[B');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Apply and run these commands');
+                expect(stdout.getOutput()).toContain('▶  应用并运行这些命令');
             });
             stdin.write('\r');
             await waitFor(() => {

@@ -755,10 +755,10 @@ describe('refreshInterval', () => {
         expect(settings.statusLine?.refreshInterval).toBeUndefined();
     });
 
-    it('setRefreshInterval should do nothing when no statusLine exists', async () => {
+    it('setRefreshInterval should reject without creating a statusLine when none exists', async () => {
         await saveClaudeSettings({});
 
-        await setRefreshInterval(10);
+        await expect(setRefreshInterval(10)).rejects.toThrow('未配置状态行');
 
         const settings = await loadClaudeSettings();
         expect(settings.statusLine).toBeUndefined();
@@ -851,10 +851,10 @@ describe('refreshInterval', () => {
         expect(settings.statusLine?.refreshInterval).toBeUndefined();
     });
 
-    it('setRefreshInterval should do nothing when no statusLine exists', async () => {
+    it('setRefreshInterval should reject without creating a statusLine when none exists', async () => {
         await saveClaudeSettings({});
 
-        await setRefreshInterval(10);
+        await expect(setRefreshInterval(10)).rejects.toThrow('未配置状态行');
 
         const settings = await loadClaudeSettings();
         expect(settings.statusLine).toBeUndefined();

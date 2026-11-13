@@ -255,7 +255,7 @@ describe('renderer minimalist mode', () => {
         const preRenderedLines = preRenderAllWidgets([widgets], settings, context);
         const content = preRenderedLines[0]?.[0]?.content;
 
-        // With minimalist mode, model widget should render raw value ('Claude') not 'Model: Claude'
+        // With minimalist mode, model widget should render raw value ('Claude') not '模型: Claude'
         expect(content).toBe('Claude');
     });
 
@@ -282,7 +282,7 @@ describe('renderer color levels', () => {
     ];
     const extendedColorCode = /\x1b\[[34]8;[25];/;
 
-    it('emits no 256-color or truecolor escapes at No Color and Basic', () => {
+    it('emits no 256-color or truecolor escapes at 无颜色 and Basic', () => {
         for (const colorLevel of [0, 1] as const) {
             for (const enabled of [false, true]) {
                 const line = renderLine(widgets, {

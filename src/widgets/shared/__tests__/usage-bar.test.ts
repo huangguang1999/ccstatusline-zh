@@ -27,7 +27,7 @@ describe('formatUsageBar', () => {
         expect(asked).toBe(false);
     });
 
-    it('draws the time cursor when given one', () => {
+    it('draws the 时间游标 when given one', () => {
         expect(formatUsageBar(item('slider-only'), 50, {}, () => ({ cursorPercent: 90 }))).toBe(`${'▓'.repeat(5)}${'░'.repeat(4)}│`);
     });
 });

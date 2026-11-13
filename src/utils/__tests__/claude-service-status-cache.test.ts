@@ -180,7 +180,7 @@ function cachedStatus(fetchedAt: number, indicator: string): Record<string, unkn
     };
 }
 
-describe('Claude Status cache', () => {
+describe('Claude 服务状态 cache', () => {
     let harness: ProbeHarness;
 
     beforeEach(() => {

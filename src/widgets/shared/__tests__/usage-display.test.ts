@@ -36,7 +36,7 @@ describe('makeSliderBar', () => {
         expect(makeSliderBar(50, 6)).toBe('▓▓▓░░░');
     });
 
-    it('renders a time cursor when cursorPercent is provided', () => {
+    it('renders a 时间游标 when cursorPercent is provided', () => {
         expect(makeSliderBar(50, 10, { cursorPercent: 50 })).toBe('▓▓▓▓▓│░░░░');
     });
 
@@ -98,7 +98,7 @@ describe('cycleUsageDisplayMode with slider', () => {
     });
 });
 
-// Block Usage's at-limit and Block Reset Timer's under-limit states both read
+// Block Usage's at-limit and 时段重置计时's under-limit states both read
 // this, so the two always swap at the same render
 describe('isAtSessionLimit', () => {
     it.each([

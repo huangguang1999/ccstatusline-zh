@@ -331,7 +331,7 @@ describe('npm registry request', () => {
             new Promise<'still pending'>(resolve => setTimeout(() => { resolve('still pending'); }, 1000))
         ]);
 
-        expect(result).toEqual(new Error('npm registry request timed out after 10ms'));
+        expect(result).toEqual(new Error('npm 仓库请求超过 10ms 未响应'));
         expect(destroy).toHaveBeenCalledOnce();
     });
 
@@ -350,7 +350,7 @@ describe('npm registry request', () => {
         });
 
         await expect(fetchLatestNpmVersion(5000, stalledErrorRequest))
-            .rejects.toThrow(`npm registry returned HTTP ${statusCode ?? 'unknown'}`);
+            .rejects.toThrow(`npm 仓库返回 HTTP ${statusCode ?? 'unknown'}`);
         expect(destroy).toHaveBeenCalledOnce();
     });
 
@@ -401,7 +401,7 @@ describe('npm registry request', () => {
             proxy = await startStalledProxy();
             process.env.HTTPS_PROXY = proxy.url;
 
-            await expect(fetchLatestNpmVersion(50)).rejects.toThrow('npm registry request timed out after 50ms');
+            await expect(fetchLatestNpmVersion(50)).rejects.toThrow('npm 仓库请求超过 50ms 未响应');
             await proxy.connectionClosed;
         });
     });

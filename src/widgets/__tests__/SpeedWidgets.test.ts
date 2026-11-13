@@ -45,7 +45,7 @@ function createItem(
 describe('OutputSpeedWidget', () => {
     const widget = new OutputSpeedWidget();
 
-    it('should report Token Speed category', () => {
+    it('should report Token 速度 category', () => {
         expect(widget.getCategory()).toBe('Token 速度');
     });
 
@@ -135,7 +135,7 @@ describe('speed widget hideable states', () => {
 describe('InputSpeedWidget', () => {
     const widget = new InputSpeedWidget();
 
-    it('should report Token Speed category', () => {
+    it('should report Token 速度 category', () => {
         expect(widget.getCategory()).toBe('Token 速度');
     });
 
@@ -168,7 +168,7 @@ describe('InputSpeedWidget', () => {
 describe('TotalSpeedWidget', () => {
     const widget = new TotalSpeedWidget();
 
-    it('should report Token Speed category', () => {
+    it('should report Token 速度 category', () => {
         expect(widget.getCategory()).toBe('Token 速度');
     });
 

@@ -265,7 +265,7 @@ describe('BlockResetTimerWidget', () => {
             expect(render(widget,
                 { id: 'reset', type: 'reset-timer', metadata: { absolute: 'true' } },
                 { usageData: {}, blockMetrics }
-            )).toBe('Reset: 2026-03-12 10:00 UTC');
+            )).toBe('重置: 2026-03-12 10:00 UTC');
         } finally {
             vi.useRealTimers();
         }
@@ -388,7 +388,7 @@ describe('BlockResetTimerWidget', () => {
         ]);
     });
 
-    it('shows short bar modifier text in slider modes', () => {
+    it('shows 短进度条 modifier text in slider modes', () => {
         const widget = new BlockResetTimerWidget();
 
         expect(widget.getEditorDisplay({
@@ -403,7 +403,7 @@ describe('BlockResetTimerWidget', () => {
         }).modifierText).toBe('(仅短进度条)');
     });
 
-    it('does not show a time cursor carried over from a usage widget', () => {
+    it('does not show a 时间游标 carried over from a usage widget', () => {
         // A usage bar's cursor metadata survives a type change in the picker,
         // but this timer never draws a cursor
         const widget = new BlockResetTimerWidget();

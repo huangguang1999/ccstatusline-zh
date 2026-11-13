@@ -98,7 +98,7 @@ export const PalettePicker: React.FC<PalettePickerProps> = ({ title, initialInde
         <Box flexDirection='column'>
             <Text bold>{title}</Text>
             <Box marginTop={1}>
-                <Text dimColor>←→↑↓ move, type a number to jump, Enter apply, ESC cancel</Text>
+                <Text dimColor>←→↑↓ 移动，输入数字跳转，Enter 应用，ESC 取消</Text>
             </Box>
             <Box marginTop={1} flexDirection='column'>
                 <Text>{renderRow(0)}</Text>
@@ -111,7 +111,7 @@ export const PalettePicker: React.FC<PalettePickerProps> = ({ title, initialInde
             </Box>
             <Box marginTop={1}>
                 <Text>{getPaletteLabel(index)}</Text>
-                {typed && <Text dimColor>{`    typed: ${typed}`}</Text>}
+                {typed && <Text dimColor>{`    已输入: ${typed}`}</Text>}
             </Box>
         </Box>
     );

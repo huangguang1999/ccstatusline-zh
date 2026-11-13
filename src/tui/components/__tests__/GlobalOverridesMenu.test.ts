@@ -334,11 +334,11 @@ describe('GlobalOverridesMenu', () => {
 
         try {
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('Default Separator:');
+                expect(stdout.getOutput()).toContain('默认分隔符:');
             });
             const output = stripAnsi(stdout.getOutput());
-            expect(output).toContain(`Default Padding: "${glyph}" - Press (p) to edit`);
-            expect(output).toContain(`Default Separator: "${glyph}" - Press (s) to edit`);
+            expect(output).toContain(`默认内边距: "${glyph}" - 按 (p) 编辑`);
+            expect(output).toContain(`默认分隔符: "${glyph}" - 按 (s) 编辑`);
         } finally {
             instance.unmount();
             instance.cleanup();

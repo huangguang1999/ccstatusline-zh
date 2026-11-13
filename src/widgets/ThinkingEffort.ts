@@ -91,10 +91,10 @@ export class ThinkingEffortWidget implements Widget {
         const modifiers: string[] = [];
         const brackets = getBracketStyle(item);
         if (brackets) {
-            modifiers.push(`brackets ${brackets}`);
+            modifiers.push(`括号 ${brackets}`);
         }
         if (isLevelColorsEnabled(item)) {
-            modifiers.push('level colors');
+            modifiers.push('分级颜色');
         }
 
         return { displayText: this.getDisplayName(), modifierText: makeModifierText(modifiers) };
@@ -113,8 +113,8 @@ export class ThinkingEffortWidget implements Widget {
 
     getCustomKeybinds(): CustomKeybind[] {
         return [
-            { key: 'b', label: '(b)rackets', action: CYCLE_BRACKETS_ACTION },
-            { key: 'l', label: '(l)evel colors', action: EDIT_LEVEL_COLORS_ACTION }
+            { key: 'b', label: '(b)括号', action: CYCLE_BRACKETS_ACTION },
+            { key: 'l', label: '(l)分级颜色', action: EDIT_LEVEL_COLORS_ACTION }
         ];
     }
 

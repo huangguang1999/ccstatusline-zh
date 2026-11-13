@@ -198,13 +198,13 @@ describe('ItemsEditor', () => {
 
             // Trim "模型: " down to "M", one backspace per keypress. The
             // cursor shows as a space after the text.
-            for (const text of ['模型:', '模型', 'Mode', 'Mod', 'Mo', 'M']) {
+            for (const text of ['模型:', '模型', '模', '']) {
                 stdin.write('\x7f');
                 await waitFor(() => {
                     expect(stripAnsi(stdout.getOutput())).toContain(`"${text} " (默认: "模型: ")`);
                 });
             }
-            stdin.write(' ');
+            stdin.write('M ');
             await waitFor(() => {
                 expect(stripAnsi(stdout.getOutput())).toContain('"M  " (默认: "模型: ")');
             });
@@ -217,7 +217,7 @@ describe('ItemsEditor', () => {
             stdout.clearOutput();
             stdin.write('r');
             await waitFor(() => {
-                expect(stripAnsi(stdout.getOutput())).toContain('(raw value)');
+                expect(stripAnsi(stdout.getOutput())).toContain('(纯值)');
             });
             const rawOutput = stripAnsi(stdout.getOutput());
             expect(rawOutput).not.toContain('(e)文字前缀…');
@@ -240,7 +240,7 @@ describe('ItemsEditor', () => {
                 initialWidgets: [{
                     id: '1',
                     type: 'remote-control-status',
-                    metadata: { format: 'icon-text', nerdFont: 'true', 前缀: 'RC ' }
+                    metadata: { format: 'icon-text', nerdFont: 'true', label: 'RC ' }
                 }]
             }),
             { stdin, stdout, stderr, debug: true, exitOnCtrlC: false, patchConsole: false }
@@ -303,7 +303,7 @@ describe('ItemsEditor', () => {
         const stderr = createMockStdout();
 
         const instance = render(
-            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type: 'model', metadata: { 前缀: 'M ' } }] }),
+            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type: 'model', metadata: { label: 'M ' } }] }),
             {
                 stdin,
                 stdout,
@@ -321,7 +321,7 @@ describe('ItemsEditor', () => {
 
             stdin.write('\x1b[C');
             await waitFor(() => {
-                expect(stripAnsi(stdout.getOutput())).toContain('搜索: (无)');
+                expect(stripAnsi(stdout.getOutput())).toContain('搜索: （无）');
             });
             for (const [index, char] of Array.from(query).entries()) {
                 // The search row drops the trailing space a typed space leaves
@@ -445,7 +445,7 @@ describe('ItemsEditor', () => {
         const stderr = createMockStdout();
 
         const instance = render(
-            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type: 'model', metadata: { 前缀: '\u{1F469}\u200D\u{1F4BB} ' } }] }),
+            React.createElement(StatefulItemsEditor, { initialWidgets: [{ id: '1', type: 'model', metadata: { label: '\u{1F469}\u200D\u{1F4BB} ' } }] }),
             {
                 stdin,
                 stdout,
@@ -478,17 +478,17 @@ describe('ItemsEditor', () => {
         {
             name: 'a joined emoji',
             widget: { id: '1', type: 'custom-text', customText: '\u{1F469}‍\u{1F4BB}', merge: true },
-            row: '1. Custom Text (\u{1F469}‍\u{1F4BB}) (merged→)'
+            row: '1. 自定义文本 (\u{1F469}‍\u{1F4BB}) (merged→)'
         },
         {
             name: 'a flag',
             widget: { id: '1', type: 'custom-text', customText: '\u{1F1FA}\u{1F1F8}', merge: 'no-padding' as const },
-            row: '1. Custom Text (\u{1F1FA}\u{1F1F8}) (merged-no-pad→)'
+            row: '1. 自定义文本 (\u{1F1FA}\u{1F1F8}) (merged-no-pad→)'
         },
         {
             name: 'a skin-toned label',
             widget: { id: '1', type: 'model', metadata: { label: '\u{1F44D}\u{1F3FD} ' }, merge: true },
-            row: '1. Model (label: "\u{1F44D}\u{1F3FD} ") (merged→)'
+            row: '1. 模型 (前缀: "\u{1F44D}\u{1F3FD} ") (merged→)'
         }
     ])('shows a row with $name in full before the tags that follow it', async ({ widget, row }) => {
         const stdin = createMockStdin();
@@ -497,7 +497,7 @@ describe('ItemsEditor', () => {
         // Debug mode writes whole frames; the last one starts at the last title
         const lastFrame = () => {
             const output = stripAnsi(stdout.getOutput());
-            return output.slice(output.lastIndexOf('Edit Line 1'));
+            return output.slice(output.lastIndexOf('编辑行 1'));
         };
 
         const instance = render(
@@ -514,7 +514,7 @@ describe('ItemsEditor', () => {
 
         try {
             await waitFor(() => {
-                expect(lastFrame()).toContain('2. Version');
+                expect(lastFrame()).toContain('2. 版本');
             });
             expect(lastFrame()).toContain(row);
         } finally {
@@ -732,7 +732,7 @@ describe('ItemsEditor', () => {
         // Debug mode writes whole frames; the last one starts at the last title
         const lastFrame = () => {
             const output = stripAnsi(stdout.getOutput());
-            return output.slice(output.lastIndexOf('Edit Line 1'));
+            return output.slice(output.lastIndexOf('编辑行 1'));
         };
 
         const instance = render(
@@ -749,22 +749,22 @@ describe('ItemsEditor', () => {
 
         try {
             await waitFor(() => {
-                expect(lastFrame()).toContain('▶  1. Current Working Dir (fish-style)');
+                expect(lastFrame()).toContain('▶  1. 当前目录 (fish 风格)');
             });
 
             stdin.write('s');
             await waitFor(() => {
-                expect(lastFrame()).toContain('Enter number of segments to display');
+                expect(lastFrame()).toContain('输入显示的路径段数');
             });
 
             stdin.write('2');
             await waitFor(() => {
-                expect(lastFrame()).toContain('(blank for full path): 2');
+                expect(lastFrame()).toContain('（留空显示完整路径）： 2');
             });
 
             stdin.write('\r');
             await waitFor(() => {
-                expect(lastFrame()).toContain('▶  1. Current Working Dir (segments: 2)');
+                expect(lastFrame()).toContain('▶  1. 当前目录 (段数: 2)');
             });
             expect(lastFrame()).not.toContain('fish-style');
         } finally {

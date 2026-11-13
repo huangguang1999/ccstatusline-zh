@@ -98,8 +98,8 @@ function getPlainOutput(output: string): string {
 function getTypedWindow(stdout: CapturedWriteStream): string | undefined {
     const promptLines = getPlainOutput(stdout.getOutput())
         .split('\n')
-        .filter(line => line.includes('Enter window in seconds'));
-    return promptLines.at(-1)?.split('):')[1]?.trim();
+        .filter(line => line.includes('输入时间窗口（秒，'));
+    return promptLines.at(-1)?.split('）：')[1]?.trim();
 }
 
 async function waitForTypedWindow(stdout: CapturedWriteStream, expected: string): Promise<void> {
@@ -136,7 +136,7 @@ describe('SpeedWindowEditor', () => {
 
         try {
             await waitForTypedWindow(rendered.stdout, '0');
-            expect(getPlainOutput(rendered.stdout.getOutput())).toContain('Enter window in seconds (0-3600):');
+            expect(getPlainOutput(rendered.stdout.getOutput())).toContain('输入时间窗口（秒，0-3600）：');
         } finally {
             cleanupEditor(rendered);
         }

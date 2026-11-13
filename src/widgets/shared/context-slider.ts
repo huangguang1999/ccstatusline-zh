@@ -71,7 +71,7 @@ export function getContextSliderModifierText(item: WidgetItem): string | undefin
         return '(仅迷你进度条)';
     }
     if (mode === 'line') {
-        return '(line bar)';
+        return '(细线进度条)';
     }
     return undefined;
 }

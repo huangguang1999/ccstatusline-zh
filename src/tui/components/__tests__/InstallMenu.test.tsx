@@ -306,42 +306,42 @@ describe('InstallMenu', () => {
 
         try {
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Pinned global install');
+                expect(stdout.getOutput()).toContain('▶  固定全局安装');
             });
             stdin.write('\u001B[B');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  Auto-update');
+                expect(stdout.getOutput()).toContain('▶  自动更新');
             });
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  npx -y ccstatusline@latest');
+                expect(stdout.getOutput()).toContain('▶  npx -y ccstatusline-zh@latest');
             });
 
             // Escape
             stdout.clearOutput();
             stdin.write('\u001B');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('Select update style');
-                expect(stdout.getOutput()).toContain('▶  Auto-update');
+                expect(stdout.getOutput()).toContain('选择安装方式');
+                expect(stdout.getOutput()).toContain('▶  自动更新');
             });
-            expect(stdout.getOutput()).not.toContain('▶  Pinned global install');
+            expect(stdout.getOutput()).not.toContain('▶  固定全局安装');
 
-            // The '← Back' row
+            // The '← 返回' row
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  npx -y ccstatusline@latest');
+                expect(stdout.getOutput()).toContain('▶  npx -y ccstatusline-zh@latest');
             });
             stdin.write('\u001B[A');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('▶  ← Back');
+                expect(stdout.getOutput()).toContain('▶  ← 返回');
             });
             stdout.clearOutput();
             stdin.write('\r');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('Select update style');
-                expect(stdout.getOutput()).toContain('▶  Auto-update');
+                expect(stdout.getOutput()).toContain('选择安装方式');
+                expect(stdout.getOutput()).toContain('▶  自动更新');
             });
-            expect(stdout.getOutput()).not.toContain('▶  Pinned global install');
+            expect(stdout.getOutput()).not.toContain('▶  固定全局安装');
             expect(onCancel).not.toHaveBeenCalled();
         } finally {
             instance.unmount();

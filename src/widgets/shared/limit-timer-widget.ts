@@ -34,7 +34,7 @@ export abstract class LimitTimerWidget implements Widget {
     protected abstract getLimitInMs(context: RenderContext): number | null;
 
     getDefaultColor(): string { return 'red'; }
-    getCategory(): string { return 'Usage'; }
+    getCategory(): string { return '用量'; }
     getLabelPrefix(): string { return this.label; }
 
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
@@ -51,7 +51,7 @@ export abstract class LimitTimerWidget implements Widget {
     render(item: WidgetItem, context: RenderContext, _settings: Settings): string | null {
         const compact = isUsageCompact(item);
         if (context.isPreview) {
-            return formatRawOrLabeledValue(item, this.label, formatUsageDuration(this.previewLimitInMs, compact));
+            return formatRawOrLabeledValue(item, this.label, formatUsageDuration(this.previewLimitInMs, compact, true, item.rawValue));
         }
 
         const limitInMs = this.getLimitInMs(context);
@@ -59,7 +59,7 @@ export abstract class LimitTimerWidget implements Widget {
             return null;
         }
 
-        return formatRawOrLabeledValue(item, this.label, formatUsageDuration(Math.max(MIN_SHOWN_MS, limitInMs), compact));
+        return formatRawOrLabeledValue(item, this.label, formatUsageDuration(Math.max(MIN_SHOWN_MS, limitInMs), compact, true, item.rawValue));
     }
 
     getCustomKeybinds(): CustomKeybind[] {

@@ -390,11 +390,11 @@ describe('CustomCommandWidget', () => {
 
             try {
                 await waitFor(() => {
-                    expect(editor.output()).toContain('Enter command path:');
+                    expect(editor.output()).toContain('输入命令路径：');
                 });
                 editor.stdin.write('echo \u{1F680}');
                 await waitFor(() => {
-                    expect(editor.output()).toContain('Enter command path: echo \u{1F680}');
+                    expect(editor.output()).toContain('输入命令路径： echo \u{1F680}');
                 });
 
                 // Each key moves the cursor or changes the command, so each
@@ -424,11 +424,11 @@ describe('CustomCommandWidget', () => {
 
             try {
                 await waitFor(() => {
-                    expect(editor.output()).toContain('Enter command path:');
+                    expect(editor.output()).toContain('输入命令路径：');
                 });
                 editor.stdin.write('echo \u{1F680}');
                 await waitFor(() => {
-                    expect(editor.output()).toContain('Enter command path: echo \u{1F680}');
+                    expect(editor.output()).toContain('输入命令路径： echo \u{1F680}');
                 });
                 editor.stdin.write(LEFT);
                 await waitFor(() => {

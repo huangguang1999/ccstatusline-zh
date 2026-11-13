@@ -403,7 +403,7 @@ describe('ThinkingEffortWidget', () => {
         });
     });
 
-    describe('brackets and level colors', () => {
+    describe('brackets and 分级颜色', () => {
         const ORANGE = '\x1b[38;5;208m';
         const FG_RESET = '\x1b[39m';
         const xhighStatus = { effort: { level: 'xhigh' } };
@@ -422,11 +422,11 @@ describe('ThinkingEffortWidget', () => {
                 item: { color: 'hex:112233', metadata: { brackets: '()', levelColors: 'true', bracketColor: 'widget' } }
             });
 
-            expect(result).toBe(`(Thinking: ${ORANGE}xhigh${FG_RESET})`);
+            expect(result).toBe(`(思考: ${ORANGE}xhigh${FG_RESET})`);
         });
 
-        // The label editor's override replaces "Thinking: " inside the brackets
-        it('draws an edited label, or none, with brackets and level colors', () => {
+        // The label editor's override replaces "思考: " inside the brackets
+        it('draws an edited label, or none, with brackets and 分级颜色', () => {
             expect(render({ isPreview: true, item: { metadata: { brackets: '[]', label: 'T ' } } })).toBe('[T high]');
             expect(render({ isPreview: true, item: { metadata: { label: '' } } })).toBe('high');
 
@@ -458,7 +458,7 @@ describe('ThinkingEffortWidget', () => {
             expect(result).toBe('(xhigh)');
         });
 
-        it('asks the renderer to color around its level runs only while level colors are on', () => {
+        it('asks the renderer to color around its level runs only while 分级颜色 are on', () => {
             const widget = new ThinkingEffortWidget();
             const item: WidgetItem = { id: 'e', type: 'thinking-effort' };
 
@@ -484,12 +484,12 @@ describe('ThinkingEffortWidget', () => {
 
             expect(widget.getEditorDisplay({ id: 'e', type: 'thinking-effort' }).modifierText).toBeUndefined();
             expect(widget.getEditorDisplay({ id: 'e', type: 'thinking-effort', metadata: { brackets: '<>', levelColors: 'true' } }).modifierText)
-                .toBe('(brackets <>, level colors)');
+                .toBe('(括号 <>, 分级颜色)');
         });
     });
 
     // The renderer colors everything but the level runs, the way it colors any widget
-    describe('level colors on the status line', () => {
+    describe('分级颜色 on the status line', () => {
         const ORANGE = '\x1b[38;5;208m';
         const FG_RESET = '\x1b[39m';
         const levelColored: WidgetItem = { id: 'e', type: 'thinking-effort', metadata: { levelColors: 'true' } };
@@ -510,7 +510,7 @@ describe('ThinkingEffortWidget', () => {
             // nord's first segment at 256 colors: text 16 on background 73
             const themeText = '\x1b[38;5;16m';
 
-            expect(line).toBe(`${themeText}\x1b[48;5;73mThinking: ${ORANGE}xhigh${themeText}\x1b[49m${FG_RESET}`);
+            expect(line).toBe(`${themeText}\x1b[48;5;73m思考: ${ORANGE}xhigh${themeText}\x1b[49m${FG_RESET}`);
         });
 
         it('draws the label and widget-colored brackets in the item color', () => {
@@ -518,29 +518,29 @@ describe('ThinkingEffortWidget', () => {
             const BASE = '\x1b[38;2;17;34;51m';
 
             expect(renderLine(item, { colorLevel: 3 })).toBe(
-                `${BASE}${ORANGE}(${BASE}Thinking: ${ORANGE}xhigh${BASE}${ORANGE})${BASE}${FG_RESET}`
+                `${BASE}${ORANGE}(${BASE}思考: ${ORANGE}xhigh${BASE}${ORANGE})${BASE}${FG_RESET}`
             );
         });
 
         it('leaves the label in the terminal\'s color when the item color is "Default"', () => {
-            expect(renderLine({ ...levelColored, color: '' }, { colorLevel: 3 })).toBe(`Thinking: ${ORANGE}xhigh${FG_RESET}`);
+            expect(renderLine({ ...levelColored, color: '' }, { colorLevel: 3 })).toBe(`思考: ${ORANGE}xhigh${FG_RESET}`);
         });
 
         it('sweeps an item gradient across the label and keeps the level color', () => {
             const line = renderLine({ ...levelColored, color: 'gradient:atlas' }, { colorLevel: 3 });
 
             // atlas runs #feac5e to #4bc0c8 across "Thinking:", the text it colors
-            expect(line.startsWith('\x1b[38;2;254;172;94mT')).toBe(true);
+            expect(line.startsWith('\x1b[38;2;254;172;94m思')).toBe(true);
             expect(line).toContain(`\x1b[38;2;75;192;200m: ${ORANGE}xhigh${FG_RESET}`);
         });
 
         it('gives way to a global foreground override', () => {
             expect(renderLine(levelColored, { colorLevel: 3, overrideForegroundColor: 'hex:AABBCC' }))
-                .toBe(`\x1b[38;2;170;187;204mThinking: xhigh${FG_RESET}`);
+                .toBe(`\x1b[38;2;170;187;204m思考: xhigh${FG_RESET}`);
         });
 
-        it('colors nothing at the No Color level', () => {
-            expect(renderLine(levelColored, { colorLevel: 0 })).toBe('Thinking: xhigh');
+        it('colors nothing at the 无颜色 level', () => {
+            expect(renderLine(levelColored, { colorLevel: 0 })).toBe('思考: xhigh');
         });
     });
 });

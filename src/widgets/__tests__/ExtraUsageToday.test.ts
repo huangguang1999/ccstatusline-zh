@@ -39,19 +39,19 @@ describe('ExtraUsageTodayWidget', () => {
     });
 
     it('shows the extra usage spent today', () => {
-        expect(render(item, { usageData })).toBe('Overage Today: $46.10');
+        expect(render(item, { usageData })).toBe('今日超额: $46.10');
         expect(render({ ...item, rawValue: true }, { usageData })).toBe('$46.10');
     });
 
     it('formats the amount in the currency reported by the API', () => {
-        expect(render(item, { usageData: { ...usageData, extraUsageCurrency: 'EUR' } })).toBe('Overage Today: €46.10');
+        expect(render(item, { usageData: { ...usageData, extraUsageCurrency: 'EUR' } })).toBe('今日超额: €46.10');
     });
 
     it('applies the global cost style', () => {
         const settings = { ...DEFAULT_SETTINGS, numberFormat: { cost: { style: 'whole' as const } } };
         const widget = new ExtraUsageTodayWidget();
 
-        expect(widget.render(item, { usageData }, settings)).toBe('Overage Today: $46');
+        expect(widget.render(item, { usageData }, settings)).toBe('今日超额: $46');
         expect(widget.supportsNumberFormat()).toBe(true);
     });
 
@@ -61,29 +61,29 @@ describe('ExtraUsageTodayWidget', () => {
         expect(render(item, { usageData: { extraUsageEnabled: true, extraUsageUsed: 12345 } })).toBeNull();
     });
 
-    it('renders n/a when extra usage is disabled, or nothing when that state is hidden', () => {
+    it('renders n/a 超额用量关闭时, or nothing when that state is hidden', () => {
         const context: RenderContext = { usageData: { extraUsageEnabled: false } };
 
-        expect(render(item, context)).toBe('Overage Today: n/a');
+        expect(render(item, context)).toBe('今日超额: n/a');
         expect(render({ ...item, metadata: { hide: 'disabled' } }, context)).toBeNull();
     });
 
     it('shows usage errors only when the extra usage data is missing', () => {
-        mockGetUsageErrorMessage.mockReturnValue('[Timeout]');
+        mockGetUsageErrorMessage.mockReturnValue('[超时]');
 
-        expect(render(item, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
+        expect(render(item, { usageData: { error: 'timeout' } })).toBe('[超时]');
         expect(render({ ...item, metadata: { hide: 'no-data' } }, { usageData: { error: 'timeout' } })).toBeNull();
-        expect(render(item, { usageData: { ...usageData, error: 'timeout' } })).toBe('Overage Today: $46.10');
+        expect(render(item, { usageData: { ...usageData, error: 'timeout' } })).toBe('今日超额: $46.10');
     });
 
     it('renders a sample amount in the preview', () => {
-        expect(render(item, { isPreview: true })).toBe('Overage Today: $46.10');
+        expect(render(item, { isPreview: true })).toBe('今日超额: $46.10');
     });
 
     it('declares the disabled and no-data hideable states', () => {
         const widget = new ExtraUsageTodayWidget();
 
         expect(widget.getHideableStates().map(state => state.key)).toEqual(['disabled', 'no-data']);
-        expect(widget.getCategory()).toBe('Usage');
+        expect(widget.getCategory()).toBe('用量');
     });
 });

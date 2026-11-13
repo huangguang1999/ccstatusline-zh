@@ -512,7 +512,7 @@ async function loadClaudeSettingsForUpdate(retry: string): Promise<ClaudeSetting
         return await loadClaudeSettings({ logErrors: false });
     } catch (error) {
         const reason = error instanceof Error ? error.message : String(error);
-        throw new Error(`Could not read existing Claude settings at ${getClaudeSettingsPath()} (${reason}). The file was left unchanged; fix or remove it, then ${retry}.`, { cause: error });
+        throw new Error(`无法读取现有 Claude 设置 ${getClaudeSettingsPath()}（${reason}）。原文件未修改，请修复或移除该文件后${retry}。`, { cause: error });
     }
 }
 
@@ -521,7 +521,7 @@ export async function installStatusLine({
     supportsRefreshInterval = false,
     installationMetadata
 }: InstallStatusLineOptions): Promise<void> {
-    const settings = await loadClaudeSettingsForUpdate('install again');
+    const settings = await loadClaudeSettingsForUpdate('重新安装');
 
     await backupClaudeSettings('.orig');
 
@@ -558,7 +558,7 @@ export async function uninstallStatusLine(): Promise<void> {
     // Throwing here, before anything is removed, keeps the installation
     // metadata and hooks in place and stops the caller from going on to
     // remove the global package that statusLine still runs.
-    const settings = await loadClaudeSettingsForUpdate('uninstall again');
+    const settings = await loadClaudeSettingsForUpdate('重新卸载');
 
     // statusLine and the managed hooks go in one write. If it fails, both
     // stay and the metadata isn't cleared, so the caller doesn't go on to
@@ -593,10 +593,10 @@ export async function getRefreshInterval(): Promise<number | null> {
 }
 
 export async function setRefreshInterval(interval: number | null): Promise<void> {
-    const settings = await loadClaudeSettingsForUpdate('try again');
+    const settings = await loadClaudeSettingsForUpdate('重试');
 
     if (!settings.statusLine) {
-        throw new Error(`No status line is configured in ${getClaudeSettingsPath()}, so there is no refresh interval to set. Install ccstatusline to Claude Code again.`);
+        throw new Error(`${getClaudeSettingsPath()} 中未配置状态行，无法设置刷新间隔。请将 ccstatusline-zh 重新安装到 Claude Code。`);
     }
 
     if (interval === null) {

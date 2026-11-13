@@ -345,16 +345,16 @@ describe('LineSelector', () => {
 
             view.press(UP_ARROW);
             await waitFor(() => {
-                expect(view.rows().at(-1)).toBe('▶  ← Back');
+                expect(view.rows().at(-1)).toBe('▶  ← 返回');
             });
 
             view.press('a');
             await waitFor(() => {
                 expect(view.rows()).toEqual([
-                    '☰ Line 1 (1 widget)',
-                    '☰ Line 2 (empty)',
-                    '▶  ☰ Line 3 (empty)',
-                    '← Back'
+                    '☰ 第 1 行 (1 个组件)',
+                    '☰ 第 2 行 (空)',
+                    '▶  ☰ 第 3 行 (空)',
+                    '← 返回'
                 ]);
             });
             expect(view.onLinesUpdate).toHaveBeenCalledTimes(1);

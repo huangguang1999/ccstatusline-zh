@@ -171,10 +171,10 @@ describe('EffortColorsEditor', () => {
 
         try {
             await editor.ready();
-            expect(editor.takeOutput()).toContain('Sample: (low)');
+            expect(editor.takeOutput()).toContain('示例: (low)');
 
             await editor.press(DOWN);
-            expect(editor.takeOutput()).toContain('Sample: (medium)');
+            expect(editor.takeOutput()).toContain('示例: (medium)');
         } finally {
             editor.cleanup();
         }
@@ -187,8 +187,8 @@ describe('EffortColorsEditor', () => {
             await editor.ready();
             await editor.press(DOWN, DOWN, DOWN, DOWN, DOWN);
             const output = editor.takeOutput();
-            expect(output).toContain('Sample: (max)');
-            expect(output).toMatch(/▶\s+brackets/);
+            expect(output).toContain('示例: (max)');
+            expect(output).toMatch(/▶\s+括号/);
         } finally {
             editor.cleanup();
         }
@@ -225,10 +225,10 @@ describe('EffortColorsEditor', () => {
         try {
             await editor.ready();
             await editor.press(DOWN, DOWN, DOWN, DOWN, DOWN);
-            expect(editor.takeOutput()).toContain('Match effort');
+            expect(editor.takeOutput()).toContain('跟随力度');
 
             await editor.press(RIGHT);
-            expect(editor.takeOutput()).toContain('Widget color');
+            expect(editor.takeOutput()).toContain('组件颜色');
 
             await editor.press(ENTER);
             expect(editor.savedMetadata()?.bracketColor).toBe('widget');
@@ -237,15 +237,15 @@ describe('EffortColorsEditor', () => {
         }
     });
 
-    it('turns level colors on with Space', async () => {
+    it('turns 分级颜色 on with Space', async () => {
         const editor = renderEditor(rawWithParens);
 
         try {
             await editor.ready();
-            expect(editor.takeOutput()).toContain('Level colors: Off');
+            expect(editor.takeOutput()).toContain('分级颜色: 关闭');
 
             await editor.press(' ');
-            expect(editor.takeOutput()).toContain('Level colors: On');
+            expect(editor.takeOutput()).toContain('分级颜色: 启用');
 
             await editor.press(ENTER);
             expect(editor.savedMetadata()?.levelColors).toBe('true');
@@ -260,7 +260,7 @@ describe('EffortColorsEditor', () => {
         try {
             await editor.ready();
             const output = editor.takeOutput();
-            expect(output).toMatch(/xhigh\s+Orange/);
+            expect(output).toMatch(/xhigh\s+橙色/);
             expect(output).not.toContain('ansi256:208');
         } finally {
             editor.cleanup();
@@ -283,7 +283,7 @@ describe('EffortColorsEditor', () => {
             const output = editor.takeColoredOutput();
             // The default orange has no 16-color equivalent; bright magenta stands in
             expect(stripAnsi(output)).toMatch(/xhigh\s+Bright Magenta/);
-            expect(output).toMatch(/Sample: .*\x1b\[95mxhigh/);
+            expect(output).toMatch(/示例: .*\x1b\[95mxhigh/);
             expect(output).not.toContain('\x1b[38;5;');
         } finally {
             editor.cleanup();
@@ -292,7 +292,7 @@ describe('EffortColorsEditor', () => {
         }
     });
 
-    it('colors nothing at the No Color level, as on the status line', async () => {
+    it('colors nothing at the 无颜色 level, as on the status line', async () => {
         const editor = renderEditor(
             { id: 'e', type: 'thinking-effort', rawValue: true, metadata: { 'levelColors': 'true', 'levelColor.low': 'hex:ff0000' } },
             { ...DEFAULT_SETTINGS, colorLevel: 0 }
@@ -302,7 +302,7 @@ describe('EffortColorsEditor', () => {
             await editor.ready();
             const output = editor.takeColoredOutput();
             expect(stripAnsi(output)).toMatch(/low\s+#FF0000/);
-            expect(output).toContain('Sample: low');
+            expect(output).toContain('示例: low');
             expect(output).not.toContain('\x1b[38;2;255;0;0m');
         } finally {
             editor.cleanup();
@@ -343,10 +343,10 @@ describe('EffortColorsEditor', () => {
         try {
             await editor.ready();
             await editor.press('x', 'orange', ENTER);
-            expect(editor.takeOutput()).toContain('Not a color');
+            expect(editor.takeOutput()).toContain('颜色无效');
 
             await editor.press(ESC);
-            expect(editor.takeOutput()).toContain('Sample: (low)');
+            expect(editor.takeOutput()).toContain('示例: (low)');
             expect(editor.onCancel).not.toHaveBeenCalled();
 
             await editor.press(ENTER);
@@ -356,7 +356,7 @@ describe('EffortColorsEditor', () => {
         }
     });
 
-    it('restores the default colors with (d) but leaves level colors on', async () => {
+    it('restores the default colors with (d) but leaves 分级颜色 on', async () => {
         const editor = renderEditor({
             ...rawWithParens,
             metadata: { 'brackets': '()', 'levelColors': 'true', 'levelColor.low': 'blue', 'bracketColor': 'widget' }

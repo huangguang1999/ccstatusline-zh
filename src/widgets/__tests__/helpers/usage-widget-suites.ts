@@ -135,14 +135,14 @@ export function runUsagePercentWidgetSuite<TWidget extends UsageWidgetLike>(conf
     it('shows usage error text when API call fails', () => {
         const widget = config.createWidget();
 
-        config.errorMessageMock.mockReturnValue('[Timeout]');
-        expect(config.render(widget, config.baseItem, { usageData: { error: 'timeout' } })).toBe('[Timeout]');
+        config.errorMessageMock.mockReturnValue('[超时]');
+        expect(config.render(widget, config.baseItem, { usageData: { error: 'timeout' } })).toBe('[超时]');
     });
 
     it('hides usage error text when the no-data state is enabled', () => {
         const widget = config.createWidget();
 
-        config.errorMessageMock.mockReturnValue('[Timeout]');
+        config.errorMessageMock.mockReturnValue('[超时]');
         expect(config.render(widget, {
             ...config.baseItem,
             metadata: { hide: 'no-data' }
@@ -239,7 +239,7 @@ export function runUsagePercentWidgetSuite<TWidget extends UsageWidgetLike>(conf
         expect(widget.getEditorDisplay(config.modifierItem).modifierText).toBe(config.expectedModifierText);
     });
 
-    it('shows time cursor editor modifiers in short bar modes', () => {
+    it('shows 时间游标 editor modifiers in 短进度条 modes', () => {
         const widget = config.createWidget();
 
         expect(widget.getEditorDisplay({

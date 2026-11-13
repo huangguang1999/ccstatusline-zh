@@ -76,7 +76,7 @@ const ENTER = '\r';
 const DOWN = '\x1b[B';
 const RIGHT = '\x1b[C';
 const LEFT = '\x1b[D';
-const PICKER_TITLE = 'Select ANSI 256 Color';
+const PICKER_TITLE = '选择 ANSI 256 色';
 
 function renderMenu(widgets: WidgetItem[], settings: Partial<Settings> = {}, columns = 160) {
     const stdin = new MockTtyStream() as unknown as NodeJS.ReadStream;
@@ -140,7 +140,7 @@ function renderMenu(widgets: WidgetItem[], settings: Partial<Settings> = {}, col
         // The latest frame of whichever screen was drawn last
         latestScreen: () => {
             const text = output();
-            const start = Math.max(text.lastIndexOf(PICKER_TITLE), text.lastIndexOf('Configure Colors'));
+            const start = Math.max(text.lastIndexOf(PICKER_TITLE), text.lastIndexOf('配置颜色'));
             return text.slice(start);
         },
         cleanup: () => {
@@ -194,11 +194,11 @@ describe('ColorMenu 256-color grid', () => {
         }
     });
 
-    it('lists (a)nsi256 next to (h)ex at truecolor', async () => {
+    it('lists (a)nsi256 next to (h)十六进制 at truecolor', async () => {
         const menu = renderMenu([orangeModel], { colorLevel: 3 });
         try {
             await menu.press();
-            expect(menu.latestScreen()).toContain('(h)ex, (a)nsi256,');
+            expect(menu.latestScreen()).toContain('(h)十六进制，(a)256 色，');
         } finally {
             menu.cleanup();
         }
@@ -299,7 +299,7 @@ describe('ColorMenu 256-color grid', () => {
         try {
             await menu.press('a', RIGHT, ENTER);
             expect(menu.lastUpdate()?.[0]?.color).toBe('ansi256:209');
-            expect(menu.latestScreen()).toContain('Configure Colors');
+            expect(menu.latestScreen()).toContain('配置颜色');
         } finally {
             menu.cleanup();
         }
@@ -310,7 +310,7 @@ describe('ColorMenu 256-color grid', () => {
         try {
             await menu.press('a', RIGHT, ESC);
             expect(menu.lastUpdate()).toEqual([orangeModel]);
-            expect(menu.latestScreen()).toContain('Configure Colors');
+            expect(menu.latestScreen()).toContain('配置颜色');
         } finally {
             menu.cleanup();
         }

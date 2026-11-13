@@ -113,16 +113,16 @@ describe('global command resolution', () => {
         const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ccstatusline-path-'));
         const originalPath = process.env.PATH;
         try {
-            fs.writeFileSync(path.join(binDir, 'ccstatusline'), '#!/bin/sh\n', { mode: 0o755 });
+            fs.writeFileSync(path.join(binDir, 'ccstatusline-zh'), '#!/bin/sh\n', { mode: 0o755 });
             process.env.PATH = `${path.join(binDir, 'missing')}:${binDir}`;
             mockExecFileSync({
-                'which -a ccstatusline': missingProgramError('which'),
+                'which -a ccstatusline-zh': missingProgramError('which'),
                 'bun pm bin -g': `${binDir}\n`
             });
 
             const resolution = inspectGlobalCommandResolution('bun', { platform: 'linux' });
 
-            expect(resolution.resolvedPaths).toEqual([path.join(binDir, 'ccstatusline')]);
+            expect(resolution.resolvedPaths).toEqual([path.join(binDir, 'ccstatusline-zh')]);
             expect(resolution.warning).toBeNull();
         } finally {
             process.env.PATH = originalPath;
@@ -134,11 +134,11 @@ describe('global command resolution', () => {
         const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ccstatusline-path-'));
         const originalPath = process.env.PATH;
         try {
-            fs.writeFileSync(path.join(binDir, 'ccstatusline'), '#!/bin/sh\n', { mode: 0o755 });
+            fs.writeFileSync(path.join(binDir, 'ccstatusline-zh'), '#!/bin/sh\n', { mode: 0o755 });
             process.env.PATH = binDir;
-            mockExecFileSync({ 'which -a ccstatusline': failedCommandError('which -a ccstatusline') });
+            mockExecFileSync({ 'which -a ccstatusline-zh': failedCommandError('which -a ccstatusline-zh') });
 
-            expect(getCommandResolutionPaths('ccstatusline', { platform: 'linux' })).toEqual([]);
+            expect(getCommandResolutionPaths('ccstatusline-zh', { platform: 'linux' })).toEqual([]);
         } finally {
             process.env.PATH = originalPath;
             fs.rmSync(binDir, { recursive: true, force: true });
@@ -189,16 +189,16 @@ describe('global command resolution', () => {
         const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ccstatusline-merged-usr-'));
         try {
             fs.mkdirSync(path.join(root, 'usr', 'bin'), { recursive: true });
-            fs.writeFileSync(path.join(root, 'usr', 'bin', 'ccstatusline'), '#!/bin/sh\n', { mode: 0o755 });
+            fs.writeFileSync(path.join(root, 'usr', 'bin', 'ccstatusline-zh'), '#!/bin/sh\n', { mode: 0o755 });
             fs.symlinkSync('usr/bin', path.join(root, 'bin'));
             mockExecFileSync({
-                'which -a ccstatusline': `${root}/usr/bin/ccstatusline\n${root}/bin/ccstatusline\n`,
+                'which -a ccstatusline-zh': `${root}/usr/bin/ccstatusline-zh\n${root}/bin/ccstatusline-zh\n`,
                 'npm prefix -g': `${root}/usr\n`
             });
 
             const resolution = inspectGlobalCommandResolution('npm', { platform: 'linux' });
 
-            expect(resolution.resolvedPaths).toEqual([`${root}/usr/bin/ccstatusline`, `${root}/bin/ccstatusline`]);
+            expect(resolution.resolvedPaths).toEqual([`${root}/usr/bin/ccstatusline-zh`, `${root}/bin/ccstatusline-zh`]);
             expect(resolution.warning).toBeNull();
         } finally {
             fs.rmSync(root, { recursive: true, force: true });
@@ -210,17 +210,17 @@ describe('global command resolution', () => {
         try {
             fs.mkdirSync(path.join(root, 'usr', 'bin'), { recursive: true });
             fs.mkdirSync(path.join(root, '.bun', 'bin'), { recursive: true });
-            fs.writeFileSync(path.join(root, 'usr', 'bin', 'ccstatusline'), '#!/bin/sh\n', { mode: 0o755 });
-            fs.writeFileSync(path.join(root, '.bun', 'bin', 'ccstatusline'), '#!/bin/sh\n', { mode: 0o755 });
+            fs.writeFileSync(path.join(root, 'usr', 'bin', 'ccstatusline-zh'), '#!/bin/sh\n', { mode: 0o755 });
+            fs.writeFileSync(path.join(root, '.bun', 'bin', 'ccstatusline-zh'), '#!/bin/sh\n', { mode: 0o755 });
             fs.symlinkSync('usr/bin', path.join(root, 'bin'));
             mockExecFileSync({
-                'which -a ccstatusline': `${root}/usr/bin/ccstatusline\n${root}/bin/ccstatusline\n${root}/.bun/bin/ccstatusline\n`,
+                'which -a ccstatusline-zh': `${root}/usr/bin/ccstatusline-zh\n${root}/bin/ccstatusline-zh\n${root}/.bun/bin/ccstatusline-zh\n`,
                 'npm prefix -g': `${root}/usr\n`
             });
 
             const resolution = inspectGlobalCommandResolution('npm', { platform: 'linux' });
 
-            expect(resolution.warning).toBe(`⚠ Multiple ccstatusline binaries are on PATH. Claude Code will run the first match: ${root}/usr/bin/ccstatusline.\nOther matches: ${root}/.bun/bin/ccstatusline`);
+            expect(resolution.warning).toBe(`⚠ PATH 中存在多个 ccstatusline-zh 可执行文件，Claude Code 将使用第一个匹配：${root}/usr/bin/ccstatusline-zh。\n其他匹配：${root}/.bun/bin/ccstatusline-zh`);
         } finally {
             fs.rmSync(root, { recursive: true, force: true });
         }
@@ -333,7 +333,7 @@ describe('global command resolution', () => {
         expect(resolution.warning).toContain('/usr/local/bin/ccstatusline-zh');
     });
 
-    it('warns when ccstatusline is not resolvable after a global install', () => {
+    it('warns when ccstatusline-zh is not resolvable after a global install', () => {
         mockExecFileSync({ 'npm prefix -g': '/usr/local\n' });
 
         const resolution = inspectGlobalCommandResolution('npm', { platform: 'linux' });

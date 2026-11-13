@@ -75,7 +75,7 @@ describe('SpendLimitUsageWidget', () => {
         expect(render(baseItem, { isPreview: true })).toBe('消费限额: 40.0%');
     });
 
-    it('offers no time cursor because the payload carries no window length', () => {
+    it('offers no 时间游标 because the payload carries no window length', () => {
         const keybinds = new SpendLimitUsageWidget().getCustomKeybinds(baseItem);
 
         expect(keybinds.map(keybind => keybind.action)).toEqual(['toggle-progress', 'toggle-invert']);

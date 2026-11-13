@@ -17,13 +17,13 @@ import {
 } from './shared/prompt-cache';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
-const LABEL = 'Miss recache: ';
+const LABEL = '未命中重建: ';
 
 export class CacheMissTokensWidget implements Widget {
     getDefaultColor(): string { return 'yellow'; }
-    getDescription(): string { return 'Shows the tokens this session\'s prompt cache misses wrote back to the cache'; }
-    getDisplayName(): string { return 'Cache Miss Tokens'; }
-    getCategory(): string { return 'Cache'; }
+    getDescription(): string { return '显示本会话因提示缓存未命中而重新写入缓存的 Token 数'; }
+    getDisplayName(): string { return '缓存未命中 Token'; }
+    getCategory(): string { return '缓存'; }
     getLabelPrefix(): string { return LABEL; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName() };

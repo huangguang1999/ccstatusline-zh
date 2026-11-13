@@ -102,9 +102,9 @@ describe('context window override across widgets', () => {
         const { bar, ...values } = renderContextWidgets(context);
         expect(bar).toContain('100k/1.0M (10%)');
         expect(values).toEqual({
-            window: 'Win: 1.0M',
-            percentage: 'Ctx Used: 10.0%',
-            usable: 'Ctx(u) Used: 12.5%'
+            window: '窗口: 1.0M',
+            percentage: '已用: 10.0%',
+            usable: '已用: 12.5%'
         });
         expect(calculateContextPercentageMetrics(context)).toEqual({ usedPercentage: 10, windowSize: 1000000 });
     });
@@ -112,8 +112,8 @@ describe('context window override across widgets', () => {
     it('calculates remaining percentages from the effective window', () => {
         const context: RenderContext = { data: { context_window: { context_window_size: 200000, current_usage: 100000, used_percentage: 50 } } };
         const rendered = renderContextWidgets(context, true);
-        expect(rendered.percentage).toBe('Ctx Left: 90.0%');
-        expect(rendered.usable).toBe('Ctx(u) Left: 87.5%');
+        expect(rendered.percentage).toBe('剩余: 90.0%');
+        expect(rendered.usable).toBe('剩余: 87.5%');
     });
 
     it('caps percentages when usage exceeds the effective window', () => {
@@ -122,15 +122,15 @@ describe('context window override across widgets', () => {
         const { bar, ...values } = renderContextWidgets(context);
         expect(bar).toContain('100k/50k (100%)');
         expect(values).toEqual({
-            window: 'Win: 50.0k',
-            percentage: 'Ctx Used: 100.0%',
-            usable: 'Ctx(u) Used: 100.0%'
+            window: '窗口: 50.0k',
+            percentage: '已用: 100.0%',
+            usable: '已用: 100.0%'
         });
     });
 
     it('does not reinterpret a percentage without a known token count or reported window', () => {
         const context: RenderContext = { data: { context_window: { used_percentage: 50 } } };
-        expect(renderContextWidgets(context)).toEqual({ window: 'Win: 1.0M', bar: null, percentage: null, usable: null });
+        expect(renderContextWidgets(context)).toEqual({ window: '窗口: 1.0M', bar: null, percentage: null, usable: null });
     });
 
     it.each([undefined, 'invalid'])('preserves reported values when the override is %s', (override) => {
@@ -143,9 +143,9 @@ describe('context window override across widgets', () => {
         const { bar, ...values } = renderContextWidgets(context);
         expect(bar).toContain('100k/200k (50%)');
         expect(values).toEqual({
-            window: 'Win: 200.0k',
-            percentage: 'Ctx Used: 49.0%',
-            usable: 'Ctx(u) Used: 62.5%'
+            window: '窗口: 200.0k',
+            percentage: '已用: 49.0%',
+            usable: '已用: 62.5%'
         });
     });
 });

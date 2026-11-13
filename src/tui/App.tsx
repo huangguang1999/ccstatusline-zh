@@ -518,7 +518,7 @@ export function buildConfigLoadNotice(configLoadNotice: string | null): string |
         return null;
     }
 
-    return `⚠ ${configLoadNotice} — showing the migrated settings; saving here backs up the file first.`;
+    return `⚠ ${configLoadNotice}，正在显示迁移后的配置；保存前会先备份原文件。`;
 }
 
 export function buildInvalidConfigSaveConfirm(

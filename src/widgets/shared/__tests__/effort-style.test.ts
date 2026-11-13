@@ -45,7 +45,7 @@ describe('bracket style', () => {
     });
 });
 
-describe('level colors', () => {
+describe('分级颜色', () => {
     it('are off by default and store nothing when turned back off', () => {
         expect(isLevelColorsEnabled(base)).toBe(false);
 
@@ -120,14 +120,14 @@ describe('formatThinkingEffort', () => {
     const plain = { colorLevel: 'ansi256', colorsDisabled: false } as const;
 
     it('renders the label, or just the value in raw mode, when nothing is customized', () => {
-        expect(formatThinkingEffort(base, xhigh, plain)).toBe('Thinking: xhigh');
+        expect(formatThinkingEffort(base, xhigh, plain)).toBe('思考: xhigh');
         expect(formatThinkingEffort({ ...base, rawValue: true }, xhigh, plain)).toBe('xhigh');
     });
 
     it('wraps the whole output in the chosen brackets', () => {
         expect(formatThinkingEffort(withMetadata({ brackets: '()' }, { rawValue: true }), xhigh, plain)).toBe('(xhigh)');
         expect(formatThinkingEffort(withMetadata({ brackets: '<>' }, { rawValue: true }), xhigh, plain)).toBe('<xhigh>');
-        expect(formatThinkingEffort(withMetadata({ brackets: '[]' }), xhigh, plain)).toBe('[Thinking: xhigh]');
+        expect(formatThinkingEffort(withMetadata({ brackets: '[]' }), xhigh, plain)).toBe('[思考: xhigh]');
     });
 
     // The renderer colors the rest with the widget color (Widget.colorsOnlyItsRuns)
@@ -135,7 +135,7 @@ describe('formatThinkingEffort', () => {
         const item = withMetadata({ brackets: '()', levelColors: 'true' });
 
         expect(formatThinkingEffort(item, xhigh, plain)).toBe(
-            `${ORANGE}(${FG_RESET}Thinking: ${ORANGE}xhigh${FG_RESET}${ORANGE})${FG_RESET}`
+            `${ORANGE}(${FG_RESET}思考: ${ORANGE}xhigh${FG_RESET}${ORANGE})${FG_RESET}`
         );
     });
 

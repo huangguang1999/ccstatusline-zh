@@ -170,7 +170,7 @@ describe('ContextBarWidget', () => {
         expect(fifth?.metadata?.display).toBe('progress-short');
     });
 
-    it('renders a thin line bar in line mode', () => {
+    it('renders a thin 细线进度条 in line mode', () => {
         const context: RenderContext = {
             data: {
                 context_window: {
@@ -187,8 +187,8 @@ describe('ContextBarWidget', () => {
         const item: WidgetItem = { id: 'ctx', type: 'context-bar', metadata: { display: 'line' } };
         const widget = new ContextBarWidget();
 
-        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe(`Context: ${'━'.repeat(2)}${'─'.repeat(14)} 30k/200k (15%)`);
-        expect(widget.getEditorDisplay(item).modifierText).toBe('(line bar)');
+        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe(`上下文: ${'━'.repeat(2)}${'─'.repeat(14)} 30k/200k (15%)`);
+        expect(widget.getEditorDisplay(item).modifierText).toBe('(细线进度条)');
     });
 
     it('formats context preview samples with the selected styles', () => {

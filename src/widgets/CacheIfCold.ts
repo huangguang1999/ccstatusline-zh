@@ -11,15 +11,15 @@ import { resolveNumberFormat } from '../utils/number-format';
 import { getPromptCache } from './shared/prompt-cache';
 import { formatRawOrLabeledValue } from './shared/raw-or-labeled';
 
-const LABEL = 'If cold: ';
+const LABEL = '过期重建: ';
 
 // Claude Code leaves the figure null right after a compaction or a clearing of
 // old tool results, until the next request records the conversation's new size
 export class CacheIfColdWidget implements Widget {
     getDefaultColor(): string { return 'brightCyan'; }
-    getDescription(): string { return 'Shows the tokens the next request re-caches if the prompt cache has gone cold by then'; }
-    getDisplayName(): string { return 'Cache If Cold'; }
-    getCategory(): string { return 'Cache'; }
+    getDescription(): string { return '显示提示缓存过期时，下次请求需要重新缓存的 Token 数'; }
+    getDisplayName(): string { return '缓存过期重建量'; }
+    getCategory(): string { return '缓存'; }
     getLabelPrefix(): string { return LABEL; }
     getEditorDisplay(item: WidgetItem): WidgetEditorDisplay {
         return { displayText: this.getDisplayName() };

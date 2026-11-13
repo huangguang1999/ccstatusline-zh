@@ -283,19 +283,19 @@ describe('PowerlineSetup helpers', () => {
         try {
             // Back is the only entry while Powerline is off
             await waitFor(() => {
-                expect(lastFrame).toContain('▶  ← Back');
+                expect(lastFrame).toContain('▶  ← 返回');
             });
 
             stdin.write('t');
             await waitFor(() => {
-                expect(lastFrame).toContain('✓ Enabled');
-                expect(lastFrame).toContain('▶  Separator');
+                expect(lastFrame).toContain('✓ 已启用');
+                expect(lastFrame).toContain('▶  分隔符');
             });
-            expect(lastFrame).not.toContain('▶  ← Back');
+            expect(lastFrame).not.toContain('▶  ← 返回');
 
             stdin.write('\r');
             await waitFor(() => {
-                expect(lastFrame).toContain('Powerline Separator Configuration');
+                expect(lastFrame).toContain('Powerline 分隔符配置');
             });
             expect(onBack).not.toHaveBeenCalled();
         } finally {
@@ -440,9 +440,9 @@ describe('PowerlineSeparatorEditor', () => {
     });
 
     it.each([
-        ['Triangle Left gets inverted, as with ← →', 'E0B2', '\uE0B0', false, true],
-        ['Round Left gets inverted, as with ← →', 'E0B6', '\uE0B0', false, true],
-        ['Triangle Right over an inverted Triangle Left drops the inversion', 'E0B0', '\uE0B2', true, false],
+        ['左三角 gets inverted, as with ← →', 'E0B2', '\uE0B0', false, true],
+        ['左圆弧 gets inverted, as with ← →', 'E0B6', '\uE0B0', false, true],
+        ['右三角 over an inverted 左三角 drops the inversion', 'E0B0', '\uE0B2', true, false],
         ['a custom code keeps the slot\'s inversion', 'E0C0', '\uE0B2', true, true]
     ])('entering a separator by hex code: %s', async (_name, hexCode, startChar, startInvert, expectedInvert) => {
         const stdin = createMockStdin();
@@ -477,12 +477,12 @@ describe('PowerlineSeparatorEditor', () => {
 
         try {
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('(h)ex');
+                expect(stdout.getOutput()).toContain('(h)十六进制');
             });
 
             stdin.write('h');
             await waitFor(() => {
-                expect(stdout.getOutput()).toContain('Enter hex code');
+                expect(stdout.getOutput()).toContain('输入十六进制代码');
             });
 
             for (let typed = 1; typed <= hexCode.length; typed++) {
