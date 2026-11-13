@@ -29,16 +29,12 @@ describe('TerminalOptionsMenu helpers', () => {
     it('builds terminal options list items with the current color level label', () => {
         const items = buildTerminalOptionsItems(2);
 
-        expect(items).toHaveLength(2);
+        expect(items).toHaveLength(1);
         expect(items[0]).toMatchObject({
-            label: '◱ 终端宽度',
-            value: 'width'
-        });
-        expect(items[1]).toMatchObject({
             label: '▓ 颜色级别',
             sublabel: '(256 色（默认）)',
             value: 'colorLevel'
         });
-        expect(items[1]?.description).toContain('颜色级别');
+        expect(items[0]?.description).toContain('Truecolor');
     });
 });

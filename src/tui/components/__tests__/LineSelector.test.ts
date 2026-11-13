@@ -335,6 +335,40 @@ describe('LineSelector', () => {
         }
     });
 
+    it('highlights the appended line when appending from the Back entry', async () => {
+        const view = renderLineSelector({ lines: [ONE_WIDGET, EMPTY], allowEditing: true });
+
+        try {
+            await waitFor(() => {
+                expect(view.frame()).toContain(FULL_EDITING_HELP);
+            });
+
+            view.press(UP_ARROW);
+            await waitFor(() => {
+                expect(view.rows().at(-1)).toBe('▶  ← 返回');
+            });
+
+            view.press('a');
+            await waitFor(() => {
+                expect(view.rows()).toEqual([
+                    '☰ 第 1 行 (1 个组件)',
+                    '☰ 第 2 行 (空)',
+                    '▶  ☰ 第 3 行 (空)',
+                    '← 返回'
+                ]);
+            });
+            expect(view.onLinesUpdate).toHaveBeenCalledTimes(1);
+
+            view.press(ENTER);
+            await waitFor(() => {
+                expect(view.onSelect).toHaveBeenCalledWith(2);
+            });
+            expect(view.onBack).not.toHaveBeenCalled();
+        } finally {
+            view.cleanup();
+        }
+    });
+
     it('deletes the highlighted line after Yes and highlights the line above it', async () => {
         const view = renderLineSelector({ lines: [ONE_WIDGET, EMPTY, TWO_WIDGETS], allowEditing: true });
 
@@ -370,8 +404,9 @@ describe('LineSelector', () => {
             // Deleting the first line keeps the highlight on the first line
             view.press('d');
             await waitFor(() => {
-                expect(view.frame()).toContain('☰ 第 1 行 (1 个组件)');
+                expect(view.frame()).toContain('确定要删除此行吗？');
             });
+            expect(view.frame()).toContain('☰ 第 1 行 (1 个组件)');
 
             view.press(ENTER);
             await waitFor(() => {

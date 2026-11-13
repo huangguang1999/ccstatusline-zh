@@ -45,13 +45,13 @@ function createItem(
 describe('OutputSpeedWidget', () => {
     const widget = new OutputSpeedWidget();
 
-    it('should report Token Speed category', () => {
+    it('should report Token 速度 category', () => {
         expect(widget.getCategory()).toBe('Token 速度');
     });
 
     it('should describe session-average behavior and window override', () => {
         expect(widget.getDescription()).toContain('全会话平均');
-        expect(widget.getDescription()).toContain('0-120');
+        expect(widget.getDescription()).toContain('0-3600');
     });
 
     it('should expose a window editor keybind', () => {
@@ -93,6 +93,14 @@ describe('OutputSpeedWidget', () => {
 
         expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe('输出: 120.0 t/s');
     });
+
+    it('should calculate output speed from a one-hour window', () => {
+        const context: RenderContext = { windowedSpeedMetrics: { 3600: createSpeedMetrics({ outputTokens: 9000, totalDurationMs: 300000 }) } };
+        const item = createItem('output-speed', { metadata: { windowSeconds: '3600' } });
+
+        expect(widget.getEditorDisplay(item).modifierText).toBe('(3600秒窗口)');
+        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe('输出: 30.0 t/s');
+    });
 });
 
 describe('speed widget hideable states', () => {
@@ -127,7 +135,7 @@ describe('speed widget hideable states', () => {
 describe('InputSpeedWidget', () => {
     const widget = new InputSpeedWidget();
 
-    it('should report Token Speed category', () => {
+    it('should report Token 速度 category', () => {
         expect(widget.getCategory()).toBe('Token 速度');
     });
 
@@ -160,13 +168,13 @@ describe('InputSpeedWidget', () => {
 describe('TotalSpeedWidget', () => {
     const widget = new TotalSpeedWidget();
 
-    it('should report Token Speed category', () => {
+    it('should report Token 速度 category', () => {
         expect(widget.getCategory()).toBe('Token 速度');
     });
 
     it('should clamp invalid editor metadata to supported range', () => {
-        const item = createItem('total-speed', { metadata: { windowSeconds: '999' } });
-        expect(widget.getEditorDisplay(item).modifierText).toBe('(120秒窗口)');
+        const item = createItem('total-speed', { metadata: { windowSeconds: '3601' } });
+        expect(widget.getEditorDisplay(item).modifierText).toBe('(3600秒窗口)');
     });
 
     it('should render preview values', () => {

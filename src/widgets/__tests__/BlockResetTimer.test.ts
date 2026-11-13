@@ -252,6 +252,25 @@ describe('BlockResetTimerWidget', () => {
         expect(mockFormatUsageResetAt).toHaveBeenCalledWith('2026-03-12T08:30:00.000Z', false, 'Asia/Tokyo', 'ja-JP', true);
     });
 
+    it('shows the transcript block\'s reset as a timestamp when no reset time is reported', () => {
+        const widget = new BlockResetTimerWidget();
+        vi.useFakeTimers({ now: new Date('2026-03-12T06:15:00.000Z') });
+
+        try {
+            const blockMetrics = {
+                startTime: new Date('2026-03-12T05:00:00.000Z'),
+                lastActivity: new Date('2026-03-12T06:10:00.000Z')
+            };
+
+            expect(render(widget,
+                { id: 'reset', type: 'reset-timer', metadata: { absolute: 'true' } },
+                { usageData: {}, blockMetrics }
+            )).toBe('重置: 2026-03-12 10:00 UTC');
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
     it('shows configured timestamp settings in editor display only in timestamp mode', () => {
         const widget = new BlockResetTimerWidget();
 
@@ -369,7 +388,7 @@ describe('BlockResetTimerWidget', () => {
         ]);
     });
 
-    it('shows short bar modifier text in slider modes', () => {
+    it('shows 短进度条 modifier text in slider modes', () => {
         const widget = new BlockResetTimerWidget();
 
         expect(widget.getEditorDisplay({
@@ -384,7 +403,7 @@ describe('BlockResetTimerWidget', () => {
         }).modifierText).toBe('(仅短进度条)');
     });
 
-    it('does not show a time cursor carried over from a usage widget', () => {
+    it('does not show a 时间游标 carried over from a usage widget', () => {
         // A usage bar's cursor metadata survives a type change in the picker,
         // but this timer never draws a cursor
         const widget = new BlockResetTimerWidget();

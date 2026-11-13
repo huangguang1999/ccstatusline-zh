@@ -1,5 +1,7 @@
 import * as childProcess from 'node:child_process';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import {
     afterEach,
     describe,
@@ -101,6 +103,88 @@ describe('global package manager inspection', () => {
             version: '2.2.13',
             warning: '⚠ PATH 中存在多个 ccstatusline-zh 可执行文件，Claude Code 将使用第一个匹配：/Users/alice/.bun/bin/ccstatusline-zh。\n其他匹配：/Users/alice/.nvm/versions/node/v24.9.0/bin/ccstatusline-zh'
         });
+    });
+
+    // Merged /usr (Ubuntu 22.04+, Debian 12): /bin links to usr/bin and PATH lists both
+    it.skipIf(process.platform === 'win32')('counts a PATH directory reached through a symlink once', () => {
+        const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ccstatusline-merged-usr-'));
+        try {
+            const packageDir = path.join(root, 'usr', 'lib', 'node_modules', 'ccstatusline-zh');
+            fs.mkdirSync(path.join(root, 'usr', 'bin'), { recursive: true });
+            fs.mkdirSync(packageDir, { recursive: true });
+            fs.writeFileSync(path.join(root, 'usr', 'bin', 'ccstatusline-zh'), '#!/bin/sh\n', { mode: 0o755 });
+            fs.writeFileSync(path.join(packageDir, 'package.json'), '{"version":"2.2.13"}');
+            fs.symlinkSync('usr/bin', path.join(root, 'bin'));
+            mockExecFileSync({
+                'which -a ccstatusline-zh': `${root}/usr/bin/ccstatusline-zh\n${root}/bin/ccstatusline-zh\n`,
+                'npm prefix -g': `${root}/usr\n`,
+                'npm root -g': `${root}/usr/lib/node_modules\n`
+            });
+
+            const activeCommand = inspectActiveGlobalCommand({
+                commandAvailability: {
+                    npm: true,
+                    bun: false
+                },
+                platform: 'linux'
+            });
+
+            expect(activeCommand).toEqual({
+                packageManager: 'npm',
+                resolvedPath: `${root}/usr/bin/ccstatusline-zh`,
+                resolvedPaths: [
+                    `${root}/usr/bin/ccstatusline-zh`,
+                    `${root}/bin/ccstatusline-zh`
+                ],
+                binDir: `${root}/usr/bin`,
+                version: '2.2.13',
+                warning: null
+            });
+        } finally {
+            fs.rmSync(root, { recursive: true, force: true });
+        }
+    });
+
+    it.skipIf(process.platform === 'win32')('lists another install once and leaves out other spellings of the active one', () => {
+        const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ccstatusline-merged-usr-'));
+        try {
+            const packageDir = path.join(root, 'usr', 'lib', 'node_modules', 'ccstatusline-zh');
+            fs.mkdirSync(path.join(root, 'usr', 'bin'), { recursive: true });
+            fs.mkdirSync(path.join(root, '.bun', 'bin'), { recursive: true });
+            fs.mkdirSync(packageDir, { recursive: true });
+            fs.writeFileSync(path.join(root, 'usr', 'bin', 'ccstatusline-zh'), '#!/bin/sh\n', { mode: 0o755 });
+            fs.writeFileSync(path.join(root, '.bun', 'bin', 'ccstatusline-zh'), '#!/bin/sh\n', { mode: 0o755 });
+            fs.writeFileSync(path.join(packageDir, 'package.json'), '{"version":"2.2.13"}');
+            fs.symlinkSync('usr/bin', path.join(root, 'bin'));
+            mockExecFileSync({
+                'which -a ccstatusline-zh': `${root}/usr/bin/ccstatusline-zh\n${root}/bin/ccstatusline-zh\n${root}/.bun/bin/ccstatusline-zh\n`,
+                'npm prefix -g': `${root}/usr\n`,
+                'npm root -g': `${root}/usr/lib/node_modules\n`
+            });
+
+            const activeCommand = inspectActiveGlobalCommand({
+                commandAvailability: {
+                    npm: true,
+                    bun: false
+                },
+                platform: 'linux'
+            });
+
+            expect(activeCommand).toEqual({
+                packageManager: 'npm',
+                resolvedPath: `${root}/usr/bin/ccstatusline-zh`,
+                resolvedPaths: [
+                    `${root}/usr/bin/ccstatusline-zh`,
+                    `${root}/bin/ccstatusline-zh`,
+                    `${root}/.bun/bin/ccstatusline-zh`
+                ],
+                binDir: `${root}/usr/bin`,
+                version: '2.2.13',
+                warning: `⚠ PATH 中存在多个 ccstatusline-zh 可执行文件，Claude Code 将使用第一个匹配：${root}/usr/bin/ccstatusline-zh。\n其他匹配：${root}/.bun/bin/ccstatusline-zh`
+            });
+        } finally {
+            fs.rmSync(root, { recursive: true, force: true });
+        }
     });
 
     it('warns about distinct POSIX bin directories that differ only in case', () => {

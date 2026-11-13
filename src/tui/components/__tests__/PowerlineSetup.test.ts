@@ -230,6 +230,82 @@ describe('PowerlineSetup helpers', () => {
             stderr.destroy();
         }
     });
+
+    it('highlights Separator when (t) turns Powerline on without a confirm', async () => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+        // In debug mode Ink writes each frame whole, in one write. Every
+        // frame here has a title with Powerline in it; bare cursor codes don't.
+        let lastFrame = '';
+        stdout.on('data', (chunk: Buffer | string) => {
+            const text = chunk.toString();
+            if (text.includes('Powerline')) {
+                lastFrame = text;
+            }
+        });
+        const onBack = vi.fn();
+        // Keeps the settings (t) writes, so the menu redraws with Powerline on
+        function StatefulPowerlineSetup() {
+            const [settings, setSettings] = React.useState<PowerlineSetupProps['settings']>({
+                ...DEFAULT_SETTINGS,
+                // No manual separators, so (t) needs no confirm
+                lines: [[{ id: '1', type: 'model' }]],
+                powerline: {
+                    ...DEFAULT_SETTINGS.powerline,
+                    enabled: false
+                }
+            });
+
+            return React.createElement(PowerlineSetup, {
+                settings,
+                powerlineFontStatus: { installed: true },
+                onUpdate: setSettings,
+                onBack,
+                onInstallFonts: vi.fn(),
+                installingFonts: false,
+                fontInstallMessage: null,
+                onClearMessage: vi.fn()
+            });
+        }
+        const instance = render(
+            React.createElement(StatefulPowerlineSetup),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            // Back is the only entry while Powerline is off
+            await waitFor(() => {
+                expect(lastFrame).toContain('▶  ← 返回');
+            });
+
+            stdin.write('t');
+            await waitFor(() => {
+                expect(lastFrame).toContain('✓ 已启用');
+                expect(lastFrame).toContain('▶  分隔符');
+            });
+            expect(lastFrame).not.toContain('▶  ← 返回');
+
+            stdin.write('\r');
+            await waitFor(() => {
+                expect(lastFrame).toContain('Powerline 分隔符配置');
+            });
+            expect(onBack).not.toHaveBeenCalled();
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
 });
 
 describe('PowerlineSeparatorEditor', () => {
@@ -354,6 +430,76 @@ describe('PowerlineSeparatorEditor', () => {
             // What ctrl+s writes must load back
             const saved: unknown = JSON.parse(JSON.stringify(updatedSettings));
             expect(SettingsSchema.safeParse(saved).success).toBe(true);
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
+
+    it.each([
+        ['左三角 gets inverted, as with ← →', 'E0B2', '\uE0B0', false, true],
+        ['左圆弧 gets inverted, as with ← →', 'E0B6', '\uE0B0', false, true],
+        ['右三角 over an inverted 左三角 drops the inversion', 'E0B0', '\uE0B2', true, false],
+        ['a custom code keeps the slot\'s inversion', 'E0C0', '\uE0B2', true, true]
+    ])('entering a separator by hex code: %s', async (_name, hexCode, startChar, startInvert, expectedInvert) => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+        const onUpdate = vi.fn<PowerlineSeparatorEditorProps['onUpdate']>();
+        const onBack = vi.fn();
+        const instance = render(
+            React.createElement(PowerlineSeparatorEditor, {
+                settings: {
+                    ...DEFAULT_SETTINGS,
+                    powerline: {
+                        ...DEFAULT_SETTINGS.powerline,
+                        enabled: true,
+                        separators: [startChar],
+                        separatorInvertBackground: [startInvert]
+                    }
+                },
+                mode: 'separator',
+                onUpdate,
+                onBack
+            }),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('(h)十六进制');
+            });
+
+            stdin.write('h');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('输入十六进制代码');
+            });
+
+            for (let typed = 1; typed <= hexCode.length; typed++) {
+                stdin.write(hexCode.charAt(typed - 1));
+                await waitFor(() => {
+                    expect(stdout.getOutput()).toContain(`U+${hexCode.slice(0, typed)}`);
+                });
+            }
+
+            stdin.write('\r');
+            await waitFor(() => {
+                expect(onUpdate).toHaveBeenCalled();
+            });
+
+            const updatedSettings = onUpdate.mock.calls[0]?.[0];
+            expect(updatedSettings?.powerline.separators).toEqual([String.fromCodePoint(Number.parseInt(hexCode, 16))]);
+            expect(updatedSettings?.powerline.separatorInvertBackground).toEqual([expectedInvert]);
         } finally {
             instance.unmount();
             instance.cleanup();

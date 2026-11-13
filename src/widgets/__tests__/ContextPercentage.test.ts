@@ -117,7 +117,7 @@ describe('ContextPercentageWidget', () => {
             expect(result).toBe('已用: 4.2%');
         });
 
-        it('should calculate percentage using 1M denominator for Sonnet 4.5 (raw value) with [1m] suffix', () => {
+        it('should calculate percentage using 1M denominator for Sonnet 4.5 (纯值) with [1m] suffix', () => {
             const result = render('claude-sonnet-4-5-20250929[1m]', 42000, true);
             expect(result).toBe('4.2%');
         });
@@ -139,10 +139,12 @@ describe('ContextPercentageWidget', () => {
 
         const slider = widget.handleEditorAction('toggle-slider', base);
         const sliderOnly = widget.handleEditorAction('toggle-slider', slider ?? base);
-        const none = widget.handleEditorAction('toggle-slider', sliderOnly ?? base);
+        const line = widget.handleEditorAction('toggle-slider', sliderOnly ?? base);
+        const none = widget.handleEditorAction('toggle-slider', line ?? base);
 
         expect(slider?.metadata?.display).toBe('slider');
         expect(sliderOnly?.metadata?.display).toBe('slider-only');
+        expect(line?.metadata?.display).toBe('line');
         expect(none?.metadata?.display).toBeUndefined();
     });
 

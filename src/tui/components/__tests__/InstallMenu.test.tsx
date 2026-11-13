@@ -280,4 +280,75 @@ describe('InstallMenu', () => {
             stderr.destroy();
         }
     });
+
+    it('keeps Auto-update highlighted when going back from package manager selection', async () => {
+        const stdin = createMockStdin();
+        const stdout = createMockStdout();
+        const stderr = createMockStdout();
+        const onCancel = vi.fn();
+        const instance = render(
+            React.createElement(InstallMenu, {
+                commandAvailability: ALL_AVAILABLE,
+                currentVersion: '2.2.13',
+                existingStatusLine: null,
+                onSelect: vi.fn(),
+                onCancel
+            }),
+            {
+                stdin,
+                stdout,
+                stderr,
+                debug: true,
+                exitOnCtrlC: false,
+                patchConsole: false
+            }
+        );
+
+        try {
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('▶  固定全局安装');
+            });
+            stdin.write('\u001B[B');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('▶  自动更新');
+            });
+            stdin.write('\r');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('▶  npx -y ccstatusline-zh@latest');
+            });
+
+            // Escape
+            stdout.clearOutput();
+            stdin.write('\u001B');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('选择安装方式');
+                expect(stdout.getOutput()).toContain('▶  自动更新');
+            });
+            expect(stdout.getOutput()).not.toContain('▶  固定全局安装');
+
+            // The '← 返回' row
+            stdin.write('\r');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('▶  npx -y ccstatusline-zh@latest');
+            });
+            stdin.write('\u001B[A');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('▶  ← 返回');
+            });
+            stdout.clearOutput();
+            stdin.write('\r');
+            await waitFor(() => {
+                expect(stdout.getOutput()).toContain('选择安装方式');
+                expect(stdout.getOutput()).toContain('▶  自动更新');
+            });
+            expect(stdout.getOutput()).not.toContain('▶  固定全局安装');
+            expect(onCancel).not.toHaveBeenCalled();
+        } finally {
+            instance.unmount();
+            instance.cleanup();
+            stdin.destroy();
+            stdout.destroy();
+            stderr.destroy();
+        }
+    });
 });

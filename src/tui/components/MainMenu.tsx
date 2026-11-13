@@ -4,10 +4,7 @@ import {
 } from 'ink';
 import React from 'react';
 
-import type {
-    InstallationMetadata,
-    Settings
-} from '../../types/Settings';
+import type { InstallationMetadata } from '../../types/Settings';
 import { type PowerlineFontStatus } from '../../utils/powerline';
 
 import { List } from './List';
@@ -34,9 +31,7 @@ export interface MainMenuProps {
     initialSelection?: number;
     onSelectionChange?: (index: number) => void;
     powerlineFontStatus: PowerlineFontStatus;
-    settings: Settings | null;
     installation?: InstallationMetadata;
-    previewIsTruncated?: boolean;
 }
 
 interface MainMenuItem {
@@ -117,11 +112,10 @@ export function buildMainMenuItems(
                 '设置适用于所有组件的全局内边距、分隔符和颜色覆盖'
         },
         {
+            // Open before an install too: only its refresh interval needs one
             label: '🔧 配置状态行',
-            sublabel: isClaudeInstalled ? undefined : '（请先安装）',
-            disabled: !isClaudeInstalled,
             value: 'configureStatusLine',
-            description: '配置 Claude Code 状态行设置（如刷新间隔）'
+            description: '设置 ccstatusline-zh 缓存时长；安装后还可设置 Claude Code 刷新间隔'
         },
         '-',
         {
@@ -216,29 +210,17 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     initialSelection = 0,
     onSelectionChange,
     powerlineFontStatus,
-    settings,
-    installation,
-    previewIsTruncated
+    installation
 }) => {
     const menuItems = buildMainMenuItems(isClaudeInstalled, hasChanges, installation);
 
-    // Check if we should show the truncation warning
-    const showTruncationWarning
-        = previewIsTruncated && settings?.flexMode === 'full-minus-40';
-
     return (
         <Box flexDirection='column'>
-            {showTruncationWarning && (
-                <Box marginBottom={1}>
-                    <Text color='yellow'>
-                        ⚠ 部分行被截断，请查看 终端选项 → 终端宽度
-                        了解详情
-                    </Text>
-                </Box>
-            )}
-
             <Text bold>主菜单</Text>
 
+            {/* initialSelection is the highlighted row's index. Saving swaps Save &
+                Exit and Exit without saving for Exit, which moves the entries
+                below, and the highlight must stay on its entry, not its row. */}
             <List
                 items={menuItems}
                 marginTop={1}
@@ -251,6 +233,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
                 }}
                 initialSelection={initialSelection}
                 onSelectionChange={(_, index) => onSelectionChange?.(index)}
+                keepHighlightOnItemsChange={true}
             />
         </Box>
     );

@@ -129,7 +129,7 @@ describe('GitCiStatusWidget', () => {
         expect(render({ cwd: '/tmp/repo', hide: 'no-git' }, { getCachedGitReviewData: () => null })).toBe('-');
     });
 
-    it('keeps rendering (no git) when only the no-data state is enabled', () => {
+    it('keeps rendering (无 Git) when only the no-data state is enabled', () => {
         expect(render({ cwd: '/x', hide: 'no-data' }, { isInsideGitWorkTree: () => false })).toBe('(无 Git)');
     });
 
@@ -143,6 +143,9 @@ describe('GitCiStatusWidget', () => {
     it('uses process cwd when repo path is omitted', () => {
         const getCachedGitReviewData = vi.fn(() => PASSING_PR);
         render({}, { getCachedGitReviewData, resolveGitCwd: () => undefined });
-        expect(getCachedGitReviewData).toHaveBeenCalledWith('/tmp/process-cwd', { includeChecks: true });
+        expect(getCachedGitReviewData).toHaveBeenCalledWith('/tmp/process-cwd', {
+            includeChecks: true,
+            context: expect.objectContaining({}) as unknown
+        });
     });
 });
