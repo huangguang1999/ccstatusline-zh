@@ -124,6 +124,13 @@ describe('Prompt cache widgets', () => {
             expect(render(item('last-cache-miss', { rawValue: true }), withCache(DOCS_EXAMPLE))).toBe('3m ago, tools changed (+2)');
         });
 
+        it('localizes durations longer than a day while preserving raw values', () => {
+            const cache = { ...DOCS_EXAMPLE, last_miss_at: Math.floor(Date.now() / 1000) - (24 * 60 + 2 * 60 + 3) * 60 };
+
+            expect(render(item('last-cache-miss'), withCache(cache))).toBe('最近未命中: 1天2时3分前, 工具变更 (+2)');
+            expect(render(item('last-cache-miss', { rawValue: true }), withCache(cache))).toBe('1d2h3m ago, tools changed (+2)');
+        });
+
         it('lists several causes', () => {
             const cache = { ...DOCS_EXAMPLE, last_miss_cause: { causes: ['system_prompt_changed', 'ttl_expired_5m'], system_char_delta: 120 } };
 

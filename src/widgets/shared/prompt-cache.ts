@@ -75,7 +75,11 @@ export function formatMissCause(cause: LastMissCause | null | undefined): string
     return cause.causes.map(name => formatCause(name, cause)).join(', ');
 }
 
-export function formatMissAge(lastMissAtSeconds: number, nowMs = Date.now()): string {
+export function formatMissAge(lastMissAtSeconds: number, nowMs = Date.now(), rawValue = true): string {
     const ageMs = nowMs - lastMissAtSeconds * 1000;
-    return ageMs < 60 * 1000 ? 'just now' : `${formatUsageDuration(ageMs, true, true, true)} ago`;
+    if (ageMs < 60 * 1000) {
+        return rawValue ? 'just now' : '刚刚';
+    }
+    const duration = formatUsageDuration(ageMs, true, true, rawValue);
+    return rawValue ? `${duration} ago` : `${duration}前`;
 }

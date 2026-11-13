@@ -32,10 +32,8 @@ export class LastCacheMissWidget implements Widget {
             return null;
         }
 
-        const raw = `${formatMissAge(cache.last_miss_at)}, ${formatMissCause(cache.last_miss_cause)}`;
+        const raw = `${formatMissAge(cache.last_miss_at, Date.now(), !!item.rawValue)}, ${formatMissCause(cache.last_miss_cause)}`;
         const value = item.rawValue ? raw : raw
-            .replace('just now', '刚刚')
-            .replace(' ago', '前')
             .replace(/(\d+)h/g, '$1时')
             .replace(/(\d+)m/g, '$1分')
             .replace('tools changed', '工具变更')
