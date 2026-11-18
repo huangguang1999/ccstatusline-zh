@@ -5,8 +5,12 @@ import path from 'node:path';
 
 import type { BlockMetrics } from '../types';
 
+import { withCacheLock } from './cache-lock';
 import { getClaudeConfigDir } from './claude-settings';
-import { getBlockMetrics } from './jsonl-blocks';
+import {
+    scanBlockMetrics,
+    type BlockScanResult
+} from './jsonl-blocks';
 
 const readFileSync = fs.readFileSync;
 const writeFileSync = fs.writeFileSync;
@@ -31,6 +35,12 @@ interface BlockCache {
  * interval late.
  */
 const EMPTY_RESULT_TTL_MS = 60 * 1000;
+// Synchronous work in one repaint is bounded. Progress is persisted per
+// transcript, so the next render resumes instead of starting the scan over.
+const BLOCK_SCAN_BUDGET_MS = 1200;
+// A process normally renders once. If several widgets need the same fallback,
+// they share one deadline rather than each starting another full time slice.
+const blockScanDeadlines = new Map<string, number>();
 
 function normalizeConfigDir(configDir: string): string {
     return path.resolve(configDir);
@@ -52,6 +62,11 @@ export function getBlockCachePath(configDir = getClaudeConfigDir()): string {
         'ccstatusline',
         `block-cache-${configHash}.json`
     );
+}
+
+/** Per-transcript scan progress belonging to this config directory. */
+export function getBlockScanCacheDir(configDir = getClaudeConfigDir()): string {
+    return `${getBlockCachePath(configDir)}.files`;
 }
 
 /**
@@ -178,7 +193,7 @@ export function writeBlockCache(startTime: Date, configDir = getClaudeConfigDir(
  * Gets block metrics with caching support
  * Returns cached result if still valid, otherwise recalculates
  */
-export function getCachedBlockMetrics(sessionDurationHours = 5): BlockMetrics | null {
+export function getCachedBlockMetrics(sessionDurationHours = 5, scanBudgetMs = BLOCK_SCAN_BUDGET_MS): BlockMetrics | null {
     const sessionDurationMs = sessionDurationHours * 60 * 60 * 1000;
     const now = new Date();
     const activeConfigDir = getClaudeConfigDir();
@@ -206,9 +221,35 @@ export function getCachedBlockMetrics(sessionDurationHours = 5): BlockMetrics | 
         return null;
     }
 
-    // Cache miss or expired - run full calculation
-    const metrics = getBlockMetrics();
+    // Only one process advances the resumable scan. Contenders render their old
+    // cache or the usual loading/error state instead of duplicating disk work.
+    const deadlineMs = blockScanDeadlines.get(activeConfigDir) ?? Date.now() + scanBudgetMs;
+    blockScanDeadlines.set(activeConfigDir, deadlineMs);
+    if (Date.now() >= deadlineMs) {
+        return null;
+    }
 
+    const scan: { result?: BlockScanResult } = {};
+    try {
+        withCacheLock(getBlockCachePath(activeConfigDir), () => {
+            scan.result = scanBlockMetrics(activeConfigDir, {
+                cacheDir: getBlockScanCacheDir(activeConfigDir),
+                deadlineMs,
+                nowMs: now.getTime()
+            });
+        });
+    } catch {
+        return null;
+    }
+
+    // A timeout is not an empty result. Per-file offsets and timestamps have
+    // already been saved, and the next repaint continues from them.
+    if (!scan.result || scan.result.status === 'timeout') {
+        return null;
+    }
+
+    blockScanDeadlines.delete(activeConfigDir);
+    const metrics = scan.result.metrics;
     if (metrics) {
         writeBlockCache(metrics.startTime, activeConfigDir);
     } else {
