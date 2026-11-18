@@ -83,6 +83,26 @@ describe('resumable transcript block scans', () => {
         }
     });
 
+    it('keeps timestamps older than the lookback in recently modified transcripts', () => {
+        const nowMs = Date.parse('2026-11-18T12:00:00.000Z');
+        const rows: string[] = [];
+        // Four-hour gaps form one continuous chain for 60 hours. The legacy
+        // algorithm reads every row in this recently modified file, including
+        // rows before its 10/20/48-hour file-mtime lookback.
+        for (let hoursAgo = 60; hoursAgo >= 0; hoursAgo -= 4) {
+            rows.push(makeUsageLine(new Date(nowMs - hoursAgo * 60 * 60 * 1000)));
+        }
+        fs.writeFileSync(transcriptPath, rows.join('\n'));
+        fs.utimesSync(transcriptPath, nowMs / 1000, nowMs / 1000);
+
+        const result = scanBlockMetrics(claudeDir, { cacheDir, nowMs });
+        expect(result.status).toBe('complete');
+        if (result.status === 'complete') {
+            expect(result.metrics?.startTime.toISOString()).toBe('2026-11-18T08:00:00.000Z');
+            expect(result.metrics?.lastActivity.toISOString()).toBe('2026-11-18T12:00:00.000Z');
+        }
+    });
+
     it('saves a mid-file timeout and resumes from its byte offset', () => {
         const nowMs = Date.parse('2026-11-18T12:00:00.000Z');
         const recentActivity = new Date(nowMs - 30 * 60 * 1000);
@@ -102,15 +122,20 @@ describe('resumable transcript block scans', () => {
         const interrupted = scanBlockMetrics(claudeDir, { cacheDir, deadlineMs: 1000, nowMs });
         expect(interrupted).toEqual({ status: 'timeout' });
 
-        const cacheFiles = fs.readdirSync(cacheDir).filter(file => file.endsWith('.json'));
+        const cacheFiles = fs.readdirSync(cacheDir).filter(file => file.endsWith('.json') && file !== 'scan-state.json');
         expect(cacheFiles).toHaveLength(1);
+        expect(fs.existsSync(path.join(cacheDir, 'scan-state.json'))).toBe(true);
         const partial = JSON.parse(fs.readFileSync(path.join(cacheDir, cacheFiles[0] ?? ''), 'utf8')) as { complete: boolean; offset: number };
         expect(partial.complete).toBe(false);
         expect(partial.offset).toBeGreaterThan(0);
         expect(partial.offset).toBeLessThan(fs.statSync(transcriptPath).size);
 
         vi.restoreAllMocks();
+        const statSync = vi.spyOn(fs, 'statSync');
         const resumed = scanBlockMetrics(claudeDir, { cacheDir, nowMs });
+        // The persisted discovery snapshot avoids another glob/stat pass.
+        expect(statSync).not.toHaveBeenCalled();
+        statSync.mockRestore();
         expect(resumed.status).toBe('complete');
         if (resumed.status === 'complete') {
             expect(resumed.metrics?.startTime.toISOString()).toBe(floorToHour(recentActivity).toISOString());
@@ -160,6 +185,20 @@ describe('resumable transcript block scans', () => {
             expect(appended.metrics?.startTime.toISOString()).toBe(floorToHour(firstActivity).toISOString());
             expect(appended.metrics?.lastActivity.toISOString()).toBe(appendedActivity.toISOString());
         }
+    });
+
+    it('reads a chunk even when discovery has already exhausted the budget', () => {
+        const nowMs = Date.parse('2026-11-18T12:00:00.000Z');
+        fs.writeFileSync(transcriptPath, `${makeUsageLine(new Date(nowMs))}\n`.repeat(15_000));
+
+        const result = scanBlockMetrics(claudeDir, { cacheDir, deadlineMs: Date.now() - 1, nowMs });
+        expect(result).toEqual({ status: 'timeout' });
+
+        const cacheFiles = fs.readdirSync(cacheDir).filter(file => file.endsWith('.json') && file !== 'scan-state.json');
+        expect(cacheFiles).toHaveLength(1);
+        const partial = JSON.parse(fs.readFileSync(path.join(cacheDir, cacheFiles[0] ?? ''), 'utf8')) as { complete: boolean; offset: number };
+        expect(partial.complete).toBe(false);
+        expect(partial.offset).toBeGreaterThan(0);
     });
 
     it('does not turn a timed-out public scan into a no-block cache entry', () => {
