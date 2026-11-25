@@ -6,9 +6,17 @@ name: Release
 # publish 任务挂在受保护的 `npm-publish` Environment 上：
 # 配置了「必需审批人」后，这一步会暂停并通知你，点一下批准才会真正发布。
 #
-# 需要的仓库配置：
-#   - Secret  NPM_TOKEN  —— npm automation token（automation 类型可绕过 2FA-OTP）
+# npm 鉴权用 Trusted Publishing（OIDC）：GitHub Actions 每次发布时换取短期凭据，
+# 不需要长期 token，也就不用每 90 天轮换。要求 npm CLI ≥ 11.5.1、Node ≥ 22.14。
+#
+# 需要的配置：
+#   - npmjs.com → ccstatusline-zh → Settings → Trusted Publisher → GitHub Actions：
+#     仓库填本仓库，Workflow filename 填 `release.yml`，Environment 填 `npm-publish`，
+#     并允许 `npm publish`（字段区分大小写，npm 保存时不校验，填错要到发布时才报错）
 #   - Settings → Environments → 新建 `npm-publish`，加 Required reviewers（你自己）
+#   - 过渡期保留 Secret NPM_TOKEN 作回退：npm 会先尝试 OIDC，失败才用 token。
+#     确认某次发布的 `npm view ccstatusline-zh@<版本> _npmUser` 带 trustedPublisher 后，
+#     删掉下面的 NODE_AUTH_TOKEN 和该 Secret。
 
 on:
   push:
@@ -60,9 +68,16 @@ jobs:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
 
+      # Node 22 自带 npm 10.x，不支持 Trusted Publishing，升到 11.x
+      - name: Upgrade npm for trusted publishing
+        run: |
+          npm install -g npm@^11.5.1
+          npm --version
+
       - name: Publish to npm
         run: npm publish --provenance --access public
         env:
+          # 过渡期回退，见文件头说明
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Tag and GitHub Release
